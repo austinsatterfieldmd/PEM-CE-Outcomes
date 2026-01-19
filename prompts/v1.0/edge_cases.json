@@ -1,0 +1,46 @@
+[
+  {
+    "description": "Question mentions multiple cancers - use most prominent",
+    "question": "Immune checkpoint inhibitors are approved for various malignancies including NSCLC, melanoma, and RCC. Which biomarker is most predictive of response across tumor types?",
+    "expected_tags": {
+      "topic": "Biomarker testing",
+      "disease_state": "Multiple/General oncology",
+      "biomarker": "PD-L1"
+    },
+    "notes": "When a question genuinely discusses multiple cancer types without focusing on one, use 'Multiple/General oncology'"
+  },
+  {
+    "description": "Supportive care question without specific cancer",
+    "question": "What is the recommended approach to prevent chemotherapy-induced nausea and vomiting in patients receiving highly emetogenic regimens?",
+    "expected_tags": {
+      "topic": "AE management",
+      "disease_state": null,
+      "treatment": null
+    },
+    "notes": "Supportive care questions may not have a disease_state if they apply broadly"
+  },
+  {
+    "description": "Question about a drug class rather than specific drug",
+    "question": "What is the mechanism of action of CDK4/6 inhibitors in HR-positive breast cancer?",
+    "expected_tags": {
+      "topic": "Disease overview",
+      "disease_state": "Breast cancer",
+      "disease_type": "HR+/HER2-",
+      "treatment": "CDK4/6 inhibitor"
+    },
+    "notes": "When a drug class is mentioned rather than specific agent, use the class name"
+  },
+  {
+    "description": "Trial name in answer but not question",
+    "question": "What is the evidence supporting osimertinib in the adjuvant setting for EGFR-mutated NSCLC?",
+    "expected_tags": {
+      "topic": "Guidelines/evidence",
+      "disease_state": "NSCLC",
+      "disease_type": "EGFR-mutated",
+      "treatment_line": "Adjuvant",
+      "treatment": "osimertinib",
+      "trial": "ADAURA"
+    },
+    "notes": "Consider the correct answer when tagging - ADAURA is the landmark adjuvant trial"
+  }
+]

@@ -1,0 +1,96 @@
+# Automated CE Outcomes Dashboard - Git Ignore
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Testing
+.coverage
+.pytest_cache/
+htmlcov/
+.tox/
+.nox/
+
+# Type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Logs
+logs/*.log
+*.log
+
+# Database (keep structure, ignore data)
+data/databases/*.db
+!data/databases/.gitkeep
+
+# Raw data files (may contain sensitive data)
+data/raw/*.xlsx
+data/raw/*.csv
+data/raw/*.json
+!data/raw/.gitkeep
+
+# Review files (generated)
+data/review/*.xlsx
+
+# Node.js (dashboard)
+node_modules/
+dashboard/node_modules/
+.npm
+.pnpm-store/
+
+# Build outputs
+dashboard/dist/
+dashboard/build/
+.vite/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+
+# Claude Code local settings
+.claude/
+
+# Documentation drafts (Word docs)
+*.docx

@@ -1,0 +1,72 @@
+[
+  {
+    "question": "A 65-year-old woman with newly diagnosed metastatic EGFR-mutated NSCLC is being considered for first-line therapy. Which of the following agents would be most appropriate as initial systemic therapy?",
+    "correct_answer": "Osimertinib",
+    "tags": {
+      "topic": "Treatment selection",
+      "disease_state": "NSCLC",
+      "disease_stage": "Metastatic",
+      "disease_type": "EGFR-mutated",
+      "treatment_line": "First-line",
+      "treatment": "osimertinib",
+      "biomarker": "EGFR",
+      "trial": null
+    }
+  },
+  {
+    "question": "Based on the results of the DESTINY-Breast03 trial, what is the preferred second-line treatment for patients with HER2-positive metastatic breast cancer who have progressed on trastuzumab and a taxane?",
+    "correct_answer": "Trastuzumab deruxtecan",
+    "tags": {
+      "topic": "Clinical efficacy",
+      "disease_state": "Breast cancer",
+      "disease_stage": "Metastatic",
+      "disease_type": "HER2+",
+      "treatment_line": "Second-line",
+      "treatment": "trastuzumab deruxtecan",
+      "biomarker": "HER2",
+      "trial": "DESTINY-Breast03"
+    }
+  },
+  {
+    "question": "Which of the following biomarkers should be tested in all patients with newly diagnosed metastatic colorectal cancer to guide treatment selection?",
+    "correct_answer": "RAS and BRAF mutation status, and MSI/MMR status",
+    "tags": {
+      "topic": "Biomarker testing",
+      "disease_state": "Colorectal cancer",
+      "disease_stage": "Metastatic",
+      "disease_type": null,
+      "treatment_line": null,
+      "treatment": null,
+      "biomarker": "KRAS",
+      "trial": null
+    }
+  },
+  {
+    "question": "A patient receiving pembrolizumab develops grade 2 pneumonitis. What is the most appropriate management?",
+    "correct_answer": "Hold pembrolizumab and start corticosteroids",
+    "tags": {
+      "topic": "AE management",
+      "disease_state": null,
+      "disease_stage": null,
+      "disease_type": null,
+      "treatment_line": null,
+      "treatment": "pembrolizumab",
+      "biomarker": null,
+      "trial": null
+    }
+  },
+  {
+    "question": "In patients with newly diagnosed multiple myeloma who are transplant-eligible, which of the following induction regimens is most commonly used?",
+    "correct_answer": "VRd (bortezomib, lenalidomide, dexamethasone)",
+    "tags": {
+      "topic": "Treatment selection",
+      "disease_state": "Multiple myeloma",
+      "disease_stage": null,
+      "disease_type": null,
+      "treatment_line": "First-line",
+      "treatment": "VRd",
+      "biomarker": null,
+      "trial": null
+    }
+  }
+]

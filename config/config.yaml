@@ -1,0 +1,48 @@
+# Automated CE Outcomes Dashboard - Main Configuration
+
+app:
+  name: "Automated CE Outcomes Dashboard"
+  version: "3.0.0"
+  description: "CME question tagging with 3-model LLM voting"
+
+# Database settings
+database:
+  path: "data/databases/questions.db"
+  backup_enabled: true
+  backup_dir: "data/databases/backups"
+
+# API server settings
+server:
+  host: "127.0.0.1"
+  port: 8000
+  reload: true  # For development
+  cors_origins:
+    - "http://localhost:3000"
+    - "http://localhost:5173"
+    - "http://127.0.0.1:3000"
+    - "http://127.0.0.1:5173"
+
+# Tagging workflow settings
+tagging:
+  batch_size: 100
+  parallel_models: true
+  web_search_enabled: true
+  max_web_searches_per_question: 3
+
+# Prompt settings
+prompts:
+  current_version: "v1.0"
+  directory: "prompts"
+
+# Voting thresholds
+voting:
+  unanimous_confidence: 1.0
+  majority_confidence: 0.67
+  conflict_confidence: 0.0
+  auto_accept_unanimous: true  # Set false for 100% human review
+  spot_check_rate: 0.10  # 10% of unanimous votes spot-checked
+
+# Review settings
+review:
+  export_format: "xlsx"
+  export_dir: "data/review"
