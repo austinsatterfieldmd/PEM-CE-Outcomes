@@ -217,7 +217,7 @@ export default function QSuiteTab() {
       formData.append('file', file);
       formData.append('model', model);
       formData.append('include_qboost', String(includeQBoost));
-      formData.append('include_qpredict', String(includeQPredict));
+      formData.append('include_qpredict', String(_includeQPredict));
 
       const response = await fetch(`${API_BASE}/qsuite/upload`, {
         method: 'POST',

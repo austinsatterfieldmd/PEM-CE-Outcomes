@@ -257,7 +257,6 @@ export default function PerformanceBarChart({
 
   // Text colors based on background
   const textColor = whiteBackground ? '#374151' : '#94a3b8'
-  const _titleColor = whiteBackground ? '#111827' : '#ffffff'
   const gridColor = whiteBackground ? '#e5e7eb' : '#334155'
 
   // Stacked format: render multiple separate charts
