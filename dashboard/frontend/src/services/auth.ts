@@ -13,8 +13,23 @@ type AuthState = any;
 type TokenResponse = any;
 
 // Development mode helper - bypasses auth for local testing
+// Also bypasses auth when Okta is not configured (e.g., initial deployment)
 export function isDevMode(): boolean {
-  return import.meta.env.DEV && import.meta.env.VITE_DISABLE_AUTH === 'true';
+  // Explicit disable via env var
+  if (import.meta.env.VITE_DISABLE_AUTH === 'true') {
+    return true;
+  }
+  // Dev mode with no auth configured
+  if (import.meta.env.DEV) {
+    return true;
+  }
+  // Production but Okta not configured - bypass auth gracefully
+  const issuer = import.meta.env.VITE_OKTA_ISSUER;
+  const clientId = import.meta.env.VITE_OKTA_CLIENT_ID;
+  if (!issuer || !clientId || issuer === 'https://your-org.okta.com/oauth2/default' || clientId === 'your-client-id') {
+    return true;
+  }
+  return false;
 }
 
 // Okta configuration from environment variables
