@@ -1,0 +1,626 @@
+topics:
+- Treatment selection
+- Treatment indication
+- Clinical efficacy
+- Safety profile
+- AE management
+- Biomarker testing
+- Mechanism of action
+- Diagnosis
+- Prognosis
+- Study design
+- Multidisciplinary care
+- Shared decision-making
+- Disparities in care
+- Barriers to care
+disease_stages:
+  solid_tumors:
+  - Early-stage
+  - Locally advanced
+  - Metastatic
+  - Oligometastatic
+  multiple_myeloma:
+  - R-ISS I
+  - R-ISS II
+  - R-ISS III
+  - ISS I
+  - ISS II
+  - ISS III
+  lymphoma:
+  - Ann Arbor I
+  - Ann Arbor II
+  - Ann Arbor III
+  - Ann Arbor IV
+  cll:
+  - Rai 0
+  - Rai I
+  - Rai II
+  - Rai III
+  - Rai IV
+  - Binet A
+  - Binet B
+  - Binet C
+  sclc:
+  - Limited-stage
+  - Extensive-stage
+disease_types:
+  multiple_myeloma:
+  - High-risk
+  - Standard-risk
+  - Plasma cell leukemia
+  - Smoldering MM
+  - MGUS
+  - Light chain MM
+  - Non-secretory MM
+  - Extramedullary MM
+  breast_cancer:
+  - HER2+
+  - HER2-low
+  - HR+/HER2-
+  - Triple-negative
+  - Inflammatory
+  - Lobular
+  - Ductal
+  - ER+/PR+
+  - ER+/PR-
+  nsclc:
+  - Adenocarcinoma
+  - Squamous
+  - Large cell
+  - Adenosquamous
+  - Sarcomatoid
+  - NOS (Not otherwise specified)
+  crc:
+  - Left-sided
+  - Right-sided
+  - Rectal
+  - MSI-H
+  - MSS
+  - Mucinous
+  prostate:
+  - Castration-sensitive
+  - Castration-resistant
+  - Metastatic CRPC
+  - Metastatic CSPC
+  - High-risk localized
+  ovarian:
+  - High-grade serous
+  - Low-grade serous
+  - Clear cell
+  - Endometrioid
+  - Mucinous
+  - Platinum-sensitive
+  - Platinum-resistant
+treatment_lines:
+- 1L
+- 2L
+- 2L+
+- 3L+
+- Adjuvant
+- Neoadjuvant
+- Perioperative
+- Maintenance
+- Consolidation
+- R/R (Relapsed/Refractory)
+- Newly diagnosed
+treatment_eligibility:
+  multiple_myeloma:
+  - Transplant-eligible
+  - Transplant-ineligible
+  solid_tumors:
+  - Surgery candidate
+  - Not surgical candidate
+  general:
+  - Fit for intensive therapy
+  - Unfit for intensive therapy
+age_groups:
+- Younger (<65)
+- Elderly (65-74)
+- Very elderly (>=75)
+fitness_status:
+- Fit
+- Frail
+organ_dysfunction:
+- Renal
+- Cardiac
+- Hepatic
+- Pulmonary
+- Neurologic
+disease_specific_factors:
+  breast_cancer:
+  - Premenopausal
+  - Postmenopausal
+  cml:
+  - Chronic phase
+  - Accelerated phase
+  - Blast phase
+drug_classes:
+  targeted_therapy:
+  - EGFR TKI
+  - ALK TKI
+  - ROS1 TKI
+  - KRAS G12C inhibitor
+  - MET inhibitor
+  - RET inhibitor
+  - NTRK inhibitor
+  - BRAF inhibitor
+  - BRAF/MEK combination
+  - HER2 TKI
+  immunotherapy:
+  - Anti-PD-1
+  - Anti-PD-L1
+  - Anti-CTLA-4
+  - Anti-LAG-3
+  - Anti-TIGIT
+  - ICI combination
+  antibody_therapy:
+  - Anti-HER2
+  - Anti-CD20
+  - Anti-CD38
+  - Anti-BCMA
+  - Anti-CD19
+  - Bispecific antibody
+  - ADC (Antibody-drug conjugate)
+  cellular_therapy:
+  - CAR-T
+  - CAR-NK
+  - TIL therapy
+  small_molecule:
+  - CDK4/6 inhibitor
+  - PARP inhibitor
+  - PI3K inhibitor
+  - mTOR inhibitor
+  - BCL-2 inhibitor
+  - BTK inhibitor
+  - JAK inhibitor
+  - FLT3 inhibitor
+  - IDH inhibitor
+  myeloma_specific:
+  - Proteasome inhibitor
+  - IMiD (Immunomodulatory drug)
+  - XPO1 inhibitor (selinexor)
+  - Anti-CD38
+  - Anti-BCMA
+  - Bispecific antibody
+  - CAR-T therapy
+  - Antibody-drug conjugate (ADC)
+  - CELMoD
+  conventional:
+  - Chemotherapy
+  - Hormone therapy
+  - Radiation therapy
+  - Corticosteroid
+drug_targets:
+  tyrosine_kinases:
+  - EGFR
+  - ALK
+  - ROS1
+  - MET
+  - RET
+  - NTRK1
+  - NTRK2
+  - NTRK3
+  - FGFR
+  - FLT3
+  - BTK
+  - JAK1
+  - JAK2
+  oncogenes:
+  - KRAS G12C
+  - BRAF V600E
+  - BRAF V600K
+  - HER2
+  - PIK3CA
+  - IDH1
+  - IDH2
+  immune_checkpoints:
+  - PD-1
+  - PD-L1
+  - CTLA-4
+  - LAG-3
+  - TIGIT
+  - TIM-3
+  cell_surface:
+  - CD19
+  - CD20
+  - CD22
+  - CD38
+  - BCMA
+  - GPRC5D
+  - FcRH5
+  - HER2
+  - TROP-2
+  - Nectin-4
+  - Tissue factor
+  intracellular:
+  - CDK4/6
+  - PARP
+  - PI3K
+  - mTOR
+  - BCL-2
+  - MCL-1
+  - XPO1
+  - Proteasome
+metastatic_sites:
+  common:
+  - Brain
+  - Liver
+  - Bone
+  - Lung
+  - Adrenal
+  - Peritoneal
+  - Lymph node
+  - Skin
+  - Soft tissue
+  cns:
+  - CNS involvement
+  - Leptomeningeal
+  - Brain metastases
+  - Spinal cord
+  myeloma_specific:
+  - Extramedullary plasmacytoma
+  - Soft tissue plasmacytoma
+symptoms:
+  general:
+  - Pain
+  - Fatigue
+  - Weight loss
+  - Fever
+  - Night sweats
+  respiratory:
+  - Dyspnea
+  - Cough
+  - Hemoptysis
+  gi:
+  - Nausea
+  - Vomiting
+  - Diarrhea
+  - Constipation
+  - Anorexia
+  neurologic:
+  - Neuropathy
+  - Headache
+  - Confusion
+  - Seizures
+  myeloma_specific:
+  - Bone pain
+  - Hypercalcemia
+  - Anemia
+  - Renal insufficiency
+  - Recurrent infections
+performance_status:
+  ecog:
+  - ECOG 0
+  - ECOG 1
+  - ECOG 2
+  - ECOG 3
+  - ECOG 4
+  karnofsky:
+  - KPS 100
+  - KPS 90
+  - KPS 80
+  - KPS 70
+  - KPS 60
+  - KPS <=60
+toxicity_types:
+  hematologic:
+  - Neutropenia
+  - Febrile neutropenia
+  - Thrombocytopenia
+  - Anemia
+  - Lymphopenia
+  - Pancytopenia
+  gastrointestinal:
+  - Diarrhea
+  - Nausea
+  - Vomiting
+  - Mucositis
+  - Colitis
+  - Hepatitis
+  dermatologic:
+  - Rash
+  - Pruritus
+  - Hand-foot syndrome
+  - Photosensitivity
+  - Alopecia
+  pulmonary:
+  - Pneumonitis
+  - ILD (Interstitial lung disease)
+  - Dyspnea
+  cardiac:
+  - Cardiotoxicity
+  - QT prolongation
+  - Heart failure
+  - Hypertension
+  neurologic:
+  - Peripheral neuropathy
+  - Encephalopathy
+  - Headache
+  - ICANS
+  endocrine:
+  - Hypothyroidism
+  - Hyperthyroidism
+  - Adrenal insufficiency
+  - Type 1 diabetes
+  renal:
+  - Nephrotoxicity
+  - AKI (Acute kidney injury)
+  - Proteinuria
+  infusion:
+  - Infusion reaction
+  - Hypersensitivity
+  - Anaphylaxis
+  cellular_therapy:
+  - CRS (Cytokine release syndrome)
+  - ICANS
+  - Prolonged cytopenias
+  - Infections
+toxicity_organ:
+- Hematologic
+- GI
+- Dermatologic
+- Pulmonary
+- Hepatic
+- Renal
+- Cardiac
+- Neurologic
+- Endocrine
+- Musculoskeletal
+- Ocular
+toxicity_grades:
+- Grade 1
+- Grade 2
+- Grade 3
+- Grade 4
+- Grade 5
+- Any grade
+- Grade >=3
+efficacy_endpoints:
+  survival:
+  - OS (Overall survival)
+  - PFS (Progression-free survival)
+  - DFS (Disease-free survival)
+  - EFS (Event-free survival)
+  - RFS (Recurrence-free survival)
+  - TTP (Time to progression)
+  response:
+  - ORR (Overall response rate)
+  - CR (Complete response)
+  - sCR (Stringent complete response)
+  - VGPR (Very good partial response)
+  - PR (Partial response)
+  - SD (Stable disease)
+  - DCR (Disease control rate)
+  - CBR (Clinical benefit rate)
+  duration:
+  - DOR (Duration of response)
+  - TTR (Time to response)
+  - TTNT (Time to next treatment)
+  mrd:
+  - MRD negativity
+  - MRD negative CR
+  - Sustained MRD negativity
+  pathologic:
+  - pCR (Pathologic complete response)
+  - RCB (Residual cancer burden)
+  - MPR (Major pathologic response)
+outcome_context:
+- Primary endpoint
+- Secondary endpoint
+- Exploratory endpoint
+- Subgroup analysis
+- Post-hoc analysis
+- Long-term follow-up
+clinical_benefit:
+- Statistically significant
+- Clinically meaningful
+- Superior
+- Non-inferior
+- Equivalent
+- No benefit
+- Detrimental
+guideline_sources:
+  oncology:
+  - NCCN
+  - ASCO
+  - ESMO
+  hematology:
+  - IMWG (International Myeloma Working Group)
+  - ASTCT
+  - ASH
+  - ELN (European LeukemiaNet)
+  - IWCLL
+  supportive_care:
+  - MASCC
+  - ASCO Supportive Care
+  regulatory:
+  - FDA label
+  - EMA label
+evidence_types:
+- Phase 3 RCT
+- Phase 2
+- Phase 1
+- Phase 1/2
+- Real-world evidence
+- Meta-analysis
+- Systematic review
+- Case series
+- Case report
+- Expert opinion
+- Guideline recommendation
+cme_outcome_levels:
+- 3 - Knowledge
+- 4 - Competence
+data_response_types:
+- Numeric
+- Qualitative
+- Comparative
+- Boolean
+stem_types:
+- Clinical vignette
+- Direct question
+- Incomplete statement
+- Case series
+lead_in_types:
+- Standard
+- Negative (EXCEPT/NOT)
+- Best answer
+- Most likely
+- Most appropriate
+answer_formats:
+- Single best
+- Compound (A+B)
+- All of above
+- None of above
+- True/False
+answer_length_patterns:
+- Uniform
+- Variable
+- Correct longest
+- Correct shortest
+distractor_homogeneity:
+- Homogeneous
+- Heterogeneous
+biomarkers:
+  lung:
+  - EGFR
+  - EGFR exon 19 deletion
+  - EGFR L858R
+  - EGFR exon 20 insertion
+  - EGFR T790M
+  - EGFR C797S
+  - ALK
+  - ROS1
+  - KRAS G12C
+  - KRAS G12D
+  - MET amplification
+  - MET exon 14 skipping
+  - RET
+  - NTRK
+  - BRAF V600E
+  - HER2
+  - NRG1
+  - PD-L1
+  - TMB-high
+  breast:
+  - HER2
+  - HER2-low
+  - ER
+  - PR
+  - BRCA1
+  - BRCA2
+  - PIK3CA
+  - ESR1
+  - AKT1
+  colorectal:
+  - KRAS
+  - NRAS
+  - BRAF V600E
+  - MSI-H
+  - dMMR
+  - HER2
+  - NTRK
+  myeloma:
+  - t(4;14)
+  - t(14;16)
+  - t(14;20)
+  - del(17p)
+  - gain(1q)
+  - del(1p)
+  - t(11;14)
+  - Hyperdiploidy
+  - MRD
+  general:
+  - TMB (Tumor mutational burden)
+  - TMB-high
+  - MSI-H
+  - dMMR
+  - pMMR
+  - HRD
+trials:
+  myeloma:
+  - MAIA
+  - CASSIOPEIA
+  - PERSEUS
+  - GRIFFIN
+  - CARTITUDE-1
+  - CARTITUDE-4
+  - KarMMa
+  - KarMMa-3
+  - MajesTEC-1
+  - MonumenTAL-1
+  - DREAMM-2
+  - BOSTON
+  - IKEMA
+  - CANDOR
+  - APOLLO
+  - POLLUX
+  - CASTOR
+  nsclc:
+  - KEYNOTE-024
+  - KEYNOTE-042
+  - KEYNOTE-189
+  - KEYNOTE-407
+  - CheckMate-227
+  - CheckMate-9LA
+  - IMpower110
+  - IMpower150
+  - FLAURA
+  - FLAURA2
+  - ADAURA
+  - ALINA
+  - CROWN
+  - LIBRETTO-001
+  - CodeBreaK 200
+  - KRYSTAL-1
+  breast:
+  - DESTINY-Breast03
+  - DESTINY-Breast04
+  - monarchE
+  - NATALEE
+  - PALLAS
+  - OlympiA
+  - KEYNOTE-522
+  - IMpassion031
+  - TROPION-Breast01
+  crc:
+  - KEYNOTE-177
+  - CheckMate-142
+  - BEACON
+  - DESTINY-CRC01
+verified_values:
+  symptom:
+  - Hypercalcemia
+  - Bone fracture
+  - Anemia
+  treatment:
+  - Idecabtagene vicleucel
+  - Elranatamab
+  - Teclistamab
+  - Linvoseltamab
+  - Isatuximab
+  - Carfilzomib
+  - Lenalidomide
+  - Bortezomib
+  biomarker:
+  - del(17p)
+  - MRD
+  drug_class:
+  - CAR-T therapy
+  - Bispecific antibody
+  - Monoclonal antibody
+  - Proteasome inhibitor
+  - IMiD
+  disease_type:
+  - High-risk
+  prior_therapy:
+  - Prior anti-CD38
+  - Prior PI
+  - Prior IMiD
+  toxicity_type:
+  - Infections
+  - VTE
+  trial:
+  - IsKia
+  efficacy_endpoint:
+  - MRD negativity rate

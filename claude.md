@@ -2,30 +2,138 @@
 
 This file provides context and guidelines for Claude Code when working on this project.
 
+## Working Style Preferences
+
+**IMPORTANT**: When the user makes open-ended statements or asks investigative questions, prioritize fact-finding and reporting results BEFORE making any changes. Do NOT make fixes or edits without consulting the user first, even in auto-edit mode. Always present findings and proposed solutions, then wait for user approval before implementing changes.
+
+**TERMINAL COMMANDS**: When asking the user to run commands in their terminal:
+1. ALWAYS provide full absolute paths - never use relative paths
+2. Use PowerShell-compatible syntax: use `;` for command chaining (NOT `&&` which is Bash-only)
+3. Quote paths containing spaces with double quotes
+
+Examples:
+- Good: `cd "c:\Users\snair\OneDrive - MJH\Documents\GitHub\Steve-V2-Outcomes-Tagger\Automated-CE-Outcomes-Dashboard\dashboard\frontend"; npm run dev`
+- Bad: `cd dashboard/frontend && npm run dev` (relative path AND wrong separator)
+
 ## Project Overview
 
 This is an Automated CE Outcomes Dashboard and Tagging System designed to process and analyze continuing education (CE) outcomes data using AI-powered multi-model tagging with a two-stage disease-specific architecture.
 
 ## Tagging Architecture: V2.0 Two-Stage System
 
-### Stage 1: Disease Classification
-- **Single premium LLM** (Claude Sonnet 4.5 or GPT-4o)
+### Stage 1: Disease Classification (3-Model Voting)
+- **3-model parallel voting** (GPT-5.2, Claude Opus 4.5, Gemini 2.5 Pro)
 - Lightweight prompt (~1K tokens)
-- Returns: `disease_state` (e.g., "Breast cancer") + optional `disease_stage`
+- Returns: `is_oncology`, `disease_state`, `needs_review`, `review_reason`
+- **Web search fallback**: Triggered on ANY disagreement (majority or conflict) for trial-based disease lookup
 - **Cost**: ~$0.01 per question
 
-### Stage 2: Disease-Specific Tagging
+### Stage 2: Disease-Specific Tagging (3-Model Voting)
 - **3-model parallel voting** (GPT-4o + Claude Sonnet 3.5 + Gemini Pro)
 - Disease-specific prompt loaded based on Stage 1 result
-- Focused prompts (~2-3K tokens) with disease-specific rules
-- Returns: Remaining 7 tag fields with voting consensus
-- **Cost**: ~$0.08 per question
+- Focused prompts (~3-4K tokens) with disease-specific rules
+- Returns: **66 tag fields** organized in 6 groups (see Field Schema below)
+- **Web search fallback**: Triggered on ANY disagreement for factual fields
+- **Cost**: ~$0.13 per question
 
-### Total Cost & Benefits
-- **~$0.09 per question** (40% savings vs V1.0 single-stage)
-- Modular disease-specific rules (easy to update)
-- Better accuracy (focused context, targeted rules)
-- Cleaner architecture (one rule file per disease)
+### Deduplication (Pre-Tagging)
+- **Embedding model**: OpenAI text-embedding-3-small (1536 dimensions)
+- **Similarity threshold**: 95% cosine similarity
+- **Quality-based canonical selection**: Best version chosen (encoding, completeness, grammar)
+- **Cost**: ~$0.00001 per question (negligible)
+
+### Total Pipeline Cost
+
+| Scenario | Cost | Notes |
+|----------|------|-------|
+| Duplicate question | ~$0.00001 | Dedup only, skip tagging |
+| New non-oncology | ~$0.01 | Dedup + Stage 1, skip Stage 2 |
+| New oncology | ~$0.14 | Dedup + Stage 1 + Stage 2 (66 fields) |
+
+## Field Schema (66 LLM-Tagged + 2 Computed)
+
+### Core Fields (19)
+- `topic` - Educational focus (10 canonical values)
+- `disease_stage` - Early-stage, Metastatic
+- `disease_type` - Molecular/receptor subtype
+- `treatment_line` - 1L, 2L+, Adjuvant, R/R
+- `treatment_1-5` - Drug/regimen names (5 slots)
+- `biomarker_1-5` - Tested markers (5 slots)
+- `trial_1-5` - Clinical trial names (5 slots)
+
+### Group A: Treatment Metadata (10)
+- `drug_class_1-3` - Drug class (EGFR TKI, Anti-PD-1, etc.)
+- `drug_target_1-3` - Molecular target (EGFR, HER2, PD-1, etc.)
+- `prior_therapy_1-3` - Prior treatments
+- `resistance_mechanism` - Resistance type
+
+### Group B: Clinical Context (9)
+- `metastatic_site_1-3` - Brain, Liver, Bone metastases
+- `symptom_1-3` - Pain, Dyspnea, Fatigue
+- `special_population_1-2` - Elderly, Frail, Organ dysfunction
+- `performance_status` - ECOG 0-4, Fit/Unfit/Frail
+
+### Group C: Safety/Toxicity (7)
+- `toxicity_type_1-5` - Specific adverse events
+- `toxicity_organ` - Affected organ system
+- `toxicity_grade` - CTCAE grade
+
+### Group D: Efficacy/Outcomes (5)
+- `efficacy_endpoint_1-3` - OS, PFS, ORR, etc.
+- `outcome_context` - Primary/Secondary endpoint, Subgroup analysis
+- `clinical_benefit` - Statistically significant, Superior, etc.
+
+### Group E: Evidence/Guidelines (3)
+- `guideline_source_1-2` - NCCN, ASCO, ESMO
+- `evidence_type` - Phase 3 RCT, Real-world evidence
+
+### Group F: Question Format/Quality (13)
+- `cme_outcome_level` - 3 - Knowledge, 4 - Competence
+- `data_response_type` - Numeric, Qualitative, Comparative, Boolean
+- `stem_type` - Clinical vignette, Direct question, Incomplete statement
+- `lead_in_type` - Standard, Negative (EXCEPT/NOT), Best answer
+- `answer_format` - Single best, Compound (A+B), All of above
+- `answer_length_pattern` - Uniform, Variable, Correct longest
+- `distractor_homogeneity` - Homogeneous, Heterogeneous
+- `flaw_absolute_terms` - Boolean (true/false)
+- `flaw_grammatical_cue` - Boolean
+- `flaw_implausible_distractor` - Boolean
+- `flaw_clang_association` - Boolean
+- `flaw_convergence_vulnerability` - Boolean
+- `flaw_double_negative` - Boolean
+
+### Computed Fields (2) - Derived from raw data
+- `answer_option_count` - 2-5 (count of answer options)
+- `correct_answer_position` - A, B, C, D, E
+
+## Voting & Review Logic
+
+### Agreement Levels
+
+| Level | Pattern | Behavior |
+|-------|---------|----------|
+| **Unanimous** | 3/3 agree | Auto-accept, no review needed |
+| **Majority** | 2/3 agree | Accept majority value, FLAG FOR REVIEW |
+| **Conflict** | 1/1/1 | NO auto-assignment, FLAG FOR REVIEW |
+
+### Key Principles
+1. **Never auto-resolve conflicts**: All 3 votes are preserved for LLM evaluation
+2. **Majority votes flagged**: Even 2/1 agreement goes to review queue (for LLM eval)
+3. **Web search on disagreement**: Both majority AND conflict trigger web search
+4. **Preserve dissenting votes**: Know which model disagreed and what it said
+
+### Review Reason Values
+
+| Stage | Reason | Meaning |
+|-------|--------|---------|
+| Stage 1 | `oncology_conflict` | 3-way split on is_oncology |
+| Stage 1 | `oncology_majority` | 2/1 split on is_oncology |
+| Stage 1 | `disease_conflict` | 3-way split on disease_state |
+| Stage 1 | `disease_majority` | 2/1 split on disease_state |
+| Stage 1 | `conflict_resolved_by_web_search` | Web search broke a tie |
+| Stage 2 | `conflict_in_fields:X,Y` | Conflict in specific fields |
+| Stage 2 | `majority_in_fields:X,Y` | Majority vote in specific fields |
+| Both | `*\|web_search_used` | Appended when web search was performed |
 
 ## Project Structure
 
@@ -37,9 +145,9 @@ src/
 ├── core/
 │   ├── taggers/                  # Multi-model tagging system
 │   │   ├── openrouter_client.py  # Unified LLM client (GPT, Claude, Gemini)
-│   │   ├── disease_classifier.py # Stage 1: Disease classification
+│   │   ├── disease_classifier.py # Stage 1: Disease classification (3-model voting)
 │   │   ├── multi_model_tagger.py # Two-stage orchestration + voting
-│   │   └── vote_aggregator.py    # 3-model consensus logic
+│   │   └── vote_aggregator.py    # 3-model consensus logic + review flagging
 │   ├── services/
 │   │   ├── disease_prompt_manager.py # Disease-specific prompt loader
 │   │   └── prompt_manager.py     # Prompt version management
@@ -47,6 +155,9 @@ src/
 │   │   ├── constants.py          # Disease states, abbreviations
 │   │   └── topic_constants.py    # Topic keywords
 │   └── preprocessing/            # Data preprocessing
+├── deduplication/                # Question deduplication
+│   ├── embeddings.py             # OpenAI embedding generation
+│   └── cleanup.py                # Text encoding cleanup
 ├── workflows/                    # Workflow orchestration
 └── __init__.py
 
@@ -81,19 +192,79 @@ config/
 ├── config.yaml                   # Main configuration
 ├── models.yaml                   # LLM model configs
 └── logging.yaml                  # Logging config
+
+scripts/
+├── run_deduplication.py          # Batch deduplication script
+└── run_stage1_classification.py  # Stage 1 classification script
+```
+
+## Key Data Structures
+
+### Stage 1 Response (DiseaseClassifier)
+```python
+{
+    "is_oncology": True/False/None,  # None = conflict, needs review
+    "disease_state": "Breast cancer",  # or None if conflict/undetermined
+    "needs_review": True/False,
+    "review_reason": "disease_majority",
+    "voting_details": {
+        "gpt": {"is_oncology": True, "disease_state": "Breast cancer"},
+        "claude": {"is_oncology": True, "disease_state": "Breast cancer"},
+        "gemini": {"is_oncology": True, "disease_state": "NSCLC"},
+        "web_search": {"disease_state": "Breast cancer", "source": "trial_lookup"},
+        "agreement": "majority",
+        "oncology_agreement": "unanimous",
+        "disease_agreement": "majority"
+    }
+}
+```
+
+### Stage 2 Response (AggregatedVote)
+```python
+AggregatedVote(
+    question_id=123,
+    overall_agreement=AgreementLevel.MAJORITY,
+    overall_confidence=0.67,
+    needs_review=True,
+    review_reason="majority_in_fields:treatment,biomarker|web_search_used",
+    # Individual model responses (preserved for LLM eval)
+    gpt_tags={...},
+    claude_tags={...},
+    gemini_tags={...},
+    # Final aggregated result
+    final_tags={
+        "topic": "Treatment selection",
+        "disease_state": "Breast cancer",
+        "disease_type": "HER2+",
+        ...
+    },
+    # Per-field voting details
+    tags={
+        "treatment": TagVote(
+            final_value="trastuzumab",
+            agreement_level=AgreementLevel.MAJORITY,
+            gpt_value="trastuzumab",
+            claude_value="trastuzumab",
+            gemini_value="pertuzumab",
+            dissenting_model="gemini"
+        ),
+        ...
+    },
+    web_searches_used=[...]
+)
 ```
 
 ## Key Components
 
 ### Disease-Specific Rules (Priority Diseases)
 
-**Completed:**
+**Completed (66-field prompts):**
 1. ✓ **Breast cancer** - Complex subtyping (HR+/HER2-, HER2+, HER2-low, TNBC)
+2. ✓ **NSCLC** - Molecular subtypes (EGFR, ALK, ROS1, KRAS G12C, etc.)
+3. ✓ **Multiple Myeloma** - No staging, R/R vs newly diagnosed
+4. ✓ **CRC** - MSI-H, biomarker testing emphasis
 
 **TODO:**
-2. **NSCLC** - Molecular subtypes (EGFR, ALK, ROS1, KRAS G12C, etc.)
-3. **Multiple Myeloma** - No staging, R/R vs newly diagnosed
-4. **CRC** - MSI-H, biomarker testing emphasis
 5. **SCLC** - Unique staging (Limited/Extensive)
 6. **Prostate cancer** - Castration status
 7. **Ovarian cancer** - BRCA, HRD, platinum resistance
@@ -164,11 +335,13 @@ config/
 - **Integration tests**: API endpoints, end-to-end tagging flow
 - **Validation scripts**: Dry-run with sample questions (no API costs)
 - **Manual review**: Visual inspection for accuracy
+- **LLM Eval**: Review queue data used to evaluate model accuracy over time
 
 ## Configuration
 
 ### Environment Variables
 - `OPENROUTER_API_KEY`: Required for LLM calls
+- `OPENAI_API_KEY`: Required for embeddings (deduplication)
 - See `.env.template` for full list
 
 ### Config Files
@@ -181,29 +354,41 @@ config/
 - Python 3.9+
 - FastAPI (API framework)
 - OpenRouter (multi-model LLM routing)
+- OpenAI Embeddings (deduplication)
 - SQLite (local database)
+- Snowflake (production data source)
 - YAML configuration
 - Git version control
 
 ## Current Status
 
 **Implemented:**
-- ✓ Two-stage architecture (Stage 1: Disease classification, Stage 2: Voting)
-- ✓ DiseaseClassifier class
-- ✓ DiseasePromptManager class
-- ✓ MultiModelTagger with V1/V2 support
-- ✓ Breast cancer disease-specific rules (complete)
-- ✓ Fallback prompt for diseases without specific rules
+- ✓ Two-stage architecture (Stage 1: 3-model voting, Stage 2: 3-model voting)
+- ✓ **66-field schema** across 6 groups (Core, Treatment Metadata, Clinical Context, Safety/Toxicity, Efficacy/Outcomes, Evidence/Guidelines, Question Format/Quality)
+- ✓ DiseaseClassifier class with voting + web search fallback
+- ✓ VoteAggregator with review flagging (majority + conflict) for all 66 fields
+- ✓ MultiModelTagger with web search on ANY disagreement
+- ✓ Disease-specific prompts: Breast cancer, NSCLC, Multiple Myeloma, CRC (all 66-field)
+- ✓ Fallback prompt (66-field) for diseases without specific rules
+- ✓ Deduplication pipeline with quality-based canonical selection
+- ✓ Review reason tracking for LLM evaluation
+- ✓ Question quality fields (Group F) for CME item analysis
 
 **TODO:**
-- Unit tests for disease_classifier and prompt_manager
-- Dry-run validation script
-- Additional disease rules (NSCLC, MM, CRC, etc.)
-- Frontend integration with two-stage results
+- Unit tests for 66-field vote_aggregator
+- Tests for computed fields (answer_option_count, correct_answer_position)
+- Post-processing normalizer for evolving fields
+- Canonical term extraction from tagged data
+- Frontend integration with review queue
+- Snowflake integration for new question ingestion
+- LLM eval dashboard for model accuracy tracking
 
 ## Notes
 
-- Main branch: master
-- Default prompt version: v2.0 (two-stage)
+- Main branch: main
+- Default prompt version: v2.0 (two-stage, 66-field schema)
 - V1.0 still available for backwards compatibility
-- Cost savings: ~40% vs V1.0 single-stage approach
+- **Field schema**: 66 LLM-tagged fields + 2 computed fields = 68 total
+- **Boolean flaw fields**: 6 fields in Group F must be true/false (not strings, not null)
+- **Computed fields**: answer_option_count and correct_answer_position are derived from raw data, not LLM-tagged
+- All disagreements (majority + conflict) trigger web search and review

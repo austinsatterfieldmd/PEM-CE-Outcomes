@@ -1,0 +1,20 @@
+# CME Question Explorer Dashboard - Backend Dependencies
+
+# Web framework
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+
+# Data validation
+pydantic>=2.0.0
+
+# Database
+# SQLite is built into Python, no additional package needed
+
+# Data processing (may already be installed in parent project)
+pandas>=2.0.0
+openpyxl>=3.1.0
+
+# CORS middleware included in fastapi
+
+# Authentication (Okta JWT validation)
+python-jose[cryptography]>=3.3.0

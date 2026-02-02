@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 # Project paths
 PROJECT_ROOT = Path(__file__).parent.parent.parent.parent
 PROMPTS_DIR = PROJECT_ROOT / "prompts"
+CORRECTIONS_DIR = PROJECT_ROOT / "data" / "corrections"
 
 
 @dataclass
@@ -380,15 +381,26 @@ class PromptManager:
         # Map disease_state to filename
         disease_filename = self._disease_to_filename(disease_state)
 
-        # Path to disease rules file
-        disease_rules_path = self.prompts_dir / version / "disease_rules" / f"{disease_filename}.md"
+        # Try assembled prompt first (v2.0 modular system)
+        assembled_path = self.prompts_dir / version / "disease_prompts" / f"{disease_filename}_prompt_v2.txt"
+        if assembled_path.exists():
+            logger.info(f"Loading assembled disease prompt for: {disease_state}")
+            return assembled_path.read_text(encoding="utf-8")
 
+        # Fallback to legacy disease_rules/*.md
+        disease_rules_path = self.prompts_dir / version / "disease_rules" / f"{disease_filename}.md"
         if disease_rules_path.exists():
             logger.info(f"Loading disease-specific prompt for: {disease_state}")
             return disease_rules_path.read_text(encoding="utf-8")
-        else:
-            logger.warning(f"No disease-specific prompt found for: {disease_state} at {disease_rules_path}")
-            return None
+
+        # Also try disease_prompts/*.txt (legacy naming)
+        legacy_prompt_path = self.prompts_dir / version / "disease_prompts" / f"{disease_filename}_prompt.txt"
+        if legacy_prompt_path.exists():
+            logger.info(f"Loading legacy disease prompt for: {disease_state}")
+            return legacy_prompt_path.read_text(encoding="utf-8")
+
+        logger.warning(f"No disease-specific prompt found for: {disease_state}")
+        return None
 
     def get_fallback_prompt(self, version: str = "v2.0") -> str:
         """
@@ -456,19 +468,172 @@ class PromptManager:
             >>> "Breast cancer" in diseases
             True
         """
+        diseases = set()
+
+        # Check assembled prompts (v2.0 modular system)
+        assembled_dir = self.prompts_dir / version / "disease_prompts"
+        if assembled_dir.exists():
+            for file_path in assembled_dir.glob("*_prompt_v2.txt"):
+                # Convert filename back to disease name (remove _prompt_v2 suffix)
+                disease_name = file_path.stem.replace("_prompt_v2", "").replace("_", " ").title()
+                diseases.add(disease_name)
+
+        # Also check legacy disease_rules/*.md
         disease_rules_dir = self.prompts_dir / version / "disease_rules"
-
-        if not disease_rules_dir.exists():
-            return []
-
-        diseases = []
-        for file_path in disease_rules_dir.glob("*.md"):
-            # Convert filename back to disease name
-            disease_name = file_path.stem.replace("_", " ").title()
-            diseases.append(disease_name)
+        if disease_rules_dir.exists():
+            for file_path in disease_rules_dir.glob("*.md"):
+                disease_name = file_path.stem.replace("_", " ").title()
+                diseases.add(disease_name)
 
         logger.debug(f"Found {len(diseases)} disease-specific prompts")
-        return sorted(diseases)
+        return sorted(list(diseases))
+
+    def _get_corrections_file(self, disease_state: str) -> Path:
+        """Get the corrections file path for a disease."""
+        disease_name = self._disease_to_filename(disease_state)
+        return CORRECTIONS_DIR / f"{disease_name}_corrections.jsonl"
+
+    def load_corrections(self, disease_state: str, limit: int = 5) -> List[Dict[str, Any]]:
+        """
+        Load recent human corrections for a disease state.
+
+        Args:
+            disease_state: The disease to load corrections for
+            limit: Maximum number of corrections to return (most recent first)
+
+        Returns:
+            List of correction records, most recent first
+        """
+        corrections_file = self._get_corrections_file(disease_state)
+
+        if not corrections_file.exists():
+            logger.debug(f"No corrections file found for {disease_state}")
+            return []
+
+        try:
+            corrections = []
+            with open(corrections_file, 'r', encoding='utf-8') as f:
+                for line in f:
+                    if line.strip():
+                        corrections.append(json.loads(line))
+
+            # Return most recent first
+            recent = corrections[-limit:][::-1]
+            logger.info(f"Loaded {len(recent)} corrections for {disease_state}")
+            return recent
+
+        except Exception as e:
+            logger.error(f"Failed to load corrections for {disease_state}: {e}")
+            return []
+
+    def format_correction_as_fewshot(self, correction: Dict[str, Any]) -> str:
+        """
+        Format a correction record as a few-shot example.
+
+        Returns a formatted string showing the question and corrected tags.
+        """
+        question_stem = correction.get('question_stem', '')
+        correct_answer = correction.get('correct_answer', '')
+        corrected_tags = correction.get('corrected_tags', {})
+        edited_fields = correction.get('edited_fields', [])
+
+        # Only include the tag fields, not metadata like confidence scores
+        tag_fields_only = {
+            k: v for k, v in corrected_tags.items()
+            if not k.endswith('_confidence') and k not in [
+                'topic_method', 'needs_review', 'review_flags',
+                'review_reason', 'flagged_at', 'agreement_level'
+            ]
+        }
+
+        example = f"""**Question:** {question_stem}
+
+**Correct Answer:** {correct_answer}
+
+**Human-Verified Tags:**
+```json
+{json.dumps(tag_fields_only, indent=2, ensure_ascii=False)}
+```
+
+**Reviewer corrected:** {', '.join(edited_fields)}
+"""
+        return example
+
+    def get_fewshot_examples(self, disease_state: str, count: int = 3) -> str:
+        """
+        Get formatted few-shot examples from recent human corrections.
+
+        Args:
+            disease_state: The disease to get examples for
+            count: Number of examples to include
+
+        Returns:
+            Formatted string with few-shot examples to inject into prompt
+        """
+        corrections = self.load_corrections(disease_state, limit=count)
+
+        if not corrections:
+            return ""
+
+        header = """
+---
+
+## Learn From Recent Human Corrections
+
+The following questions were recently reviewed by a human expert who corrected the AI-generated tags.
+Study these corrections carefully to understand the expected tagging patterns for this disease.
+
+"""
+
+        examples = []
+        for i, correction in enumerate(corrections, 1):
+            examples.append(f"### Human Correction #{i}\n\n{self.format_correction_as_fewshot(correction)}")
+
+        return header + "\n\n".join(examples) + "\n\n---\n"
+
+    def get_disease_prompt_with_fewshots(
+        self,
+        disease_state: str,
+        version: str = "v2.0",
+        num_fewshots: int = 3
+    ) -> Optional[str]:
+        """
+        Get disease-specific prompt WITH dynamic few-shot examples from human corrections.
+
+        This is the method to use for Stage 2 tagging to benefit from human corrections.
+
+        Args:
+            disease_state: Disease name
+            version: Prompt version
+            num_fewshots: Number of recent corrections to include as examples
+
+        Returns:
+            Complete prompt with disease rules + human corrections as examples
+        """
+        # Get base prompt
+        base_prompt = self.get_disease_prompt(disease_state, version)
+
+        if not base_prompt:
+            return None
+
+        # Get few-shot examples
+        fewshot_section = self.get_fewshot_examples(disease_state, count=num_fewshots)
+
+        if not fewshot_section:
+            logger.debug(f"No corrections available for {disease_state}, using base prompt only")
+            return base_prompt
+
+        # Inject few-shots before the final "Now analyze" instruction
+        marker = "Now analyze the following"
+        if marker in base_prompt:
+            parts = base_prompt.rsplit(marker, 1)
+            enhanced_prompt = parts[0] + fewshot_section + "\n" + marker + parts[1]
+        else:
+            # If no marker, append at the end
+            enhanced_prompt = base_prompt + "\n\n" + fewshot_section
+
+        logger.info(f"Enhanced prompt with {num_fewshots} few-shot examples for {disease_state}")
+        return enhanced_prompt
 
 
 # Singleton instance

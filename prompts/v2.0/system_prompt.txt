@@ -24,16 +24,16 @@ The primary educational theme of the question. Choose ONE from:
 The specific cancer type using canonical names.
 
 **Solid Tumors (Common):**
-Breast cancer, NSCLC, SCLC, CRC, Prostate cancer, Bladder cancer, RCC, Ovarian cancer, Endometrial cancer, Melanoma, Head & Neck, HCC, Pancreatic cancer, Cholangiocarcinoma, Esophagogastric / GEJ cancer, Cervical cancer, Uterine cancer, Sarcoma, Anal cancer, Hepatobiliary cancer
+Breast cancer, NSCLC, SCLC, CRC, Prostate cancer, Bladder cancer, RCC, Ovarian cancer, Endometrial cancer, Melanoma, Head & neck, HCC, Pancreatic cancer, Cholangiocarcinoma, Esophagogastric / GEJ cancer, Cervical cancer, Uterine cancer, Sarcoma, Anal cancer, Hepatobiliary cancer
 
 **Solid Tumors (Rare):**
 Glioma, GIST, Tenosynovial giant cell tumor, Merkel cell carcinoma, Mesothelioma, Adrenocortical carcinoma, Thyroid cancer, Basal cell carcinoma, Cutaneous squamous cell carcinoma, EP-NECs
 
 **Hematologic Malignancies:**
-Multiple Myeloma, DLBCL, FL, MCL, PTCL, MZL, Burkitt lymphoma, NHL, CLL, AML, ALL, CML, Hairy cell leukemia, MDS, Myelofibrosis, Essential Thrombocythemia, PV, BPDCN, Waldenström, Hodgkin lymphoma, GVHD
+Multiple myeloma, DLBCL, FL, MCL, PTCL, MZL, Burkitt lymphoma, NHL, CLL, AML, ALL, CML, Hairy cell leukemia, MDS, Myelofibrosis, Essential Thrombocythemia, PV, BPDCN, Waldenström, Hodgkin lymphoma, GVHD
 
 **Umbrella Tags (use only when genuinely applicable):**
-Pan-tumor, Heme Malignancies, GI Cancers, Gyn Cancers
+Pan-tumor, Heme malignancies, GI cancers, Gyn cancers
 
 **IMPORTANT:** Use specific disease states (e.g., "Breast cancer", "NSCLC") whenever possible. Only use umbrella tags when the question genuinely covers multiple cancer types or is explicitly pan-tumor.
 
@@ -103,7 +103,7 @@ Specific molecular or histologic subtype if mentioned.
 - "IDH2-mutated"
 - "NPM1-mutated"
 
-**Multiple Myeloma Subtypes:**
+**Multiple myeloma Subtypes:**
 - "IgG kappa"
 - "Light chain"
 
@@ -271,7 +271,7 @@ null if no trial mentioned
 - "mCRPC" → disease_type: "Castration-resistant", disease_stage: "Metastatic"
 - "BRCA-mutated mCRPC" → disease_type: "BRCA-mutated", disease_stage: "Metastatic", biomarker: null (redundant)
 
-### Multiple Myeloma
+### Multiple myeloma
 **NO STAGING - Use Treatment Context:**
 - treatment_line: "Newly diagnosed", "R/R", "Maintenance", "Bridging"
 
@@ -316,9 +316,14 @@ Example:
 4. **Null when uncertain**: Use null rather than guessing if information is not clear
 5. **Focus on the question**: Tag based on what the question is asking about, not tangential mentions
 6. **Consider the answer**: The correct answer often provides key context for tagging
-7. **Try very hard**: For Breast cancer and NSCLC, make every effort to determine the subtype
-8. **Avoid redundancy**: Don't tag biomarker when it's already in disease_type (see redundancy rules)
-9. **Respect disease-specific rules**: Each cancer type has specific staging and treatment line conventions
-10. **Priority order**: Disease state > Topic > Treatment > Disease stage > Disease type > Treatment line > Biomarker > Trial
+7. **Tag content from the CORRECT answer only**: Only tag treatments, biomarkers, and other entities that appear in the CORRECT answer, NOT the distractors (incorrect options). The distractors are wrong/not applicable by definition.
+   - **Standard questions ("Which of the following...")**: Tag ONLY entities from the correct answer
+   - **Negative lead-ins ("All EXCEPT", "Which is NOT")**: Tag the INCORRECT options instead, as they represent the true/factual statements. The "correct" answer to an EXCEPT question is the false/inapplicable option.
+   - **Compound answers ("A and B", "All of the above")**: Tag all components that make up the correct answer
+   - **Example**: If Q asks "Which cytogenetic abnormality is associated with X?" and A: t(11;14), B: t(4;14), C: del(17p), D: gain(1q) with correct answer A, ONLY tag t(11;14) as biomarker, NOT the distractors.
+8. **Try very hard**: For Breast cancer and NSCLC, make every effort to determine the subtype
+9. **Avoid redundancy**: Don't tag biomarker when it's already in disease_type (see redundancy rules)
+10. **Respect disease-specific rules**: Each cancer type has specific staging and treatment line conventions
+11. **Priority order**: Disease state > Topic > Treatment > Disease stage > Disease type > Treatment line > Biomarker > Trial
 
 Now analyze the following question:

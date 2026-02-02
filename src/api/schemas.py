@@ -29,7 +29,8 @@ class PerformanceMetric(BaseModel):
 
 
 class TagInfo(BaseModel):
-    """Tag information with confidence score."""
+    """Tag information with confidence score for all 70 LLM-tagged fields + 2 computed."""
+    # === Group A: Core Classification (20 fields) ===
     topic: Optional[str] = None
     topic_confidence: Optional[float] = None
     topic_method: Optional[str] = None
@@ -37,31 +38,204 @@ class TagInfo(BaseModel):
     disease_state_confidence: Optional[float] = None
     disease_stage: Optional[str] = None
     disease_stage_confidence: Optional[float] = None
-    disease_type: Optional[str] = None
+    disease_type_1: Optional[str] = None
+    disease_type_2: Optional[str] = None
     disease_type_confidence: Optional[float] = None
     treatment_line: Optional[str] = None
     treatment_line_confidence: Optional[float] = None
-    treatment: Optional[str] = None
+
+    # === Multi-value Existing Fields (15 slots) ===
+    treatment_1: Optional[str] = None
+    treatment_2: Optional[str] = None
+    treatment_3: Optional[str] = None
+    treatment_4: Optional[str] = None
+    treatment_5: Optional[str] = None
     treatment_confidence: Optional[float] = None
-    biomarker: Optional[str] = None
+    biomarker_1: Optional[str] = None
+    biomarker_2: Optional[str] = None
+    biomarker_3: Optional[str] = None
+    biomarker_4: Optional[str] = None
+    biomarker_5: Optional[str] = None
     biomarker_confidence: Optional[float] = None
-    trial: Optional[str] = None
+    trial_1: Optional[str] = None
+    trial_2: Optional[str] = None
+    trial_3: Optional[str] = None
+    trial_4: Optional[str] = None
+    trial_5: Optional[str] = None
     trial_confidence: Optional[float] = None
+
+    # === Group B: Patient Characteristics (5 fields) ===
+    treatment_eligibility: Optional[str] = None
+    age_group: Optional[str] = None
+    organ_dysfunction: Optional[str] = None
+    fitness_status: Optional[str] = None
+    disease_specific_factor: Optional[str] = None
+
+    # === Group C: Treatment Metadata (10 fields) ===
+    drug_class_1: Optional[str] = None
+    drug_class_2: Optional[str] = None
+    drug_class_3: Optional[str] = None
+    drug_target_1: Optional[str] = None
+    drug_target_2: Optional[str] = None
+    drug_target_3: Optional[str] = None
+    prior_therapy_1: Optional[str] = None
+    prior_therapy_2: Optional[str] = None
+    prior_therapy_3: Optional[str] = None
+    resistance_mechanism: Optional[str] = None
+
+    # === Group D: Clinical Context (7 fields) ===
+    metastatic_site_1: Optional[str] = None
+    metastatic_site_2: Optional[str] = None
+    metastatic_site_3: Optional[str] = None
+    symptom_1: Optional[str] = None
+    symptom_2: Optional[str] = None
+    symptom_3: Optional[str] = None
+    performance_status: Optional[str] = None
+
+    # === Group E: Safety/Toxicity (7 fields) ===
+    toxicity_type_1: Optional[str] = None
+    toxicity_type_2: Optional[str] = None
+    toxicity_type_3: Optional[str] = None
+    toxicity_type_4: Optional[str] = None
+    toxicity_type_5: Optional[str] = None
+    toxicity_organ: Optional[str] = None
+    toxicity_grade: Optional[str] = None
+
+    # === Group F: Efficacy/Outcomes (5 fields) ===
+    efficacy_endpoint_1: Optional[str] = None
+    efficacy_endpoint_2: Optional[str] = None
+    efficacy_endpoint_3: Optional[str] = None
+    outcome_context: Optional[str] = None
+    clinical_benefit: Optional[str] = None
+
+    # === Group G: Evidence/Guidelines (3 fields) ===
+    guideline_source_1: Optional[str] = None
+    guideline_source_2: Optional[str] = None
+    evidence_type: Optional[str] = None
+
+    # === Group H: Question Format/Quality (13 LLM-tagged fields) ===
+    # Existing (2)
+    cme_outcome_level: Optional[str] = None
+    data_response_type: Optional[str] = None
+    # Question structure (5)
+    stem_type: Optional[str] = None
+    lead_in_type: Optional[str] = None
+    answer_format: Optional[str] = None
+    answer_length_pattern: Optional[str] = None
+    distractor_homogeneity: Optional[str] = None
+    # Item writing flaws (6 boolean fields)
+    flaw_absolute_terms: Optional[bool] = None
+    flaw_grammatical_cue: Optional[bool] = None
+    flaw_implausible_distractor: Optional[bool] = None
+    flaw_clang_association: Optional[bool] = None
+    flaw_convergence_vulnerability: Optional[bool] = None
+    flaw_double_negative: Optional[bool] = None
+
+    # === Computed fields (derived from raw data, not LLM-tagged) ===
+    answer_option_count: Optional[int] = None
+    correct_answer_position: Optional[str] = None
+
+    # === Review metadata ===
     needs_review: Optional[bool] = None
     review_flags: Optional[List[str]] = None
     flagged_at: Optional[datetime] = None
 
 
 class TagUpdate(BaseModel):
-    """Request model for updating tags on a question."""
+    """Request model for updating tags on a question (all 70 LLM-tagged fields)."""
+    # === Group A: Core Classification ===
     topic: Optional[str] = None
     disease_state: Optional[str] = None
     disease_stage: Optional[str] = None
-    disease_type: Optional[str] = None
+    disease_type_1: Optional[str] = None
+    disease_type_2: Optional[str] = None
     treatment_line: Optional[str] = None
-    treatment: Optional[str] = None
-    biomarker: Optional[str] = None
-    trial: Optional[str] = None
+
+    # === Multi-value Existing Fields ===
+    treatment_1: Optional[str] = None
+    treatment_2: Optional[str] = None
+    treatment_3: Optional[str] = None
+    treatment_4: Optional[str] = None
+    treatment_5: Optional[str] = None
+    biomarker_1: Optional[str] = None
+    biomarker_2: Optional[str] = None
+    biomarker_3: Optional[str] = None
+    biomarker_4: Optional[str] = None
+    biomarker_5: Optional[str] = None
+    trial_1: Optional[str] = None
+    trial_2: Optional[str] = None
+    trial_3: Optional[str] = None
+    trial_4: Optional[str] = None
+    trial_5: Optional[str] = None
+
+    # === Group B: Patient Characteristics ===
+    treatment_eligibility: Optional[str] = None
+    age_group: Optional[str] = None
+    organ_dysfunction: Optional[str] = None
+    fitness_status: Optional[str] = None
+    disease_specific_factor: Optional[str] = None
+
+    # === Group C: Treatment Metadata ===
+    drug_class_1: Optional[str] = None
+    drug_class_2: Optional[str] = None
+    drug_class_3: Optional[str] = None
+    drug_target_1: Optional[str] = None
+    drug_target_2: Optional[str] = None
+    drug_target_3: Optional[str] = None
+    prior_therapy_1: Optional[str] = None
+    prior_therapy_2: Optional[str] = None
+    prior_therapy_3: Optional[str] = None
+    resistance_mechanism: Optional[str] = None
+
+    # === Group D: Clinical Context ===
+    metastatic_site_1: Optional[str] = None
+    metastatic_site_2: Optional[str] = None
+    metastatic_site_3: Optional[str] = None
+    symptom_1: Optional[str] = None
+    symptom_2: Optional[str] = None
+    symptom_3: Optional[str] = None
+    performance_status: Optional[str] = None
+
+    # === Group E: Safety/Toxicity ===
+    toxicity_type_1: Optional[str] = None
+    toxicity_type_2: Optional[str] = None
+    toxicity_type_3: Optional[str] = None
+    toxicity_type_4: Optional[str] = None
+    toxicity_type_5: Optional[str] = None
+    toxicity_organ: Optional[str] = None
+    toxicity_grade: Optional[str] = None
+
+    # === Group F: Efficacy/Outcomes ===
+    efficacy_endpoint_1: Optional[str] = None
+    efficacy_endpoint_2: Optional[str] = None
+    efficacy_endpoint_3: Optional[str] = None
+    outcome_context: Optional[str] = None
+    clinical_benefit: Optional[str] = None
+
+    # === Group G: Evidence/Guidelines ===
+    guideline_source_1: Optional[str] = None
+    guideline_source_2: Optional[str] = None
+    evidence_type: Optional[str] = None
+
+    # === Group H: Question Format/Quality (13 LLM-tagged fields) ===
+    # Existing (2)
+    cme_outcome_level: Optional[str] = None
+    data_response_type: Optional[str] = None
+    # Question structure (5)
+    stem_type: Optional[str] = None
+    lead_in_type: Optional[str] = None
+    answer_format: Optional[str] = None
+    answer_length_pattern: Optional[str] = None
+    distractor_homogeneity: Optional[str] = None
+    # Item writing flaws (6 boolean fields)
+    flaw_absolute_terms: Optional[bool] = None
+    flaw_grammatical_cue: Optional[bool] = None
+    flaw_implausible_distractor: Optional[bool] = None
+    flaw_clang_association: Optional[bool] = None
+    flaw_convergence_vulnerability: Optional[bool] = None
+    flaw_double_negative: Optional[bool] = None
+
+    # === Admin fields ===
     question_stem: Optional[str] = Field(None, description="Updated question stem (admin only)")
     mark_as_reviewed: Optional[bool] = False
 
@@ -137,6 +311,11 @@ class SearchFilters(BaseModel):
     biomarkers: Optional[List[str]] = Field(None, description="Filter by biomarker(s)")
     trials: Optional[List[str]] = Field(None, description="Filter by trial(s)")
     activities: Optional[List[str]] = Field(None, description="Filter by activity(s)")
+    # Patient Characteristics filters (new in 70-field schema)
+    treatment_eligibilities: Optional[List[str]] = Field(None, description="Filter by treatment eligibility (Transplant-eligible, etc.)")
+    age_groups: Optional[List[str]] = Field(None, description="Filter by age group (Younger, Elderly, Very elderly)")
+    fitness_statuses: Optional[List[str]] = Field(None, description="Filter by fitness status (Fit, Frail)")
+    organ_dysfunctions: Optional[List[str]] = Field(None, description="Filter by organ dysfunction (Renal, Cardiac, Hepatic)")
     min_confidence: Optional[float] = Field(None, ge=0, le=1, description="Minimum confidence threshold")
     max_confidence: Optional[float] = Field(None, ge=0, le=1, description="Maximum confidence threshold")
     has_performance_data: Optional[bool] = Field(None, description="Filter to questions with performance data")
@@ -171,19 +350,109 @@ class SearchResponse(BaseModel):
 # ============== Export Models ==============
 
 class QuestionExport(BaseModel):
-    """Question data for export with all tags and activities."""
+    """Question data for export with all 70 LLM-tagged fields + 2 computed + activities."""
     id: int
     question_stem: str
     correct_answer: Optional[str] = None
     incorrect_answers: Optional[str] = Field(None, description="Pipe-separated list of incorrect answers")
+
+    # === Group A: Core Classification ===
     topic: Optional[str] = None
     disease_state: Optional[str] = None
-    disease_type: Optional[str] = None
+    disease_type_1: Optional[str] = None
+    disease_type_2: Optional[str] = None
     disease_stage: Optional[str] = None
-    treatment: Optional[str] = None
     treatment_line: Optional[str] = None
-    biomarker: Optional[str] = None
-    trial: Optional[str] = None
+
+    # === Multi-value Existing Fields ===
+    treatment_1: Optional[str] = None
+    treatment_2: Optional[str] = None
+    treatment_3: Optional[str] = None
+    treatment_4: Optional[str] = None
+    treatment_5: Optional[str] = None
+    biomarker_1: Optional[str] = None
+    biomarker_2: Optional[str] = None
+    biomarker_3: Optional[str] = None
+    biomarker_4: Optional[str] = None
+    biomarker_5: Optional[str] = None
+    trial_1: Optional[str] = None
+    trial_2: Optional[str] = None
+    trial_3: Optional[str] = None
+    trial_4: Optional[str] = None
+    trial_5: Optional[str] = None
+
+    # === Group B: Patient Characteristics ===
+    treatment_eligibility: Optional[str] = None
+    age_group: Optional[str] = None
+    organ_dysfunction: Optional[str] = None
+    fitness_status: Optional[str] = None
+    disease_specific_factor: Optional[str] = None
+
+    # === Group C: Treatment Metadata ===
+    drug_class_1: Optional[str] = None
+    drug_class_2: Optional[str] = None
+    drug_class_3: Optional[str] = None
+    drug_target_1: Optional[str] = None
+    drug_target_2: Optional[str] = None
+    drug_target_3: Optional[str] = None
+    prior_therapy_1: Optional[str] = None
+    prior_therapy_2: Optional[str] = None
+    prior_therapy_3: Optional[str] = None
+    resistance_mechanism: Optional[str] = None
+
+    # === Group D: Clinical Context ===
+    metastatic_site_1: Optional[str] = None
+    metastatic_site_2: Optional[str] = None
+    metastatic_site_3: Optional[str] = None
+    symptom_1: Optional[str] = None
+    symptom_2: Optional[str] = None
+    symptom_3: Optional[str] = None
+    performance_status: Optional[str] = None
+
+    # === Group E: Safety/Toxicity ===
+    toxicity_type_1: Optional[str] = None
+    toxicity_type_2: Optional[str] = None
+    toxicity_type_3: Optional[str] = None
+    toxicity_type_4: Optional[str] = None
+    toxicity_type_5: Optional[str] = None
+    toxicity_organ: Optional[str] = None
+    toxicity_grade: Optional[str] = None
+
+    # === Group F: Efficacy/Outcomes ===
+    efficacy_endpoint_1: Optional[str] = None
+    efficacy_endpoint_2: Optional[str] = None
+    efficacy_endpoint_3: Optional[str] = None
+    outcome_context: Optional[str] = None
+    clinical_benefit: Optional[str] = None
+
+    # === Group G: Evidence/Guidelines ===
+    guideline_source_1: Optional[str] = None
+    guideline_source_2: Optional[str] = None
+    evidence_type: Optional[str] = None
+
+    # === Group H: Question Format/Quality (13 LLM-tagged fields) ===
+    # Existing (2)
+    cme_outcome_level: Optional[str] = None
+    data_response_type: Optional[str] = None
+    # Question structure (5)
+    stem_type: Optional[str] = None
+    lead_in_type: Optional[str] = None
+    answer_format: Optional[str] = None
+    answer_length_pattern: Optional[str] = None
+    distractor_homogeneity: Optional[str] = None
+    # Item writing flaws (6 boolean fields)
+    flaw_absolute_terms: Optional[bool] = None
+    flaw_grammatical_cue: Optional[bool] = None
+    flaw_implausible_distractor: Optional[bool] = None
+    flaw_clang_association: Optional[bool] = None
+    flaw_convergence_vulnerability: Optional[bool] = None
+    flaw_double_negative: Optional[bool] = None
+
+    # === Computed fields (derived from raw data) ===
+    answer_option_count: Optional[int] = None
+    correct_answer_position: Optional[str] = None
+
+    # === Performance metrics ===
     pre_score: Optional[float] = None
     post_score: Optional[float] = None
     knowledge_gain: Optional[float] = None
@@ -210,6 +479,11 @@ class FilterOptions(BaseModel):
     biomarkers: List[dict] = Field(default_factory=list)
     trials: List[dict] = Field(default_factory=list)
     activities: List[dict] = Field(default_factory=list)
+    # Patient Characteristics filter options (new in 70-field schema)
+    treatment_eligibilities: List[dict] = Field(default_factory=list)
+    age_groups: List[dict] = Field(default_factory=list)
+    fitness_statuses: List[dict] = Field(default_factory=list)
+    organ_dysfunctions: List[dict] = Field(default_factory=list)
 
 
 # ============== Analytics Models ==============

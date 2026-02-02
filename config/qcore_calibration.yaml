@@ -1,0 +1,182 @@
+# QCore Score Calibration Configuration
+#
+# Part of Q-Suite: Question Quality Analysis
+# QCore = QC (Quality Check) + Core (getting to the core of question quality)
+# Expert default penalties based on psychometric research (Haladyna et al., Case & Swanson).
+# These weights will be refined as performance data accumulates.
+#
+# Last updated: 2026-02-01
+# Calibration status: Expert defaults (pre-data)
+# Questions analyzed: 250 (MM only)
+# Next calibration: After 4K questions tagged
+
+version: "1.0.0"
+calibration_date: "2026-02-01"
+calibration_type: "expert_defaults"
+questions_analyzed: 250
+
+# Two grading scales based on CME outcome level
+# Note: No F grade - D is the floor
+grading_scales:
+  L3_knowledge:
+    description: "Level 3 (Knowledge) - Recall/recognition questions"
+    thresholds:
+      A: 85
+      B: 70
+      C: 55
+      D: 0  # D is the floor (no F grade)
+  L4_competence:
+    description: "Level 4 (Competence) - Application/decision questions"
+    thresholds:
+      A: 90
+      B: 80
+      C: 67
+      D: 0  # D is the floor (no F grade)
+
+# Item writing flaw penalties (Tier 2-4)
+# Format: flaw_field: {L3: penalty, L4: penalty, tier: N, research_basis: "citation"}
+flaw_penalties:
+  flaw_grammatical_cue:
+    L3: 8
+    L4: 12
+    tier: 2
+    research_basis: "Strong test-wiseness cue (Haladyna 2004)"
+    expected_impact: "Inflates pre-score (test-wiseness)"
+
+  flaw_implausible_distractor:
+    L3: 6
+    L4: 10
+    tier: 3
+    research_basis: "Reduces effective options; validity threat (less severe if 4+ options)"
+    expected_impact: "Inflates pre-score AND reduces knowledge gain"
+
+  flaw_clang_association:
+    L3: 6
+    L4: 10
+    tier: 3
+    research_basis: "Word matching enables cueing"
+    expected_impact: "Inflates pre-score (test-wiseness)"
+
+  flaw_convergence_vulnerability:
+    L3: 6
+    L4: 10
+    tier: 3
+    research_basis: "Elimination strategy bypass (Case & Swanson)"
+    expected_impact: "Inflates pre-score (test-wiseness)"
+
+  flaw_absolute_terms:
+    L3: 5
+    L4: 8
+    tier: 4
+    research_basis: "'Always/never' heuristic widely known"
+    expected_impact: "Inflates pre-score (test-wiseness)"
+
+  flaw_double_negative:
+    L3: 5
+    L4: 8
+    tier: 4
+    research_basis: "Cognitive load issue, not knowledge barrier"
+    expected_impact: "Reduces knowledge gain (confusion)"
+
+# Structure-based deductions (Tier 1-4)
+# Tier 1 (-15 L4 / -10 L3): Fundamentally flawed question formats
+# Tier 2 (-12 L4 / -8 L3): Major vulnerabilities
+# Tier 3 (-10 L4 / -6 L3): Significant issues
+# Tier 4 (-8 L4 / -5 L3): Minor issues
+structure_deductions:
+  distractor_homogeneity:
+    Heterogeneous:
+      L3: 5
+      L4: 8
+      tier: 4
+      rationale: "Mixed distractor types reduce discrimination"
+
+  answer_length_pattern:
+    Variable:
+      L3: 2
+      L4: 4
+      rationale: "Inconsistent lengths are minor cue"
+    Correct longest:
+      L3: 8
+      L4: 12
+      tier: 2
+      rationale: "MAJOR test-wiseness vulnerability - savvy test-takers choose longest"
+    Correct shortest:
+      L3: 8
+      L4: 12
+      tier: 2
+      rationale: "MAJOR test-wiseness vulnerability - savvy test-takers notice brevity"
+
+  answer_option_count:
+    2:
+      L3: 10
+      L4: 15
+      tier: 1
+      rationale: "50% guessing probability - too high for competence assessment (unless True-False)"
+    3:
+      L3: 6
+      L4: 10
+      tier: 3
+      rationale: "33% guessing probability"
+
+  data_response_type:
+    Numeric:
+      L3: 10
+      L4: 15
+      tier: 1
+      rationale: "Numeric questions inappropriate for competence assessment"
+
+  answer_format:
+    All of above:
+      L3: 10
+      L4: 15
+      tier: 1
+      rationale: "Test-wiseness vulnerability (pattern recognition)"
+    None of above:
+      L3: 10
+      L4: 15
+      tier: 1
+      rationale: "Test-wiseness vulnerability (elimination strategy)"
+    True-False:
+      L3: 10
+      L4: 15
+      tier: 1
+      rationale: "Binary format, high guess rate"
+    Compound (A+B):
+      L3: 8
+      L4: 12
+      tier: 2
+      rationale: "Reduces discrimination, complex scoring"
+
+  lead_in_type:
+    Negative (EXCEPT/NOT):
+      L3: 10
+      L4: 15
+      tier: 1
+      rationale: "Confusing format, tests recall not application"
+
+  stem_type:
+    Incomplete statement:
+      L3: 4
+      L4: 6
+      rationale: "'The mechanism of X is...' format - tests recall, not application"
+
+# Structure-based bonuses (REMOVED)
+# Starting from 100 means 100 is the ideal baseline
+# Good structure is expected, not rewarded above baseline
+structure_bonuses: {}
+
+# Future calibration notes
+calibration_notes:
+  - "Initial weights are expert-derived, not data-driven"
+  - "Plan to recalibrate after 4K questions are tagged (est. 1-2 months)"
+  - "Calibration will use: mean(pre_with_flaw) - mean(pre_without_flaw) for test-wiseness"
+  - "Calibration will use: mean(gain_without_flaw) - mean(gain_with_flaw) for confusion"
+  - "Penalties will be normalized to 0-15 range per flaw"
+  - "D is the floor grade - no F grade assigned"
+
+# References
+references:
+  - "Haladyna TM, Downing SM, Rodriguez MC. A review of multiple-choice item-writing guidelines for classroom assessment. Applied Measurement in Education. 2002;15(3):309-333."
+  - "Case SM, Swanson DB. Constructing Written Test Questions for the Basic and Clinical Sciences. NBME. 2002."
+  - "Masters JC, Hulsmeyer BS, Pike ME, et al. Assessment of multiple-choice questions in selected test banks accompanying text books used in nursing education. J Nurs Educ. 2001;40(1):25-32."

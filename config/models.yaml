@@ -15,7 +15,7 @@ models:
     cost_per_m_input: 1.75
     cost_per_m_output: 14.00
     temperature: 0.1
-    max_tokens: 1000
+    max_tokens: 4000  # Increased for 70-field JSON output
 
   claude:
     id: "anthropic/claude-opus-4.5"
@@ -24,7 +24,7 @@ models:
     cost_per_m_input: 5.00
     cost_per_m_output: 25.00
     temperature: 0.1
-    max_tokens: 1000
+    max_tokens: 4000  # Increased for 70-field JSON output
 
   gemini:
     id: "google/gemini-2.5-pro"
@@ -33,7 +33,7 @@ models:
     cost_per_m_input: 1.25
     cost_per_m_output: 10.00
     temperature: 0.1
-    max_tokens: 1000
+    max_tokens: 6000  # Higher limit - Gemini needs more tokens for 70-field JSON
 
   search:
     id: "perplexity/sonar"
@@ -48,9 +48,10 @@ models:
       search_context_size: "high"
 
 # Model roles
+# 2-model voting: GPT-5.2 + Gemini 2.5 Pro
+# Claude dropped for cost savings - comparable accuracy at higher cost
 voting_models:
   - gpt
-  - claude
   - gemini
 
 search_model: search

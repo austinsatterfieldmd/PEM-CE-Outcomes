@@ -1,11 +1,16 @@
 # Automated CE Outcomes Dashboard - Git Ignore
 
-# Environment
+# ===========================================
+# ENVIRONMENT & SECRETS
+# ===========================================
 .env
 .env.local
 .env.*.local
+*.env
 
-# Python
+# ===========================================
+# PYTHON
+# ===========================================
 __pycache__/
 *.py[cod]
 *$py.class
@@ -33,14 +38,18 @@ ENV/
 env/
 .venv/
 
-# IDE
+# ===========================================
+# IDE & EDITORS
+# ===========================================
 .idea/
 .vscode/
 *.swp
 *.swo
 *~
 
-# Testing
+# ===========================================
+# TESTING
+# ===========================================
 .coverage
 .pytest_cache/
 htmlcov/
@@ -52,45 +61,120 @@ htmlcov/
 .dmypy.json
 dmypy.json
 
-# Logs
+# ===========================================
+# LOGS
+# ===========================================
 logs/*.log
 *.log
 
-# Database (keep structure, ignore data)
+# ===========================================
+# DATA FILES (SENSITIVE - DO NOT COMMIT)
+# ===========================================
+
+# Database files
+*.db
 data/databases/*.db
 !data/databases/.gitkeep
 
-# Raw data files (may contain sensitive data)
-data/raw/*.xlsx
-data/raw/*.csv
-data/raw/*.json
+# Excel files (may contain PII/sensitive data)
+*.xlsx
+*.xls
+
+# CSV data files
+data/**/*.csv
+
+# JSON data files (checkpoints, results, etc.)
+data/**/*.json
+data/**/*.jsonl
+
+# Text reports
+data/**/*.txt
+
+# Keep directory structure
+!data/databases/.gitkeep
 !data/raw/.gitkeep
+!data/review/.gitkeep
 
-# Review files (generated)
-data/review/*.xlsx
+# Root-level data files
+data/questions.db
+data/*.txt
+data/*.json
 
-# Node.js (dashboard)
+# Checkpoint data
+data/checkpoints/
+data/corrections/
+data/eval/
+data/output/
+
+# Dashboard data
+dashboard/data/
+
+# Deduplication data
+deduplication_v2/data/*.parquet
+deduplication_v2/data/*.json
+deduplication_v2/data/*.xlsx
+deduplication_v2/data/*.csv
+deduplication_v2/data/*.txt
+deduplication_v2/data/*.yaml
+# Keep the summary markdown
+!deduplication_v2/data/data_quality_summary.md
+
+# Outcomes data
+Outcomes/
+
+# ===========================================
+# TEMPORARY & GENERATED FILES
+# ===========================================
+*.tmp
+*.temp
+*.bak
+nul
+_ul
+_ul-*
+
+# Test JSON files (root level)
+q*.json
+response.json
+temp_*.json
+
+# ===========================================
+# DOCUMENTATION DRAFTS
+# ===========================================
+*.docx
+*.pptx
+
+# ===========================================
+# NODE.JS (Dashboard Frontend)
+# ===========================================
 node_modules/
 dashboard/node_modules/
+dashboard/frontend/node_modules/
 .npm
 .pnpm-store/
+package-lock.json
+dashboard/frontend/package-lock.json
 
 # Build outputs
 dashboard/dist/
 dashboard/build/
+dashboard/frontend/dist/
+dashboard/frontend/build/
 .vite/
 
-# OS
+# ===========================================
+# OS FILES
+# ===========================================
 .DS_Store
 Thumbs.db
+desktop.ini
 
-# Temporary files
-*.tmp
-*.temp
-*.bak
-
-# Claude Code local settings
+# ===========================================
+# CLAUDE CODE
+# ===========================================
 .claude/
 
-# Documentation drafts (Word docs)
-*.docx
+# ===========================================
+# MISC
+# ===========================================
+# Internal planning documents (not for repo)
+Retagging*.md

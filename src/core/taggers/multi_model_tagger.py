@@ -76,10 +76,10 @@ class MultiModelTagger:
             # V2.0: Two-stage approach
             self.disease_classifier = DiseaseClassifier(
                 client=self.client,
-                model=disease_classifier_model
+                use_voting=True
             )
             self.prompt_manager = get_prompt_manager()
-            logger.info(f"Initialized two-stage tagger (v2.0) with {disease_classifier_model}")
+            logger.info("Initialized two-stage tagger (v2.0) with 2-model voting")
         else:
             # V1.0: Single-stage approach (legacy)
             self.system_prompt = self._load_prompt("system_prompt.txt")
@@ -144,6 +144,7 @@ Example response format:
         self,
         question_text: str,
         correct_answer: Optional[str] = None,
+        incorrect_answers: Optional[List[str]] = None,
         kb_context: Optional[Dict] = None,
         disease_prompt: Optional[str] = None,
         known_disease_state: Optional[str] = None
@@ -154,6 +155,7 @@ Example response format:
         Args:
             question_text: The question text
             correct_answer: Optional correct answer
+            incorrect_answers: Optional list of incorrect answer options
             kb_context: Optional knowledge base context
             disease_prompt: Disease-specific prompt (v2.0 only)
             known_disease_state: Known disease state from Stage 1 (v2.0 only)
@@ -185,7 +187,25 @@ Example response format:
         # User message with question
         user_content = f"Question: {question_text}\n"
         if correct_answer:
-            user_content += f"Correct Answer: {correct_answer}\n"
+            user_content += f"\nCorrect Answer: {correct_answer}\n"
+
+        # Add answer options if provided
+        if incorrect_answers:
+            user_content += "\nIncorrect Answer Options:\n"
+            for i, ans in enumerate(incorrect_answers, 1):
+                user_content += f"  {i}. {ans}\n"
+
+            # Add guidance for using answer options
+            user_content += """
+IMPORTANT - Answer Options Usage:
+- If the correct answer is a compound answer (e.g., "A and B", "All of the above"),
+  extract ALL relevant entities from the combined answer options for tagging.
+  Example: If correct answer is "A and B" where A=trastuzumab and B=pertuzumab,
+  tag BOTH in treatment_1 and treatment_2.
+- Use the answer options to evaluate question quality fields (Group F):
+  answer_format, distractor_homogeneity, and flaw_* fields.
+- Consider what the answer options reveal about the educational focus.
+"""
 
         # V2.0: Inject known disease info from Stage 1
         if known_disease_state:
@@ -305,8 +325,8 @@ Example response format:
         question_id: int,
         question_text: str,
         correct_answer: Optional[str] = None,
-        kb_context: Optional[Dict] = None,
-        activity_name: Optional[str] = None
+        incorrect_answers: Optional[List[str]] = None,
+        kb_context: Optional[Dict] = None
     ) -> AggregatedVote:
         """
         Tag a single question with 3-model voting.
@@ -322,8 +342,9 @@ Example response format:
             question_id: Database ID of the question
             question_text: The question stem text
             correct_answer: Optional correct answer text
+            incorrect_answers: Optional list of incorrect answer options (needed for compound
+                             answer analysis and question quality assessment)
             kb_context: Optional knowledge base context
-            activity_name: Optional activity/course title (provides context for disease classification)
 
         Returns:
             AggregatedVote with voting results
@@ -333,7 +354,7 @@ Example response format:
         if self.use_two_stage:
             # === V2.0: TWO-STAGE FLOW ===
             return await self._tag_question_two_stage(
-                question_id, question_text, correct_answer, kb_context, activity_name
+                question_id, question_text, correct_answer, incorrect_answers, kb_context
             )
         else:
             # === V1.0: SINGLE-STAGE FLOW ===
@@ -367,13 +388,14 @@ Example response format:
             gemini_response=gemini_tags
         )
 
-        # Optional web search for conflicts
-        if self.use_web_search and aggregated.overall_agreement == AgreementLevel.CONFLICT:
+        # Web search for ANY disagreement (majority or conflict) - not just conflict
+        if self.use_web_search and aggregated.overall_agreement in [AgreementLevel.CONFLICT, AgreementLevel.MAJORITY]:
+            logger.info(f"Question {question_id}: Triggering web search due to {aggregated.overall_agreement.value} agreement")
             await self._handle_web_search(question_text, aggregated)
 
         logger.info(
             f"Question {question_id}: {aggregated.overall_agreement.value} "
-            f"(confidence: {aggregated.overall_confidence})"
+            f"(confidence: {aggregated.overall_confidence}, needs_review: {aggregated.needs_review})"
         )
 
         return aggregated
@@ -383,8 +405,8 @@ Example response format:
         question_id: int,
         question_text: str,
         correct_answer: Optional[str] = None,
-        kb_context: Optional[Dict] = None,
-        activity_name: Optional[str] = None
+        incorrect_answers: Optional[List[str]] = None,
+        kb_context: Optional[Dict] = None
     ) -> AggregatedVote:
         """
         V2.0: Two-stage tagging with oncology gate + disease classification.
@@ -397,8 +419,7 @@ Example response format:
         logger.info(f"Stage 1: Classifying oncology status and disease state for question {question_id}")
         disease_info = await self.disease_classifier.classify(
             question_text,
-            correct_answer,
-            activity_name=activity_name
+            correct_answer
         )
         is_oncology = disease_info.get("is_oncology", True)  # Default to True for safety
         disease_state = disease_info.get("disease_state")
@@ -433,9 +454,12 @@ Example response format:
         # === STAGE 2: Disease-Specific Tagging (oncology only) ===
         logger.info(f"Stage 2: Loading disease-specific prompt for {disease_state}")
 
-        # Load disease-specific prompt (or fallback if not available)
+        # Load disease-specific prompt WITH few-shot examples from human corrections
         if disease_state:
-            disease_prompt = self.prompt_manager.get_disease_prompt(disease_state, version=self.prompt_version)
+            # Try to get prompt with human-corrected few-shot examples
+            disease_prompt = self.prompt_manager.get_disease_prompt_with_fewshots(
+                disease_state, version=self.prompt_version, num_fewshots=3
+            )
             if not disease_prompt:
                 logger.warning(f"No disease-specific prompt for {disease_state}, using fallback")
                 disease_prompt = self.prompt_manager.get_fallback_prompt(version=self.prompt_version)
@@ -447,6 +471,7 @@ Example response format:
         messages = self._build_messages(
             question_text=question_text,
             correct_answer=correct_answer,
+            incorrect_answers=incorrect_answers,
             kb_context=kb_context,
             disease_prompt=disease_prompt,
             known_disease_state=disease_state
@@ -473,13 +498,14 @@ Example response format:
         if aggregated.final_tags:
             aggregated.final_tags["is_oncology"] = True
 
-        # Optional web search for conflicts
-        if self.use_web_search and aggregated.overall_agreement == AgreementLevel.CONFLICT:
+        # Web search for ANY disagreement (majority or conflict) - not just conflict
+        if self.use_web_search and aggregated.overall_agreement in [AgreementLevel.CONFLICT, AgreementLevel.MAJORITY]:
+            logger.info(f"Question {question_id}: Triggering web search due to {aggregated.overall_agreement.value} agreement")
             await self._handle_web_search(question_text, aggregated)
 
         logger.info(
             f"Question {question_id}: {aggregated.overall_agreement.value} "
-            f"(confidence: {aggregated.overall_confidence})"
+            f"(confidence: {aggregated.overall_confidence}, needs_review: {aggregated.needs_review})"
         )
 
         return aggregated
@@ -545,7 +571,12 @@ Example response format:
 
         if all_searches:
             aggregated.web_searches_used = all_searches
-            logger.info(f"Stage 2: Completed {len(all_searches)} web searches for conflict resolution")
+            # Update review_reason to indicate web search was used
+            if aggregated.review_reason:
+                aggregated.review_reason = f"{aggregated.review_reason}|web_search_used"
+            else:
+                aggregated.review_reason = "web_search_used"
+            logger.info(f"Stage 2: Completed {len(all_searches)} web searches for {aggregated.overall_agreement.value} resolution")
 
     async def tag_batch(
         self,

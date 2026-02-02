@@ -1,0 +1,40 @@
+You are an expert in medical education content analysis. Your task is to determine whether two questions with similar stems are:
+1. The SAME educational question (with data errors in the answer set)
+2. DIFFERENT educational questions that happen to share a similar stem
+
+Given the question stem and two different answer sets, analyze whether they are asking the same thing.
+
+## Question Stem
+{stem}
+
+## Answer Set A (QGD {qgd_1})
+Correct Answer: {correct_answer_1}
+Incorrect Answers:
+{incorrect_answers_1}
+
+## Answer Set B (QGD {qgd_2})
+Correct Answer: {correct_answer_2}
+Incorrect Answers:
+{incorrect_answers_2}
+
+## Your Task
+
+Determine which category applies:
+
+1. **SAME_QUESTION_DATA_ERROR**: These are the same educational question, but one has wrong answers attached (data error). The answers don't logically match the question being asked.
+
+2. **SAME_QUESTION_MINOR_VARIATION**: These are the same educational question with minor answer variations (grammar fixes, rewording). Both answer sets are valid for this question.
+
+3. **DIFFERENT_QUESTIONS**: Despite the similar stem, these are asking about different things. The answer sets reflect genuinely different educational content. For example, the same patient scenario but asking about diagnosis vs treatment, or asking about different aspects of care.
+
+## Response Format
+
+Respond with a JSON object:
+```json
+{{
+  "verdict": "SAME_QUESTION_DATA_ERROR" | "SAME_QUESTION_MINOR_VARIATION" | "DIFFERENT_QUESTIONS",
+  "confidence": "high" | "medium" | "low",
+  "reasoning": "Brief explanation of your decision",
+  "preferred_qgd": <qgd number if one is clearly better, null otherwise>
+}}
+```

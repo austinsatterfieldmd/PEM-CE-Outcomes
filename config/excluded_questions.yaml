@@ -1,0 +1,39 @@
+# Permanently Excluded Questions
+# Questions listed here will be filtered out during any import/restore operation.
+# This prevents multispecialty or non-oncology questions from being re-added.
+#
+# How to add:
+# 1. When "Not Oncology" is clicked in review, the source_id is automatically added here
+# 2. Manually add entries for known non-oncology questions
+#
+# Fields:
+#   source_id: The Question Group Designation (QGD) - primary identifier
+#   reason: Why excluded (multispecialty_sids, not_oncology, duplicate, etc.)
+#   excluded_date: When excluded (YYYY-MM-DD)
+#   activity: The activity name (for reference)
+#   notes: Optional additional context
+
+excluded_questions:
+  - source_id: "1188"
+    reason: "multispecialty_sids"
+    excluded_date: "2026-01-29"
+    activity: "Differentiating Secondary Immunodeficiencies to Improve Patient Outcomes"
+    notes: "CMV infection / secondary immunodeficiency testing - not MM-specific"
+
+  - source_id: "2280"
+    reason: "multispecialty_sids"
+    excluded_date: "2026-01-29"
+    activity: "Medical Crossfire: Which Patients with Hematologic Malignancies are at Risk for SID"
+    notes: "Hypogammaglobulinemia prevalence question - not MM treatment-specific"
+
+  - source_id: "7385"
+    reason: "multispecialty_sids"
+    excluded_date: "2026-01-29"
+    activity: "Medical Crossfire: Which Patients with Hematologic Malignancies are at Risk for SID"
+    notes: "67-year-old woman pre-HSCT immunodeficiency question - not MM treatment-specific"
+
+  - source_id: "4001"
+    reason: "not_oncology"
+    excluded_date: "2026-01-29"
+    activity: "Advances In Cirrhosis: Reframing the Management of Hepatorenal Syndrome-Acute Kidney Injury"
+    notes: "Hepatology/GI question about HRS-AKI pathophysiology in cirrhosis - not oncology"

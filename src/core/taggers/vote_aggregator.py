@@ -44,12 +44,16 @@ class AggregatedVote:
     overall_agreement: AgreementLevel = AgreementLevel.CONFLICT
     overall_confidence: float = 0.0
     needs_review: bool = True
+    review_reason: Optional[str] = None  # Why review is needed (for LLM eval)
     web_searches_used: List[Dict] = field(default_factory=list)
 
-    # Individual model responses
+    # Individual model responses (preserved for LLM eval)
     gpt_tags: Dict[str, Any] = field(default_factory=dict)
     claude_tags: Dict[str, Any] = field(default_factory=dict)
     gemini_tags: Dict[str, Any] = field(default_factory=dict)
+
+    # Final tags after aggregation
+    final_tags: Dict[str, Any] = field(default_factory=dict)
 
 
 class VoteAggregator:
@@ -58,23 +62,98 @@ class VoteAggregator:
 
     Voting rules:
     - UNANIMOUS (3/3): Auto-accept with confidence 1.0
-    - MAJORITY (2/3): Accept majority value with confidence 0.67, flag for spot-check
-    - CONFLICT (1/1/1): Flag for human review, no auto-assignment
+    - MAJORITY (2/3): Accept majority value with confidence 0.67, FLAG FOR REVIEW (for LLM eval)
+    - CONFLICT (1/1/1): NO auto-assignment, flag for human review
 
-    Configurable thresholds for auto-acceptance.
+    IMPORTANT: All individual model votes are preserved for LLM evaluation.
+    Never auto-resolve conflicts - always capture all votes and flag for review.
     """
 
-    # Tag fields that are voted on
+    # Tag fields that are voted on (73 total)
     TAG_FIELDS = [
+        # === Group A: Core Classification (5 + 15 multi-value = 20) ===
         "topic",
-        "disease_state",
         "disease_stage",
-        "disease_type",
+        "disease_type_1",
+        "disease_type_2",
         "treatment_line",
-        "treatment",
-        "biomarker",
-        "trial"
+
+        # === Multi-value Existing Fields (15) ===
+        "treatment_1", "treatment_2", "treatment_3", "treatment_4", "treatment_5",
+        "biomarker_1", "biomarker_2", "biomarker_3", "biomarker_4", "biomarker_5",
+        "trial_1", "trial_2", "trial_3", "trial_4", "trial_5",
+
+        # === Group B: Patient Characteristics (8) ===
+        "treatment_eligibility",
+        "age_group",
+        "organ_dysfunction",
+        "fitness_status",
+        "disease_specific_factor",
+        "comorbidity_1", "comorbidity_2", "comorbidity_3",
+
+        # === Group C: Treatment Metadata (10) ===
+        "drug_class_1", "drug_class_2", "drug_class_3",
+        "drug_target_1", "drug_target_2", "drug_target_3",
+        "prior_therapy_1", "prior_therapy_2", "prior_therapy_3",
+        "resistance_mechanism",
+
+        # === Group D: Clinical Context (7) ===
+        "metastatic_site_1", "metastatic_site_2", "metastatic_site_3",
+        "symptom_1", "symptom_2", "symptom_3",
+        "performance_status",
+
+        # === Group E: Safety/Toxicity (7) ===
+        "toxicity_type_1", "toxicity_type_2", "toxicity_type_3", "toxicity_type_4", "toxicity_type_5",
+        "toxicity_organ",
+        "toxicity_grade",
+
+        # === Group F: Efficacy/Outcomes (5) ===
+        "efficacy_endpoint_1", "efficacy_endpoint_2", "efficacy_endpoint_3",
+        "outcome_context",
+        "clinical_benefit",
+
+        # === Group G: Evidence/Guidelines (3) ===
+        "guideline_source_1", "guideline_source_2",
+        "evidence_type",
+
+        # === Group H: Question Format/Quality (13) ===
+        # Existing (2)
+        "cme_outcome_level",      # 3=Knowledge, 4=Competence
+        "data_response_type",     # Numeric/Qualitative/Comparative/Boolean
+        # Question structure (5)
+        "stem_type",              # Clinical vignette/Direct question/Incomplete statement
+        "lead_in_type",           # Standard/Negative (EXCEPT/NOT)/Best answer/True statement
+        "answer_format",          # Single best/Compound (A+B)/All of above/None of above/True-False
+        "answer_length_pattern",  # Uniform/Correct longest/Correct shortest/Variable
+        "distractor_homogeneity", # Homogeneous/Heterogeneous
+        # Item writing flaws - 6 separate boolean fields
+        "flaw_absolute_terms",         # true/false - "always", "never", "all", "none" in options
+        "flaw_grammatical_cue",        # true/false - stem grammar reveals answer
+        "flaw_implausible_distractor", # true/false - obviously wrong options
+        "flaw_clang_association",      # true/false - answer shares words with stem
+        "flaw_convergence_vulnerability", # true/false - multiple options share elements
+        "flaw_double_negative",        # true/false - negative stem + negative option
     ]
+
+    # Multi-value slot definitions (for validation and output formatting)
+    MULTI_VALUE_SLOTS = {
+        "treatment": 5,
+        "biomarker": 5,
+        "trial": 5,
+        "disease_type": 2,
+        "drug_class": 3,
+        "drug_target": 3,
+        "prior_therapy": 3,
+        "comorbidity": 3,
+        "metastatic_site": 3,
+        "symptom": 3,
+        "toxicity_type": 5,
+        "efficacy_endpoint": 3,
+        "guideline_source": 2,
+    }
+
+    # Computed fields (derived from raw data, not LLM-tagged)
+    COMPUTED_FIELDS = ["answer_option_count", "correct_answer_position"]
 
     def __init__(
         self,
@@ -120,6 +199,11 @@ class VoteAggregator:
         """
         Aggregate votes for a single tag field.
 
+        IMPORTANT: Never auto-resolve conflicts. All 3 votes are preserved.
+        - Unanimous: Auto-accept
+        - Majority: Accept majority BUT flag for review (dissenting vote preserved)
+        - Conflict: NO auto-assignment, flag for review (all votes preserved)
+
         Args:
             field_name: Name of the tag field
             gpt_value: GPT's value for this field
@@ -145,7 +229,7 @@ class VoteAggregator:
         values = [gpt_norm, claude_norm, gemini_norm]
         non_none_values = [v for v in values if v is not None]
 
-        # If all None, return as conflict with no value
+        # If all None, return as unanimous agreement on "no value"
         if not non_none_values:
             vote.agreement_level = AgreementLevel.UNANIMOUS
             vote.final_value = None
@@ -170,19 +254,24 @@ class VoteAggregator:
             vote.final_value = majority_value
             vote.confidence = self.majority_confidence
 
-            # Identify dissenting model
+            # Identify dissenting model (important for LLM eval)
             model_values = {"gpt": gpt_norm, "claude": claude_norm, "gemini": gemini_norm}
             for model, val in model_values.items():
                 if val != majority_value:
                     vote.dissenting_model = model
                     break
 
+            # Note: Majority votes are flagged for review in aggregate() method
             return vote
 
-        # Conflict (all different)
+        # Conflict (all different) - DO NOT auto-assign any value
         vote.agreement_level = AgreementLevel.CONFLICT
-        vote.final_value = None  # No auto-assignment for conflicts
+        vote.final_value = None  # Explicitly null - requires manual review
         vote.confidence = self.conflict_confidence
+
+        logger.info(
+            f"Field '{field_name}' conflict: gpt={gpt_norm}, claude={claude_norm}, gemini={gemini_norm}"
+        )
 
         return vote
 
@@ -197,6 +286,11 @@ class VoteAggregator:
         """
         Aggregate votes from all 3 models.
 
+        IMPORTANT: All votes are preserved for LLM evaluation.
+        - Unanimous: Auto-accept (unless spot-check selected)
+        - Majority: Accept majority value BUT flag for review
+        - Conflict: NO auto-assignment, flag for review
+
         Args:
             question_id: ID of the question being tagged
             gpt_response: GPT's tag assignments
@@ -205,7 +299,7 @@ class VoteAggregator:
             web_searches: Optional list of web searches performed
 
         Returns:
-            AggregatedVote with final results
+            AggregatedVote with final results and review flags
         """
         result = AggregatedVote(
             question_id=question_id,
@@ -217,6 +311,9 @@ class VoteAggregator:
 
         # Aggregate each tag field
         agreement_levels = []
+        conflict_fields = []
+        majority_fields = []
+
         for field in self.TAG_FIELDS:
             tag_vote = self._aggregate_field(
                 field_name=field,
@@ -227,19 +324,39 @@ class VoteAggregator:
             result.tags[field] = tag_vote
             agreement_levels.append(tag_vote.agreement_level)
 
-        # Determine overall agreement level
+            # Track which fields have disagreements (for review_reason)
+            if tag_vote.agreement_level == AgreementLevel.CONFLICT:
+                conflict_fields.append(field)
+            elif tag_vote.agreement_level == AgreementLevel.MAJORITY:
+                majority_fields.append(field)
+
+        # Build final_tags dict
+        result.final_tags = self.get_final_tags(result)
+
+        # Determine overall agreement level and review status
         if all(a == AgreementLevel.UNANIMOUS for a in agreement_levels):
             result.overall_agreement = AgreementLevel.UNANIMOUS
             result.overall_confidence = self.unanimous_confidence
             result.needs_review = not self.auto_accept_unanimous
+            result.review_reason = None
         elif any(a == AgreementLevel.CONFLICT for a in agreement_levels):
+            # Any conflict means review required
             result.overall_agreement = AgreementLevel.CONFLICT
             result.overall_confidence = self.conflict_confidence
             result.needs_review = True
+            result.review_reason = f"conflict_in_fields:{','.join(conflict_fields)}"
+            logger.warning(
+                f"Question {question_id}: Conflict in fields {conflict_fields} - flagging for manual review"
+            )
         else:
+            # Majority agreement - accept but flag for review (for LLM eval)
             result.overall_agreement = AgreementLevel.MAJORITY
             result.overall_confidence = self.majority_confidence
-            result.needs_review = True  # Majority votes go to review
+            result.needs_review = True  # CHANGED: Always review majority votes for LLM eval
+            result.review_reason = f"majority_in_fields:{','.join(majority_fields)}"
+            logger.info(
+                f"Question {question_id}: Majority agreement in fields {majority_fields} - flagging for review"
+            )
 
         return result
 
@@ -301,6 +418,8 @@ class VoteAggregator:
         """
         Format aggregated vote for human review interface.
 
+        Includes all individual model votes for LLM evaluation purposes.
+
         Args:
             aggregated: AggregatedVote result
 
@@ -312,6 +431,7 @@ class VoteAggregator:
             "overall_agreement": aggregated.overall_agreement.value,
             "overall_confidence": aggregated.overall_confidence,
             "needs_review": aggregated.needs_review,
+            "review_reason": aggregated.review_reason,
             "tags": {
                 field: {
                     "final": vote.final_value,
@@ -326,12 +446,20 @@ class VoteAggregator:
                 }
                 for field, vote in aggregated.tags.items()
             },
+            # Preserve full model responses for LLM eval
+            "model_responses": {
+                "gpt": aggregated.gpt_tags,
+                "claude": aggregated.claude_tags,
+                "gemini": aggregated.gemini_tags
+            },
             "web_searches": aggregated.web_searches_used
         }
 
     def to_database_format(self, aggregated: AggregatedVote) -> Dict[str, Any]:
         """
         Convert aggregated vote to database storage format.
+
+        Preserves all individual model votes for LLM evaluation.
 
         Args:
             aggregated: AggregatedVote result
@@ -343,11 +471,16 @@ class VoteAggregator:
 
         return {
             "question_id": aggregated.question_id,
+            # Individual model responses (preserved for LLM eval)
             "gpt_tags": json.dumps(aggregated.gpt_tags),
             "claude_tags": json.dumps(aggregated.claude_tags),
             "gemini_tags": json.dumps(aggregated.gemini_tags),
-            "aggregated_tags": json.dumps(self.get_final_tags(aggregated)),
+            # Aggregated result
+            "aggregated_tags": json.dumps(aggregated.final_tags or self.get_final_tags(aggregated)),
             "agreement_level": aggregated.overall_agreement.value,
+            # Review tracking
             "needs_review": aggregated.needs_review,
+            "review_reason": aggregated.review_reason,
+            # Web search results
             "web_searches": json.dumps(aggregated.web_searches_used) if aggregated.web_searches_used else None
         }

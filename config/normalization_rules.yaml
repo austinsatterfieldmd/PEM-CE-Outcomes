@@ -1,0 +1,393 @@
+treatment_aliases:
+  dara: daratumumab
+  dara-VRd: D-VRd
+  Dara-VRd: D-VRd
+  DVRd: D-VRd
+  dara-Rd: D-Rd
+  Dara-Rd: D-Rd
+  DRd: D-Rd
+  dara-Kd: D-Kd
+  Dara-Kd: D-Kd
+  DKd: D-Kd
+  dara-VMP: D-VMP
+  Dara-VMP: D-VMP
+  VRd: VRd (bortezomib-lenalidomide-dexamethasone)
+  KRd: KRd (carfilzomib-lenalidomide-dexamethasone)
+  Rd: Rd (lenalidomide-dexamethasone)
+  Vd: Vd (bortezomib-dexamethasone)
+  Kd: Kd (carfilzomib-dexamethasone)
+  len: lenalidomide
+  bort: bortezomib
+  bortez: bortezomib
+  carfil: carfilzomib
+  pom: pomalidomide
+  isa: isatuximab
+  ide-cel: idecabtagene vicleucel
+  cilta-cel: ciltacabtagene autoleucel
+  teclis: teclistamab
+  elran: elranatamab
+  talq: talquetamab
+  selin: selinexor
+  pembro: pembrolizumab
+  nivo: nivolumab
+  atezo: atezolizumab
+  durva: durvalumab
+  cemip: cemiplimab
+  ipi: ipilimumab
+  nivo-ipi: nivolumab + ipilimumab
+  tremel: tremelimumab
+  osi: osimertinib
+  afa: afatinib
+  dacom: dacomitinib
+  erlot: erlotinib
+  gef: gefitinib
+  alec: alectinib
+  brig: brigatinib
+  lora: lorlatinib
+  crizo: crizotinib
+  ceri: ceritinib
+  capma: capmatinib
+  tepo: tepotinib
+  selper: selpercatinib
+  pral: pralsetinib
+  soto: sotorasib
+  adagra: adagrasib
+  entrek: entrectinib
+  larotrec: larotrectinib
+  T-DXd: trastuzumab deruxtecan
+  TDXd: trastuzumab deruxtecan
+  tras-dxd: trastuzumab deruxtecan
+  enhertu: trastuzumab deruxtecan
+  T-DM1: ado-trastuzumab emtansine
+  TDM1: ado-trastuzumab emtansine
+  kadcyla: ado-trastuzumab emtansine
+  tras: trastuzumab
+  herceptin: trastuzumab
+  pertu: pertuzumab
+  perjeta: pertuzumab
+  HP: trastuzumab + pertuzumab
+  TCHP: docetaxel-carboplatin-trastuzumab-pertuzumab
+  THP: paclitaxel-trastuzumab-pertuzumab
+  palbo: palbociclib
+  ibrance: palbociclib
+  ribo: ribociclib
+  kisqali: ribociclib
+  abema: abemaciclib
+  verzenio: abemaciclib
+  olap: olaparib
+  lynparza: olaparib
+  nira: niraparib
+  zejula: niraparib
+  ruca: rucaparib
+  rubraca: rucaparib
+  talaz: talazoparib
+  talzenna: talazoparib
+  bev: bevacizumab
+  avastin: bevacizumab
+  ram: ramucirumab
+  cyramza: ramucirumab
+  cape: capecitabine
+  xeloda: capecitabine
+  gem: gemcitabine
+  gemzar: gemcitabine
+  carbo: carboplatin
+  cis: cisplatin
+  pac: paclitaxel
+  taxol: paclitaxel
+  docetaxel: docetaxel
+  taxotere: docetaxel
+  nab-pac: nab-paclitaxel
+  abraxane: nab-paclitaxel
+biomarker_aliases:
+  EGFR+: EGFR mutation
+  EGFR-positive: EGFR mutation
+  EGFR positive: EGFR mutation
+  EGFR mutant: EGFR mutation
+  EGFR mut: EGFR mutation
+  EGFR ex19del: EGFR exon 19 deletion
+  EGFR del19: EGFR exon 19 deletion
+  EGFR 19del: EGFR exon 19 deletion
+  EGFR ex20ins: EGFR exon 20 insertion
+  EGFR 20ins: EGFR exon 20 insertion
+  ALK+: ALK rearrangement
+  ALK-positive: ALK rearrangement
+  ALK positive: ALK rearrangement
+  ALK fusion: ALK rearrangement
+  EML4-ALK: ALK rearrangement
+  ROS1+: ROS1 rearrangement
+  ROS1-positive: ROS1 rearrangement
+  ROS1 positive: ROS1 rearrangement
+  ROS1 fusion: ROS1 rearrangement
+  HER2 positive: HER2+
+  HER2-positive: HER2+
+  HER2 amplified: HER2+
+  HER2 amplification: HER2+
+  ERBB2: HER2
+  ERBB2+: HER2+
+  HER2 low: HER2-low
+  HER2-low positive: HER2-low
+  HR positive: HR+
+  HR-positive: HR+
+  hormone receptor positive: HR+
+  HR negative: HR-
+  HR-negative: HR-
+  ER positive: ER+
+  ER-positive: ER+
+  estrogen receptor positive: ER+
+  PR positive: PR+
+  PR-positive: PR+
+  progesterone receptor positive: PR+
+  ER+/PR+: HR+
+  ER+PR+: HR+
+  MSI-high: MSI-H
+  MSI high: MSI-H
+  microsatellite instability high: MSI-H
+  microsatellite instability-high: MSI-H
+  MSI-low: MSI-L
+  dMMR: dMMR
+  deficient mismatch repair: dMMR
+  MMR-deficient: dMMR
+  MMR deficient: dMMR
+  pMMR: pMMR
+  proficient mismatch repair: pMMR
+  MMR-proficient: pMMR
+  MMR proficient: pMMR
+  BRCA+: BRCA mutation
+  BRCA1+: BRCA1 mutation
+  BRCA2+: BRCA2 mutation
+  gBRCA: germline BRCA mutation
+  gBRCA+: germline BRCA mutation
+  sBRCA: somatic BRCA mutation
+  sBRCA+: somatic BRCA mutation
+  del17p: del(17p)
+  17p deletion: del(17p)
+  del(17p13): del(17p)
+  gain1q: gain(1q)
+  1q gain: gain(1q)
+  1q+: gain(1q)
+  del1p: del(1p)
+  1p deletion: del(1p)
+  t4;14: t(4;14)
+  t(4:14): t(4;14)
+  t14;16: t(14;16)
+  t(14:16): t(14;16)
+  t11;14: t(11;14)
+  t(11:14): t(11;14)
+  t14;20: t(14;20)
+  t(14:20): t(14;20)
+  TMB high: TMB-high
+  TMB-H: TMB-high
+  high TMB: TMB-high
+  tumor mutational burden high: TMB-high
+  PD-L1 positive: PD-L1+
+  PD-L1-positive: PD-L1+
+  PD-L1 high: PD-L1 high expression
+  PD-L1>=50%: PD-L1 TPS >=50%
+  PD-L1>=1%: PD-L1 TPS >=1%
+trial_aliases:
+  KEYNOTE 024: KEYNOTE-024
+  KEYNOTE024: KEYNOTE-024
+  keynote-024: KEYNOTE-024
+  KEYNOTE 042: KEYNOTE-042
+  KEYNOTE042: KEYNOTE-042
+  KEYNOTE 189: KEYNOTE-189
+  KEYNOTE189: KEYNOTE-189
+  KEYNOTE 407: KEYNOTE-407
+  KEYNOTE407: KEYNOTE-407
+  KEYNOTE 522: KEYNOTE-522
+  KEYNOTE522: KEYNOTE-522
+  KEYNOTE 177: KEYNOTE-177
+  KEYNOTE177: KEYNOTE-177
+  CheckMate 227: CheckMate-227
+  CheckMate227: CheckMate-227
+  checkmate-227: CheckMate-227
+  CheckMate 9LA: CheckMate-9LA
+  CheckMate9LA: CheckMate-9LA
+  CheckMate 142: CheckMate-142
+  CheckMate142: CheckMate-142
+  IMpower 110: IMpower110
+  IMpower 150: IMpower150
+  DESTINY Breast03: DESTINY-Breast03
+  DESTINY-Breast-03: DESTINY-Breast03
+  DB-03: DESTINY-Breast03
+  DESTINY Breast04: DESTINY-Breast04
+  DESTINY-Breast-04: DESTINY-Breast04
+  DB-04: DESTINY-Breast04
+  CARTITUDE 1: CARTITUDE-1
+  CARTITUDE1: CARTITUDE-1
+  CARTITUDE 4: CARTITUDE-4
+  CARTITUDE4: CARTITUDE-4
+  KarMMa 3: KarMMa-3
+  KarMMa3: KarMMa-3
+  KARMMA-3: KarMMa-3
+  MajesTEC 1: MajesTEC-1
+  MajesTEC1: MajesTEC-1
+  Majestec-1: MajesTEC-1
+  MonumenTAL 1: MonumenTAL-1
+  MonumenTAL1: MonumenTAL-1
+  CodeBreaK 200: CodeBreaK-200
+  CodeBreak 200: CodeBreaK-200
+  CODEBREAK-200: CodeBreaK-200
+  KRYSTAL 1: KRYSTAL-1
+  KRYSTAL1: KRYSTAL-1
+  CROWN study: CROWN
+  crown trial: CROWN
+  FLAURA study: FLAURA
+  flaura trial: FLAURA
+  FLAURA 2: FLAURA2
+  FLAURA-2: FLAURA2
+  LIBRETTO 001: LIBRETTO-001
+  LIBRETTO001: LIBRETTO-001
+drug_class_aliases:
+  TKI: tyrosine kinase inhibitor
+  EGFR-TKI: EGFR TKI
+  EGFR inhibitor: EGFR TKI
+  ALK-TKI: ALK TKI
+  ALK inhibitor: ALK TKI
+  ROS1-TKI: ROS1 TKI
+  ROS1 inhibitor: ROS1 TKI
+  PARPi: PARP inhibitor
+  PARP-inhibitor: PARP inhibitor
+  CDK4/6i: CDK4/6 inhibitor
+  CDK4/6-inhibitor: CDK4/6 inhibitor
+  CDK inhibitor: CDK4/6 inhibitor
+  BTKi: BTK inhibitor
+  BTK-inhibitor: BTK inhibitor
+  BCL2i: BCL-2 inhibitor
+  BCL-2i: BCL-2 inhibitor
+  BCL2 inhibitor: BCL-2 inhibitor
+  PI3Ki: PI3K inhibitor
+  PI3K-inhibitor: PI3K inhibitor
+  mTORi: mTOR inhibitor
+  mTOR-inhibitor: mTOR inhibitor
+  checkpoint inhibitor: immune checkpoint inhibitor
+  ICI: immune checkpoint inhibitor
+  IO: immunotherapy
+  immuno: immunotherapy
+  anti-PD1: Anti-PD-1
+  anti-PDL1: Anti-PD-L1
+  anti-CTLA4: Anti-CTLA-4
+  PI: proteasome inhibitor
+  IMiD: IMiD (Immunomodulatory drug)
+  immunomodulatory drug: IMiD (Immunomodulatory drug)
+  immunomodulatory agent: IMiD (Immunomodulatory drug)
+  ADC: ADC (Antibody-drug conjugate)
+  antibody drug conjugate: ADC (Antibody-drug conjugate)
+  bispecific: bispecific antibody
+  BiTE: bispecific antibody
+  CAR T: CAR-T
+  CAR-T cell: CAR-T
+  CAR T-cell: CAR-T
+  car-t: CAR-T
+disease_type_aliases:
+  TNBC: Triple-negative
+  triple negative: Triple-negative
+  triple-negative breast cancer: Triple-negative
+  HER2-positive: HER2+
+  HER2 positive: HER2+
+  HER2-negative: HER2-
+  HER2 negative: HER2-
+  HR-positive: HR+
+  HR positive: HR+
+  HR-positive/HER2-negative: HR+/HER2-
+  hormone receptor-positive: HR+
+  hormone-receptor positive: HR+
+  IBC: Inflammatory
+  adeno: Adenocarcinoma
+  adenoca: Adenocarcinoma
+  squamous cell: Squamous
+  SCC: Squamous
+  NSCLC-SCC: Squamous
+  NSCLC-adeno: Adenocarcinoma
+  left-sided CRC: Left-sided
+  right-sided CRC: Right-sided
+  rectal cancer: Rectal
+  MSI-H CRC: MSI-H
+  high risk: High-risk
+  high-risk MM: High-risk
+  standard risk: Standard-risk
+  standard-risk MM: Standard-risk
+  PCL: Plasma cell leukemia
+  SMM: Smoldering MM
+  smoldering myeloma: Smoldering MM
+  light chain disease: Light chain MM
+  AL amyloidosis: Light chain MM
+efficacy_endpoint_aliases:
+  overall survival: OS (Overall survival)
+  progression-free survival: PFS (Progression-free survival)
+  progression free survival: PFS (Progression-free survival)
+  disease-free survival: DFS (Disease-free survival)
+  disease free survival: DFS (Disease-free survival)
+  event-free survival: EFS (Event-free survival)
+  event free survival: EFS (Event-free survival)
+  recurrence-free survival: RFS (Recurrence-free survival)
+  recurrence free survival: RFS (Recurrence-free survival)
+  overall response rate: ORR (Overall response rate)
+  response rate: ORR (Overall response rate)
+  complete response: CR (Complete response)
+  complete remission: CR (Complete response)
+  stringent complete response: sCR (Stringent complete response)
+  very good partial response: VGPR (Very good partial response)
+  partial response: PR (Partial response)
+  duration of response: DOR (Duration of response)
+  disease control rate: DCR (Disease control rate)
+  clinical benefit rate: CBR (Clinical benefit rate)
+  time to progression: TTP (Time to progression)
+  time to response: TTR (Time to response)
+  pathologic complete response: pCR (Pathologic complete response)
+  pathological complete response: pCR (Pathologic complete response)
+  MRD negative: MRD negativity
+  MRD-negative: MRD negativity
+  MRD neg: MRD negativity
+  minimal residual disease negative: MRD negativity
+treatment_line_aliases:
+  first-line: 1L
+  first line: 1L
+  1st line: 1L
+  frontline: 1L
+  second-line: 2L
+  second line: 2L
+  2nd line: 2L
+  third-line: 3L+
+  third line: 3L+
+  3rd line: 3L+
+  later-line: 2L+
+  later line: 2L+
+  second line or later: 2L+
+  2nd line+: 2L+
+  relapsed refractory: R/R (Relapsed/Refractory)
+  relapsed/refractory: R/R (Relapsed/Refractory)
+  R/R: R/R (Relapsed/Refractory)
+  RRMM: R/R (Relapsed/Refractory)
+  NDMM: Newly diagnosed
+  newly diagnosed MM: Newly diagnosed
+  new diagnosis: Newly diagnosed
+  neo-adjuvant: Neoadjuvant
+  neo adjuvant: Neoadjuvant
+  post-operative: Adjuvant
+  post operative: Adjuvant
+performance_status_aliases:
+  PS 0: ECOG 0
+  PS 1: ECOG 1
+  PS 2: ECOG 2
+  PS 3: ECOG 3
+  PS 4: ECOG 4
+  PS0: ECOG 0
+  PS1: ECOG 1
+  PS2: ECOG 2
+  ECOG PS 0: ECOG 0
+  ECOG PS 1: ECOG 1
+  ECOG PS 2: ECOG 2
+  ECOG PS 0-1: ECOG 0-1
+  good PS: ECOG 0-1
+  poor PS: ECOG 2+
+normalization_aliases:
+  Lytic lesions:
+  - Lytic lesion
+  Infections:
+  - Infection
+  Penta-refractory:
+  - Pentarefractory
+_metadata:
+  last_updated: '2026-01-29T14:19:14.226609'
+  total_aliases: 3

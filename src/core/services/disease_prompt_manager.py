@@ -5,11 +5,15 @@ Loads and manages disease-specific tagging prompts for Stage 2 of the
 two-stage tagging architecture.
 """
 
+import json
 import logging
 from pathlib import Path
-from typing import Optional, Dict
+from typing import Optional, Dict, List, Any
 
 logger = logging.getLogger(__name__)
+
+# Path to corrections directory (relative to project root)
+CORRECTIONS_DIR = Path("data/corrections")
 
 
 class DiseasePromptManager:
@@ -199,7 +203,7 @@ class DiseasePromptManager:
             "SCLC",
             "CRC",
             "Prostate cancer",
-            "Multiple Myeloma",
+            "Multiple myeloma",
             "Ovarian cancer",
             "Melanoma",
         ]
@@ -217,6 +221,151 @@ class DiseasePromptManager:
         self.disease_prompts.clear()
         self.fallback_prompt = None
         logger.debug("Cleared prompt cache")
+
+    def _normalize_disease_name(self, disease_state: str) -> str:
+        """Normalize disease name for file naming."""
+        if not disease_state:
+            return "unknown"
+        return disease_state.lower().replace(" ", "_").replace("/", "_")
+
+    def _get_corrections_file(self, disease_state: str) -> Path:
+        """Get the corrections file path for a disease."""
+        disease_name = self._normalize_disease_name(disease_state)
+        return CORRECTIONS_DIR / f"{disease_name}_corrections.jsonl"
+
+    def load_corrections(self, disease_state: str, limit: int = 5) -> List[Dict[str, Any]]:
+        """
+        Load recent human corrections for a disease state.
+
+        Args:
+            disease_state: The disease to load corrections for
+            limit: Maximum number of corrections to return (most recent first)
+
+        Returns:
+            List of correction records, most recent first
+        """
+        corrections_file = self._get_corrections_file(disease_state)
+
+        if not corrections_file.exists():
+            logger.debug(f"No corrections file found for {disease_state}")
+            return []
+
+        try:
+            corrections = []
+            with open(corrections_file, 'r', encoding='utf-8') as f:
+                for line in f:
+                    if line.strip():
+                        corrections.append(json.loads(line))
+
+            # Return most recent first
+            recent = corrections[-limit:][::-1]
+            logger.info(f"Loaded {len(recent)} corrections for {disease_state}")
+            return recent
+
+        except Exception as e:
+            logger.error(f"Failed to load corrections for {disease_state}: {e}")
+            return []
+
+    def format_correction_as_fewshot(self, correction: Dict[str, Any]) -> str:
+        """
+        Format a correction record as a few-shot example.
+
+        Returns a formatted string showing the question and corrected tags.
+        """
+        question_stem = correction.get('question_stem', '')
+        correct_answer = correction.get('correct_answer', '')
+        corrected_tags = correction.get('corrected_tags', {})
+        edited_fields = correction.get('edited_fields', [])
+
+        # Only include the tag fields, not metadata like confidence scores
+        tag_fields_only = {
+            k: v for k, v in corrected_tags.items()
+            if not k.endswith('_confidence') and k not in ['topic_method', 'needs_review', 'review_flags', 'review_reason', 'flagged_at', 'agreement_level']
+        }
+
+        example = f"""**Question:** {question_stem}
+
+**Correct Answer:** {correct_answer}
+
+**Human-Verified Tags:**
+```json
+{json.dumps(tag_fields_only, indent=2, ensure_ascii=False)}
+```
+
+**Reviewer corrected:** {', '.join(edited_fields)}
+"""
+        return example
+
+    def get_fewshot_examples(self, disease_state: str, count: int = 3) -> str:
+        """
+        Get formatted few-shot examples from recent human corrections.
+
+        Args:
+            disease_state: The disease to get examples for
+            count: Number of examples to include
+
+        Returns:
+            Formatted string with few-shot examples to inject into prompt
+        """
+        corrections = self.load_corrections(disease_state, limit=count)
+
+        if not corrections:
+            return ""
+
+        header = """
+---
+
+## Learn From Recent Human Corrections
+
+The following questions were recently reviewed by a human expert who corrected the AI-generated tags.
+Study these corrections carefully to understand the expected tagging patterns for this disease.
+
+"""
+
+        examples = []
+        for i, correction in enumerate(corrections, 1):
+            examples.append(f"### Human Correction #{i}\n\n{self.format_correction_as_fewshot(correction)}")
+
+        return header + "\n\n".join(examples) + "\n\n---\n"
+
+    def get_prompt_with_fewshots(self, disease_state: Optional[str], num_fewshots: int = 3) -> str:
+        """
+        Get disease-specific prompt WITH dynamic few-shot examples from human corrections.
+
+        This is the primary method to use when tagging new questions.
+
+        Args:
+            disease_state: Canonical disease name
+            num_fewshots: Number of recent corrections to include
+
+        Returns:
+            Complete prompt with disease rules + human corrections as examples
+        """
+        # Get base prompt
+        base_prompt = self.get_prompt_for_disease(disease_state)
+
+        if not disease_state:
+            return base_prompt
+
+        # Get few-shot examples
+        fewshot_section = self.get_fewshot_examples(disease_state, count=num_fewshots)
+
+        if not fewshot_section:
+            logger.debug(f"No corrections available for {disease_state}, using base prompt only")
+            return base_prompt
+
+        # Inject few-shots before the final "Now analyze" instruction
+        # Look for the marker at the end of the prompt
+        marker = "Now analyze the following"
+        if marker in base_prompt:
+            parts = base_prompt.rsplit(marker, 1)
+            enhanced_prompt = parts[0] + fewshot_section + "\n" + marker + parts[1]
+        else:
+            # If no marker, append at the end
+            enhanced_prompt = base_prompt + "\n\n" + fewshot_section
+
+        logger.info(f"Enhanced prompt with {num_fewshots} few-shot examples for {disease_state}")
+        return enhanced_prompt
 
 
 # Singleton instance

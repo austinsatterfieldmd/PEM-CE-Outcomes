@@ -1,0 +1,82 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    },
+    {
+      "src": "api/**/*.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/questions/search",
+      "dest": "/api/questions/search.py"
+    },
+    {
+      "src": "/api/questions/filters/options",
+      "dest": "/api/questions/filters/options.py"
+    },
+    {
+      "src": "/api/questions/filters/options/dynamic",
+      "dest": "/api/questions/filters/dynamic.py"
+    },
+    {
+      "src": "/api/questions/stats/summary",
+      "dest": "/api/questions/stats/summary.py"
+    },
+    {
+      "src": "/api/questions/(\\d+)",
+      "dest": "/api/questions/[id].py?id=$1"
+    },
+    {
+      "src": "/api/reports/aggregate/by-tag",
+      "dest": "/api/reports/aggregate/by-tag.py"
+    },
+    {
+      "src": "/api/reports/aggregate/by-demographic",
+      "dest": "/api/reports/aggregate/by-demographic.py"
+    },
+    {
+      "src": "/api/reports/trends",
+      "dest": "/api/reports/trends.py"
+    },
+    {
+      "src": "/api/reports/activities",
+      "dest": "/api/reports/activities.py"
+    },
+    {
+      "src": "/api/reports/options/demographics",
+      "dest": "/api/reports/options/demographics.py"
+    },
+    {
+      "src": "/api/reports/stats/summary",
+      "dest": "/api/reports/stats/summary.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/frontend/$1"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Credentials", "value": "true" },
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET,OPTIONS,POST,PUT" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }
+      ]
+    }
+  ],
+  "env": {
+    "OKTA_ISSUER": "@okta_issuer",
+    "OKTA_CLIENT_ID": "@okta_client_id",
+    "OKTA_AUDIENCE": "@okta_audience"
+  }
+}

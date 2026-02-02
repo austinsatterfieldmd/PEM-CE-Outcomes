@@ -1,0 +1,162 @@
+# QBoost Score Calibration Configuration
+#
+# Expert default penalties based on psychometric research (Haladyna et al., Case & Swanson).
+# These weights will be refined as performance data accumulates.
+#
+# Last updated: 2026-02-01
+# Calibration status: Expert defaults (pre-data)
+# Questions analyzed: 250 (MM only)
+# Next calibration: After 4K questions tagged
+
+version: "1.0.0"
+calibration_date: "2026-02-01"
+calibration_type: "expert_defaults"
+questions_analyzed: 250
+
+# Two grading scales based on CME outcome level
+grading_scales:
+  L3_knowledge:
+    description: "Level 3 (Knowledge) - Recall/recognition questions"
+    thresholds:
+      A: 85
+      B: 70
+      C: 55
+      D: 40
+      F: 0
+  L4_competence:
+    description: "Level 4 (Competence) - Application/decision questions"
+    thresholds:
+      A: 90
+      B: 80
+      C: 65
+      D: 50
+      F: 0
+
+# Item writing flaw penalties
+# Format: flaw_field: {L3: penalty, L4: penalty, research_basis: "citation"}
+flaw_penalties:
+  flaw_implausible_distractor:
+    L3: 10
+    L4: 15
+    research_basis: "Reduces effective options; high validity threat"
+    expected_impact: "Inflates pre-score AND reduces knowledge gain"
+
+  flaw_grammatical_cue:
+    L3: 8
+    L4: 12
+    research_basis: "Strong test-wiseness cue (Haladyna 2004)"
+    expected_impact: "Inflates pre-score (test-wiseness)"
+
+  flaw_clang_association:
+    L3: 6
+    L4: 10
+    research_basis: "Word matching enables cueing"
+    expected_impact: "Inflates pre-score (test-wiseness)"
+
+  flaw_convergence_vulnerability:
+    L3: 6
+    L4: 10
+    research_basis: "Elimination strategy bypass (Case & Swanson)"
+    expected_impact: "Inflates pre-score (test-wiseness)"
+
+  flaw_absolute_terms:
+    L3: 5
+    L4: 8
+    research_basis: "'Always/never' heuristic widely known"
+    expected_impact: "Inflates pre-score (test-wiseness)"
+
+  flaw_double_negative:
+    L3: 5
+    L4: 8
+    research_basis: "Cognitive load issue, not knowledge barrier"
+    expected_impact: "Reduces knowledge gain (confusion)"
+
+# Structure-based deductions
+structure_deductions:
+  distractor_homogeneity:
+    Heterogeneous:
+      L3: 4
+      L4: 8
+      rationale: "Mixed distractor types reduce discrimination"
+
+  answer_length_pattern:
+    Variable:
+      L3: 2
+      L4: 4
+      rationale: "Inconsistent lengths are minor cue"
+    Correct longest:
+      L3: 6
+      L4: 10
+      rationale: "MAJOR test-wiseness vulnerability - savvy test-takers choose longest"
+    Correct shortest:
+      L3: 6
+      L4: 10
+      rationale: "MAJOR test-wiseness vulnerability - savvy test-takers notice brevity"
+
+  answer_option_count:
+    2:
+      L3: 4
+      L4: 6
+      rationale: "50% guessing probability"
+    3:
+      L3: 2
+      L4: 4
+      rationale: "33% guessing probability (slightly below 4-option standard)"
+
+  data_response_type:
+    Numeric:
+      L3: 6
+      L4: 10
+      rationale: "Numeric questions disfavored - not best practice for CME assessment"
+
+# Structure-based bonuses
+structure_bonuses:
+  stem_type:
+    Clinical vignette:
+      L3: 3
+      L4: 6
+      rationale: "Better competence assessment via contextualized scenario"
+    Case series:
+      L3: 2
+      L4: 4
+      rationale: "Also provides clinical context"
+
+  lead_in_type:
+    Best answer:
+      L3: 2
+      L4: 4
+      rationale: "Requires judgment rather than absolute knowledge"
+    Most appropriate:
+      L3: 2
+      L4: 4
+      rationale: "Requires judgment rather than absolute knowledge"
+    Most likely:
+      L3: 1
+      L4: 2
+      rationale: "Encourages probabilistic thinking"
+
+  distractor_homogeneity:
+    Homogeneous:
+      L3: 2
+      L4: 4
+      rationale: "Consistent structure ensures fair comparison between options"
+
+  answer_length_pattern:
+    Uniform:
+      L3: 2
+      L4: 3
+      rationale: "No length-based cues available to test-wise examinees"
+
+# Future calibration notes
+calibration_notes:
+  - "Initial weights are expert-derived, not data-driven"
+  - "Plan to recalibrate after 4K questions are tagged (est. 1-2 months)"
+  - "Calibration will use: mean(pre_with_flaw) - mean(pre_without_flaw) for test-wiseness"
+  - "Calibration will use: mean(gain_without_flaw) - mean(gain_with_flaw) for confusion"
+  - "Penalties will be normalized to 0-15 range per flaw"
+
+# References
+references:
+  - "Haladyna TM, Downing SM, Rodriguez MC. A review of multiple-choice item-writing guidelines for classroom assessment. Applied Measurement in Education. 2002;15(3):309-333."
+  - "Case SM, Swanson DB. Constructing Written Test Questions for the Basic and Clinical Sciences. NBME. 2002."
+  - "Masters JC, Hulsmeyer BS, Pike ME, et al. Assessment of multiple-choice questions in selected test banks accompanying text books used in nursing education. J Nurs Educ. 2001;40(1):25-32."

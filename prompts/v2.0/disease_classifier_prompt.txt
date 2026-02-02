@@ -31,6 +31,24 @@ Analyze the question stem, answers, and activity name to determine:
 - Gastroenterology (IBD, GERD, cirrhosis - non-cancer)
 - Nephrology (CKD, dialysis - non-cancer)
 - Psychiatry (depression, schizophrenia, bipolar)
+- OB/GYN (routine screenings, prenatal care, LGBTQ care - even if cancer screening mentioned)
+
+### MULTISPECIALTY (classify as NON-ONCOLOGY):
+These topics are classified as multispecialty even when they occur in cancer patients or oncology contexts:
+
+- **Secondary Immunodeficiency (SID)** - Questions about diagnosing or managing immunodeficiency in cancer patients. Look for:
+  - Activity name contains "SID", "Secondary Immunodeficiency", or "Immunodeficiency"
+  - Patient has cancer but question focuses on infection diagnosis/management (CMV, PJP, fungal)
+  - Questions about immunoglobulin levels, antibody production, vaccination in immunocompromised
+  - Example: "MM patient with CMV infection - what tests for secondary immunodeficiency?" → NON-ONCOLOGY
+  - Note: Different from CMV prophylaxis in BMT context (which IS oncology)
+- **ICI myocarditis / cardio-oncology toxicities** - Immune checkpoint inhibitor-related cardiac toxicities are managed by cardiologists
+- **TA-TMA / HSCT-TMA** - Transplant-associated thrombotic microangiopathy
+- **Prostate cancer screening/risk assessment** - Target audience is primary care/GPs performing screening (IsoPSA, 4Kscore, PSA tests)
+- **Cold agglutinin syndrome (CAS)** - Even when associated with lymphoma, classified as hematology/multispecialty
+- **Iron deficiency anemia in cancer patients** - IDA management, FCM (ferric carboxymaltose), darbepoetin, even if cancer-related
+- **Autoimmune hemolytic anemia (AIHA)** - Even when associated with malignancy
+- **SIDS (Sudden Infant Death Syndrome) programs** - Even when mentioned alongside hematologic topics
 
 ### Edge Cases:
 - **Osteoporosis from cancer treatment** (e.g., aromatase inhibitor-induced) → ONCOLOGY
@@ -53,17 +71,42 @@ Analyze the question stem, answers, and activity name to determine:
 ### Canonical Disease States
 
 #### Solid Tumors (Common)
-Breast cancer, NSCLC, SCLC, CRC, Prostate cancer, Bladder cancer, RCC, Ovarian cancer, Endometrial cancer, Melanoma, Head & Neck, HCC, Pancreatic cancer, Cholangiocarcinoma, Esophagogastric / GEJ cancer, Cervical cancer, Uterine cancer, Sarcoma, Anal cancer, Hepatobiliary cancer, Non-melanoma cutaneous malignancy
+Breast cancer, NSCLC, SCLC, CRC, Prostate cancer, Bladder cancer, RCC, Ovarian cancer, Endometrial cancer, Melanoma, Head & neck, HCC, Pancreatic cancer, Esophagogastric / GEJ cancer, Cervical cancer, Uterine cancer, Sarcoma, Anal cancer, Hepatobiliary cancer, Non-melanoma cutaneous malignancy
 
 #### Solid Tumors (Rare)
-Glioma, GIST, Tenosynovial giant cell tumor, Merkel cell carcinoma, Mesothelioma, Adrenocortical carcinoma, Thyroid cancer, Basal cell carcinoma, Cutaneous squamous cell carcinoma, EP-NECs, EP-NETs, GEP-NETs
+Glioma, Tenosynovial giant cell tumor, Merkel cell carcinoma, Mesothelioma, Adrenocortical carcinoma, Thyroid cancer, Basal cell carcinoma, Cutaneous squamous cell carcinoma, EP-NEC, GEP-NET, LCNEC, NF1-associated plexiform neurofibroma, Desmoid tumor, Testicular cancer, Thymic cancer
+
+### Disease State Hierarchy (Roll-Up Rules)
+**Use parent disease state; subtypes go in disease_type field at Stage 2:**
+- **GIST** → disease_state = "Sarcoma", disease_type = "GIST"
+- **Cholangiocarcinoma** → disease_state = "Hepatobiliary cancer", disease_type = "Cholangiocarcinoma"
+- **Gallbladder carcinoma** → disease_state = "Hepatobiliary cancer", disease_type = "Gallbladder carcinoma"
+- **Intrahepatic cholangiocarcinoma** → disease_state = "Hepatobiliary cancer"
+- **Biliary tract cancer** → disease_state = "Hepatobiliary cancer"
+- **Uveal melanoma** → disease_state = "Melanoma", disease_type = "Uveal"
+
+### Disease States That Are Distinct (NOT subtypes):
+**These are separate disease_state values, NOT roll-ups:**
+- **Uterine cancer** vs **Endometrial cancer** → These are SEPARATE disease states. Endometrial is a subtype of uterine, but for our purposes, "Uterine cancer" and "Endometrial cancer" are distinct disease_states. Use whichever the question/activity explicitly mentions.
+- **CTCL** vs **PTCL** → CTCL (cutaneous T-cell lymphoma) is NOT a subtype of PTCL (peripheral T-cell lymphoma). They are distinct disease states. Use the specific one mentioned.
+- **Desmoid tumor** → Its own disease_state, NOT rolled up to "Sarcoma"
+- **t-NEPC (treatment-emergent neuroendocrine prostate cancer)** → disease_state = "Prostate cancer", NOT "EP-NEC". t-NEPC arises from prostate adenocarcinoma under therapeutic pressure and is managed by prostate cancer specialists.
+- **BIA-ALCL (breast implant-associated anaplastic large cell lymphoma)** → disease_state = "Breast cancer", NOT "PTCL". BIA-ALCL is managed by breast cancer specialists, not lymphoma specialists.
 
 #### Hematologic Malignancies
-Multiple Myeloma, DLBCL, FL, MCL, PTCL, PCNSL, MZL, Burkitt lymphoma, NHL, CLL, AML, ALL, CML, Hairy cell leukemia, MDS, Myelofibrosis, Essential Thrombocythemia, PV, BPDCN, Waldenström, Hodgkin lymphoma, GVHD, CMV (in BMT/HSCT context only)
+Multiple myeloma, DLBCL, FL, MCL, PTCL, CTCL, PCNSL, MZL, Burkitt lymphoma, NHL, CLL, AML, ALL, CML, CMML, Hairy cell leukemia, MDS, MPN, MF, ET, PV, BPDCN, Waldenström, Hodgkin lymphoma, GVHD, CMV (in BMT/HSCT context only)
+
+#### Paraneoplastic/Cancer-Associated Syndromes
+LEMS (Lambert-Eaton Myasthenic Syndrome) - often associated with SCLC but classified separately as "LEMS"
 
 #### Umbrella Tags (use only when question is broad)
-Pan-tumor, Heme Malignancies, GI Cancers, Gyn Cancers
+Pan-tumor, Heme malignancies, GI cancers, Gyn cancers, NHL
 If there is a different umbrella term that may be appropriate and not specified above, you can propose
+
+**NHL (Non-Hodgkin Lymphoma) umbrella usage:**
+- Use "NHL" when a study/question covers multiple B-cell lymphoma subtypes (e.g., DLBCL + FL + MCL)
+- Use "NHL" when the trial population includes "R/R CD20+ LBCL" or similar broad inclusion
+- Use specific subtype (DLBCL, FL, etc.) only when the question is clearly about ONE subtype
 
 ### Disease Abbreviation Mappings
 
@@ -81,9 +124,9 @@ If there is a different umbrella term that may be appropriate and not specified 
 **Colorectal:**
 - CRC, mCRC, colorectal cancer, colon cancer, rectal cancer → "CRC"
 
-**Multiple Myeloma:**
-- MM, R/R MM, RRMM, NDMM → "Multiple Myeloma"
-- relapsed/refractory multiple myeloma → "Multiple Myeloma"
+**Multiple myeloma:**
+- MM, R/R MM, RRMM, NDMM → "Multiple myeloma"
+- relapsed/refractory multiple myeloma → "Multiple myeloma"
 
 **Prostate:**
 - mCRPC, metastatic castration-resistant prostate cancer → "Prostate cancer"
@@ -95,6 +138,7 @@ If there is a different umbrella term that may be appropriate and not specified 
 - FL, follicular lymphoma → "FL"
 - MCL, mantle cell lymphoma → "MCL"
 - PTCL, peripheral T-cell lymphoma → "PTCL"
+- CTCL, cutaneous T-cell lymphoma, mycosis fungoides, Sézary syndrome → "CTCL"
 - HL, cHL, Hodgkin lymphoma, Hodgkin's lymphoma → "Hodgkin lymphoma"
 - NHL, non-Hodgkin lymphoma → "NHL"
 
@@ -103,6 +147,7 @@ If there is a different umbrella term that may be appropriate and not specified 
 - ALL, acute lymphoblastic leukemia → "ALL"
 - CLL, chronic lymphocytic leukemia → "CLL"
 - CML, chronic myeloid leukemia → "CML"
+- CMML, chronic myelomonocytic leukemia → "CMML"
 
 **Glioma:**
 - GBM, glioblastoma, glioblastoma multiforme → "Glioma"
@@ -110,35 +155,54 @@ If there is a different umbrella term that may be appropriate and not specified 
 **Other:**
 - RCC, renal cell carcinoma → "RCC"
 - HCC, hepatocellular carcinoma → "HCC"
-- HNSCC, head and neck → "Head & Neck"
+- HNSCC, head and neck → "Head & neck"
 - mCRC → "CRC"
 - PROC, platinum-resistant ovarian cancer → "Ovarian cancer"
+
+**Neuroendocrine tumors (use singular forms):**
+- EP-NEC, extrapulmonary neuroendocrine carcinoma → "EP-NEC"
+- GEP-NET, gastroenteropancreatic neuroendocrine tumor → "GEP-NET"
+- LCNEC, large cell neuroendocrine carcinoma → "LCNEC"
 
 ---
 
 ## Important Guidelines
 
 1. **Be specific**: Only use umbrella terms if the question genuinely covers multiple cancer types
-   - Use "Breast cancer" not "Gyn Cancers"
+   - Use "Breast cancer" not "Gyn cancers"
    - Use "NSCLC" not "Pan-tumor"
 
 2. **Normalize abbreviations**: Convert abbreviations to canonical forms
    - "mBC" → "Breast cancer" (not "mBC")
-   - "R/R MM" → "Multiple Myeloma" (not "R/R MM")
+   - "R/R MM" → "Multiple myeloma" (not "R/R MM")
 
-3. **Consider the answer**: The correct answer often clarifies the disease type
+3. **Naming convention**: Use sentence case for multi-word disease states (first word capitalized, rest lowercase)
+   - Correct: "Multiple myeloma", "Breast cancer", "ET", "Heme malignancies"
+   - Incorrect: "Multiple Myeloma", "Heme Malignancies", "GI Cancers"
+   - Exception: Abbreviations stay uppercase (NSCLC, SCLC, CRC, HCC, etc.)
 
-4. **Handle ambiguity**: If multiple diseases mentioned, choose the primary focus
+4. **Consider the answer**: The correct answer often clarifies the disease type
+
+5. **Consider incorrect answer options**: Incorrect answers can also provide disease context clues
+
+6. **Use activity names as context clues**: The question may appear at multiple activities - use their names to infer disease:
+   - "Miami Breast Cancer Conference" → likely Breast cancer
+   - "HEM: Congress on Hematologic Malignancies" → likely a heme malignancy
+   - "NSCLC Symposium" → likely NSCLC
+   - "CFS" or generic conferences → no disease clue
+   - If a question appeared at both "CFS" and "Miami Breast Cancer Conference", the breast cancer conference is a strong clue
+
+7. **Handle ambiguity**: If multiple diseases mentioned, choose the primary focus
    - If comparing treatments across cancers → Use umbrella term or most prominent disease
    - If one disease is the clear focus → Use that disease
 
-5. **GVHD special case**:
+8. **GVHD special case**:
    - GVHD questions can appear in 3 contexts: prophylaxis during transplant, acute GVHD, and chronic GVHD
    - **All three should map to "GVHD"** regardless of the underlying disease
    - **Prophylaxis questions are particularly tricky**: They often mention the primary disease (e.g., "A patient with AML undergoing transplant, which regimen for GVHD prophylaxis?")
    - In these cases, the question is ABOUT GVHD prevention, not about AML → classify as "GVHD"
 
-6. **CMV special case**:
+9. **CMV special case**:
    - CMV (cytomegalovirus) questions in **bone marrow transplant (BMT) / HSCT context** are ONCOLOGY
    - **disease_state should be "CMV"** when the question focuses on CMV prophylaxis or treatment in BMT/HSCT
    - **Similar to GVHD**: Even if the underlying malignancy is mentioned (e.g., "Patient with AML undergoing transplant, what CMV prophylaxis?"), the question is ABOUT CMV → classify as "CMV"
@@ -149,9 +213,149 @@ If there is a different umbrella term that may be appropriate and not specified 
      - "CMV prophylaxis in patient with myeloma receiving autologous transplant" → is_oncology=true, disease_state="CMV"
      - "CMV prophylaxis after kidney transplant" → is_oncology=false, disease_state=null
 
-7. **Disease states not in the list**:
+10. **Disease states not in the list**:
    - If you are highly confident the question is about an oncologic disease NOT in this list, you may venture outside the pre-defined list
    - Use this sparingly and only when you are certain it's a distinct oncologic disease
+
+11. **Activity title determines specialty context**:
+    - **The activity title is the most important context clue for specialty classification**
+    - If the activity title indicates a non-oncology specialty (e.g., psychiatry, cardiology), classify as NON-ONCOLOGY even if cancer is mentioned
+    - Example: A psychiatry program that mentions MDS in an answer option about depression is still NON-ONCOLOGY - the cancer mention is context for psychiatrists
+    - Example: A general internal medicine program asking about VTE mentions "hemato-oncologic population" as context but is NOT an oncology question
+
+12. **LEMS (Lambert-Eaton Myasthenic Syndrome)**:
+    - LEMS is a paraneoplastic syndrome often associated with SCLC
+    - Questions specifically about LEMS diagnosis, testing, or management → disease_state = "LEMS"
+    - The SCLC association can be captured in disease_type at Stage 2, not disease_state
+
+13. **Iron-deficiency anemia and supportive care studies**:
+    - Studies about iron deficiency, anemia management (e.g., FCM/ferric carboxymaltose), transfusion protocols → NON-ONCOLOGY
+    - Even if patients have cancer, if the study is about supportive care that applies to general medicine → NON-ONCOLOGY
+    - Exception: Studies specifically about cancer treatment-induced anemia management in oncology context → ONCOLOGY
+
+14. **Pan-tumor examples**:
+    - Clinical trial equity/retention questions (how to retain underrepresented patients in trials) → Pan-tumor
+    - Healthcare disparities in oncology → Pan-tumor
+    - General principles applicable across all cancers → Pan-tumor
+
+15. **Acute leukemia subtype inference**:
+    - "Acute leukemia" without specifier requires inference from context
+    - KMT2A-rearranged acute leukemia with menin inhibitors (revumenib, ziftomenib) → typically AML
+    - Look at answer options: if they contain AML-specific drugs → AML; if ALL-specific → ALL
+
+16. **Lung cancer meeting context**:
+    - If activity title mentions "lung cancer" or "International Lung Cancer Congress" but question is pan-tumor topic (e.g., clinical trial participation), use "NSCLC" as default
+    - Rationale: The referenced study was presented in lung cancer context, so findings are specific to that population
+    - Only use "Pan-tumor" if the question truly applies across all cancers AND activity is not disease-specific
+
+17. **GU meeting context**:
+    - If activity title mentions "GU malignancies" or "Genitourinary" and question applies broadly to all GU cancers (not just prostate), consider "Pan-tumor" or a GU umbrella
+    - Example: "Lineage plasticity" question at GU meeting → applies to prostate, bladder, RCC → could be Pan-tumor
+
+18. **School of Breast Oncology (SOBO) diploma track**:
+    - Activity titles like "Module X: [Breast-related topic]" from SOBO → always "Breast cancer"
+    - Example: "Module 2: Breast Imaging" or "Module 6: Adjuvant/Neoadjuvant Chemotherapy" → Breast cancer
+
+19. **Treatment-specific inference**:
+    - If a treatment is FDA-approved for only ONE disease, infer that disease even without explicit mention
+    - Example: mirvetuximab soravtansine → Ovarian cancer (only approved indication)
+    - Example: zanidatamab for HER2+ biliary tract → Hepatobiliary cancer
+    - **Belantamab mafodotin** → disease_state = "Multiple myeloma" (ONLY approved indication)
+    - **Ropeginterferon alfa-2b (Besremi)** → disease_state = "PV" (polycythemia vera specifically, NOT "MPN")
+
+29. **CAR-T therapy questions**:
+    - General CAR-T questions (mechanism, manufacturing, toxicity management like CRS/ICANS) → disease_state = "Heme malignancies"
+    - CAR-T is approved for multiple heme malignancies (DLBCL, FL, MCL, ALL, Multiple myeloma)
+    - Use specific disease ONLY if the question explicitly focuses on ONE disease (e.g., "CAR-T for relapsed DLBCL")
+    - Do NOT use Pan-tumor for CAR-T - current approvals are all hematologic
+
+30. **HSCT / Allo-SCT questions**:
+    - General HSCT/transplant questions (conditioning, engraftment, complications) → disease_state = "Heme malignancies"
+    - Use specific disease only if explicitly mentioned as the indication
+    - Exception: GVHD questions → disease_state = "GVHD" (see guideline #8)
+    - Exception: CMV in transplant → disease_state = "CMV" (see guideline #9)
+
+31. **Bispecific T-cell engagers (BiTEs)**:
+    - Bispecific antibodies are now approved for BOTH solid tumors AND heme malignancies
+    - General bispecific questions → disease_state = "Pan-tumor"
+    - Disease-specific bispecific questions → use that disease
+    - Examples: epcoritamab (NHL), glofitamab (DLBCL), teclistamab (MM), tarlatamab (SCLC)
+    - If question discusses bispecifics across cancer types or discusses mechanism/toxicity broadly → Pan-tumor
+
+32. **School of Nursing Oncology activities**:
+    - Activity titles with "School of Nursing Oncology" or "Oncology Nursing Diploma" → ONCOLOGY
+    - General nursing oncology education → disease_state = "Pan-tumor"
+    - Specific disease focus within nursing program → use that disease
+
+33. **VTE (Venous Thromboembolism) in oncology**:
+    - VTE programs in oncology context → ONCOLOGY, disease_state = "Pan-tumor"
+    - Cancer-associated thrombosis (CAT) is a major complication managed by oncologists
+    - DOACs for cancer-associated VTE → ONCOLOGY
+    - General VTE programs without oncology context → evaluate based on activity title
+
+34. **AL amyloidosis at myeloma meetings**:
+    - AL amyloidosis discussed at myeloma/hematologic malignancies meetings → ONCOLOGY, disease_state = "Multiple myeloma"
+    - AL amyloidosis is a plasma cell dyscrasia closely related to myeloma
+    - Context matters: if the audience is hematologist-oncologists, classify as Multiple myeloma
+
+20. **NHL umbrella for multi-subtype lymphoma studies**:
+    - Use "NHL" when a study includes multiple B-cell lymphoma subtypes
+    - Example: EPCORE NHL-1 included DLBCL, high-grade B-cell lymphoma, PMBCL, and FL → use "NHL"
+    - Use specific subtype only when clearly about ONE subtype
+
+21. **Multi-disease questions (rare)**:
+    - Occasionally a question explicitly addresses TWO distinct diseases (e.g., differential diagnosis)
+    - Use `disease_state_secondary` ONLY when the question is genuinely about both diseases
+    - Example: "Regarding Waldenström and MZL, which is correct about MYD88?" → disease_state = "Waldenström", disease_state_secondary = "MZL"
+    - Do NOT use for umbrella categories (use "NHL" or "Heme malignancies" instead when appropriate)
+    - Do NOT use when one disease is just context for the other
+
+22. **Myeloproliferative Neoplasms (MPN) umbrella**:
+    - Use "MPN" when a question/activity covers multiple MPNs (MF, ET, PV)
+    - Use specific subtype (MF, ET, PV) only when clearly about ONE MPN
+    - Example: "MPN Total Symptom Score" or activity about "Management of MPNs" → disease_state = "MPN"
+
+23. **COPE (Council on Optometric Practitioner Education) activities**:
+    - COPE-accredited activities are typically for optometrists/ophthalmologists → NON-ONCOLOGY (multispecialty)
+    - **Exception**: ADC (antibody-drug conjugate) programs about ocular toxicity management → ONCOLOGY
+    - The exception applies because ADC ocular toxicities (e.g., belantamab mafodotin, mirvetuximab) are oncology-specific side effects
+    - Example: "COPE: Managing Ocular Side Effects of ADCs" → ONCOLOGY (Pan-tumor or disease-specific based on context)
+    - Example: "COPE: Glaucoma Management Updates" → NON-ONCOLOGY
+
+24. **Pan-tumor trials at disease-specific meetings**:
+    - When a pan-tumor trial is discussed at a disease-specific meeting, use the meeting's disease state
+    - Example: DESTINY-PanTumor01 (HER2+ pan-tumor) discussed at a Gyn meeting → disease_state = "Gyn cancers"
+    - Rationale: The audience and application context is disease-specific, even if the trial itself was pan-tumor
+    - Only use "Pan-tumor" when the activity itself is not disease-specific
+
+25. **Answer options with multiple distinct cancer types**:
+    - If answer options list multiple specific cancers (e.g., "Breast cancer, lung cancer, CRC"), consider whether Pan-tumor is appropriate
+    - If the question asks "which cancers" or "all of the above" includes multiple types → likely Pan-tumor
+    - If ONE cancer is clearly the focus and others are distractors → use that specific cancer
+    - Example: "Which cancers have MSI-H/dMMR approvals? A) CRC B) Endometrial C) Gastric D) All of the above" → Pan-tumor
+
+26. **Activity name red herrings - Question content takes precedence**:
+    - **CRITICAL**: When the question content clearly indicates a NON-oncology topic, do NOT be fooled by activity names that mention oncology
+    - A question about sickle cell disease is NON-ONCOLOGY even if the activity name includes "Hematologic Malignancies"
+    - Look at what the question is actually asking about, not just the activity title
+    - This applies when a question appears at multiple activities - one activity may be the "red herring"
+    - Example: Question about hydroxyurea for sickle cell + activity "Maximizing Outcomes With PI3K Inhibitors Across Hematologic Malignancies" → is_oncology=false (sickle cell is benign hematology)
+    - The activity title about hematologic malignancies is a red herring - the question is about sickle cell disease
+
+27. **Specific dual diseases vs umbrella categories**:
+    - When a question/activity explicitly names TWO SPECIFIC diseases together (not just umbrella terms), use disease_state + disease_state_secondary
+    - Do NOT default to umbrella categories when specific diseases are explicitly mentioned
+    - Example: "Optimizing ASCT in Patients With Multiple myeloma and Non-Hodgkin Lymphoma" → disease_state="Multiple myeloma", disease_state_secondary="NHL"
+    - Do NOT use "Heme malignancies" umbrella when the activity/question explicitly names the two diseases
+    - Use umbrellas only when the question is truly about the broad category, not two specific named diseases
+
+28. **Cancer screening disparities / Healthcare equity**:
+    - **General cancer screening disparities** (MCED testing, barriers to screening) → NON-ONCOLOGY
+    - The target audience for general screening education is PRIMARY CARE PHYSICIANS (PCPs), not oncologists
+    - **EXCEPTION - Disease-specific disparities**: If the disparities topic is at a disease-specific meeting or clearly about a specific cancer's outcomes, use that disease state
+    - Example: "Disparities in breast cancer outcomes" at a breast cancer meeting → ONCOLOGY, disease_state = "Breast cancer"
+    - Example: "Barriers to MCED testing in underserved populations" → NON-ONCOLOGY (general screening)
+    - **EXCEPTION - MGUS/SMM screening is ONCOLOGY**: Screening for MGUS or SMM is ONCOLOGY with disease_state="Multiple myeloma". These are precursor conditions monitored by hematologist-oncologists, not PCPs.
 
 ---
 
@@ -162,7 +366,18 @@ Respond with ONLY a JSON object:
 ```json
 {
     "is_oncology": true,
-    "disease_state": "Breast cancer"
+    "disease_state": "Breast cancer",
+    "disease_state_secondary": null
+}
+```
+
+For multi-disease questions (rare):
+
+```json
+{
+    "is_oncology": true,
+    "disease_state": "Waldenström",
+    "disease_state_secondary": "MZL"
 }
 ```
 
@@ -171,7 +386,8 @@ Or for non-oncology questions:
 ```json
 {
     "is_oncology": false,
-    "disease_state": null
+    "disease_state": null,
+    "disease_state_secondary": null
 }
 ```
 
@@ -341,7 +557,7 @@ Or for non-oncology questions:
 - Applicable to any cancer receiving chemotherapy
 - is_oncology = true, disease_state = "Pan-tumor"
 
-### Example 11: Multiple Myeloma
+### Example 11: Multiple myeloma
 **Question:** "What is the preferred induction regimen for newly diagnosed transplant-eligible multiple myeloma?"
 **Answer:** "VRd (bortezomib, lenalidomide, dexamethasone)"
 
@@ -349,7 +565,7 @@ Or for non-oncology questions:
 ```json
 {
     "is_oncology": true,
-    "disease_state": "Multiple Myeloma"
+    "disease_state": "Multiple myeloma"
 }
 ```
 
@@ -386,6 +602,555 @@ Or for non-oncology questions:
 - CMV in solid organ transplant context (kidney transplant)
 - Not related to malignancy → NON-ONCOLOGY
 - is_oncology = false, disease_state = null
+
+### Example 14: LEMS (Paraneoplastic Syndrome)
+**Question:** "Which of the following is TRUE regarding diagnostic testing for LEMS?"
+**Answer:** "No-cost testing for antibodies targeting VGCCs is available for patients with LEMS-related symptoms"
+
+**Output:**
+```json
+{
+    "is_oncology": true,
+    "disease_state": "LEMS"
+}
+```
+
+**Rationale:**
+- LEMS (Lambert-Eaton Myasthenic Syndrome) is a paraneoplastic syndrome often associated with SCLC
+- Questions about LEMS diagnosis/testing → disease_state = "LEMS", not "SCLC"
+- The SCLC association can be noted at Stage 2, but the primary disease focus is LEMS
+
+### Example 15: NF1-Associated Plexiform Neurofibroma
+**Question:** "In a phase 2 trial assessing the use of cabozantinib in patients with NF1-associated plexiform neurofibroma, what proportion of evaluable patients achieved a partial response?"
+**Answer:** "8/19 (42%)"
+
+**Output:**
+```json
+{
+    "is_oncology": true,
+    "disease_state": "NF1-associated plexiform neurofibroma"
+}
+```
+
+**Rationale:**
+- Plexiform neurofibromas are tumors that can arise in NF1 patients
+- This is a distinct oncologic disease, not sarcoma or another umbrella term
+- is_oncology = true
+
+### Example 16: Non-Oncology Despite Cancer Mention (Psychiatry Program)
+**Question:** "Although malignancy is generally regarded as a prothrombotic event, there are several factors that can contribute to an increased risk of bleeding in the hemato-oncologic population. Withholding of SRI therapy in patients with comorbid diagnoses of depression and malignancy may be a consideration in which of the following:"
+**Answer:** "An elderly woman with myelodysplastic syndrome who has been experiencing active bleeding episodes"
+**Activity Title:** "Psychiatry Grand Rounds" or similar psychiatry program
+
+**Output:**
+```json
+{
+    "is_oncology": false,
+    "disease_state": null
+}
+```
+
+**Rationale:**
+- Activity title indicates this is a PSYCHIATRY program
+- Although MDS is mentioned in the answer, the question is about SRI therapy (antidepressants) in psychiatry
+- The cancer mention provides context for psychiatrists who will see cancer patients
+- The primary specialty is psychiatry → NON-ONCOLOGY
+
+### Example 17: Non-Oncology Supportive Care Study
+**Question:** "Which of the following statements best describes the primary efficacy results of the phase 3 IRON-CLAD study of FCM vs placebo with respect to the percent of patients who maintained Hb within 0.5 g/dL of baseline from weeks 3 to 18?"
+**Answer:** "Percent of patients was higher in the FCM group vs placebo group"
+
+**Output:**
+```json
+{
+    "is_oncology": false,
+    "disease_state": null
+}
+```
+
+**Rationale:**
+- IRON-CLAD is a study about iron-deficiency anemia management with ferric carboxymaltose (FCM)
+- Even though some patients may have cancer, iron deficiency anemia is classified as multispecialty/general medicine
+- is_oncology = false
+
+### Example 18: Pan-Tumor Clinical Trial Equity
+**Question:** "In a recently published literature review highlighting interventions to retain underrepresented groups of patients with cancer in clinical trials, which of the following led to the highest patient acceptance rate of clinical trial treatment?"
+**Answer:** "Incorporating a research nurse navigator"
+
+**Output:**
+```json
+{
+    "is_oncology": true,
+    "disease_state": "Pan-tumor"
+}
+```
+
+**Rationale:**
+- Question about clinical trial equity/retention applies across all cancer types
+- No specific cancer mentioned - general oncology principle
+- is_oncology = true, disease_state = "Pan-tumor"
+
+### Example 19: Immune-Related AE with Activity Context
+**Question:** "The National Comprehensive Cancer Network (NCCN) recommends which of the following medications for patients with immune-related colitis that is steroid refractory?"
+**Answer:** "Vedolizumab"
+**Activity Title:** "Melanoma Updates 2024" or similar melanoma program
+
+**Output:**
+```json
+{
+    "is_oncology": true,
+    "disease_state": "Melanoma"
+}
+```
+
+**Rationale:**
+- Immune-related colitis is a pan-tumor AE from checkpoint inhibitors
+- However, activity title indicates this is a MELANOMA program
+- Activity context determines the disease_state → "Melanoma"
+
+### Example 20: KMT2A-Rearranged Acute Leukemia
+**Question:** "You are supporting a trial site where a patient with relapsed KMT2A-rearranged acute leukemia is being screened for potential targeted therapy. Based on FDA approvals and guideline updates, which of the following is the most appropriate targeted agent for this patient?"
+**Answer:** "Revumenib"
+
+**Output:**
+```json
+{
+    "is_oncology": true,
+    "disease_state": "AML"
+}
+```
+
+**Rationale:**
+- "Acute leukemia" without specifier, but KMT2A-rearranged
+- Revumenib (menin inhibitor) is FDA-approved for KMT2A-rearranged AML
+- Answer options contain AML-specific drugs → AML
+
+### Example 21: ICI Myocarditis (Multispecialty)
+**Question:** "Which of the following is the gold standard for definitive diagnosis of ICI myocarditis?"
+**Answer:** "Endomyocardial biopsy"
+**Activity Title:** "Provider and Caregiver Connection Live: Aligning Oncology and Cardiology Care"
+
+**Output:**
+```json
+{
+    "is_oncology": false,
+    "disease_state": null
+}
+```
+
+**Rationale:**
+- ICI myocarditis is managed by cardiologists, even when caused by cancer immunotherapy
+- This is classified as multispecialty/cardio-oncology, not oncology
+- is_oncology = false
+
+### Example 22: TA-TMA / HSCT-TMA (Multispecialty)
+**Question:** "Which of the following options best explains the potential impact of uncontrolled complement activation on the pathogenesis of TA-TMA?"
+**Answer:** "Increased risk of central nervous system complications"
+**Activity Title:** "New Perspectives in HSCT-TMA"
+
+**Output:**
+```json
+{
+    "is_oncology": false,
+    "disease_state": null
+}
+```
+
+**Rationale:**
+- Transplant-associated thrombotic microangiopathy (TA-TMA/HSCT-TMA) is classified as multispecialty
+- Even though it occurs in transplant patients (who often have hematologic malignancies), this is not oncology
+- is_oncology = false
+
+### Example 23: Prostate Cancer Screening (Multispecialty)
+**Question:** "Which of the following adjunctive tests for prostate cancer are performed in blood samples?"
+**Answer:** "4Kscore and IsoPSA"
+**Activity Title:** "Medical Crossfire in Adjunctive Testing: Charting a New Course in Prostate Cancer Risk Assessment"
+
+**Output:**
+```json
+{
+    "is_oncology": false,
+    "disease_state": null
+}
+```
+
+**Rationale:**
+- Prostate cancer SCREENING and risk assessment is for primary care/GPs, not oncologists
+- The target audience is general practitioners performing screening, not oncologists treating cancer
+- is_oncology = false
+
+### Example 24: Cold Agglutinin Syndrome (Multispecialty)
+**Question:** "A 54-year-old female patient presents with blue fingertips and tip of nose. She has been diagnosed with lymphoma and has palpable lymph nodes. She is anemic with evidence of hemolysis..."
+**Answer:** "CAS"
+**Activity Title:** "ASCO: Improving Outcomes in Autoimmune Hemolytic Anemias (AIHA)"
+
+**Output:**
+```json
+{
+    "is_oncology": false,
+    "disease_state": null
+}
+```
+
+**Rationale:**
+- Cold agglutinin syndrome (CAS) is classified as multispecialty/hematology, not oncology
+- Even when associated with lymphoma, AIHA/CAS management is non-oncology
+- is_oncology = false
+
+### Example 25: Iron Deficiency Anemia in Cancer (Multispecialty)
+**Question:** "Which of the following statements best describes the results of an RCT comparing the efficacy and safety of darbepoetin alpha with or without IV iron in patients with chemotherapy-induced anemia?"
+**Answer:** "Percent of patients was higher in the FCM group vs placebo group"
+**Activity Title:** "Medical Crossfire: How Has Iron Supplementation Altered Treatment Planning for Patients with Cancer"
+
+**Output:**
+```json
+{
+    "is_oncology": false,
+    "disease_state": null
+}
+```
+
+**Rationale:**
+- Iron deficiency anemia management is classified as multispecialty
+- Even when the program is specific to IDA as a symptom of cancer, this is not oncology
+- is_oncology = false
+
+### Example 26: GIST → Sarcoma (Disease Hierarchy)
+**Question:** "Your patient is a 47-year-old male who presents with advanced GIST harboring a c-KIT mutation. Which of the following is the recommended initial sequence of TKI therapy?"
+**Answer:** "Imatinib, sunitinib, regorafenib, ripretinib"
+**Activity Title:** "Oncology Briefings: Bridging Unmet Needs for Patients with Soft Tissue Sarcoma"
+
+**Output:**
+```json
+{
+    "is_oncology": true,
+    "disease_state": "Sarcoma"
+}
+```
+
+**Rationale:**
+- GIST is a subtype of sarcoma - use "Sarcoma" as disease_state
+- GIST would be captured in disease_type field at Stage 2
+- Activity title also confirms this is a sarcoma program
+
+### Example 27: Cholangiocarcinoma → Hepatobiliary Cancer (Disease Hierarchy)
+**Question:** "A patient is referred with metastatic cholangiocarcinoma. Molecular testing reveals no FGFR or IDH1 aberrations. Which of the following would be the most appropriate first-line treatment?"
+**Answer:** "Durvalumab plus GemCis"
+**Activity Title:** "7th Annual School of Gastrointestinal Oncology"
+
+**Output:**
+```json
+{
+    "is_oncology": true,
+    "disease_state": "Hepatobiliary cancer"
+}
+```
+
+**Rationale:**
+- Cholangiocarcinoma is a subtype of hepatobiliary cancer - use "Hepatobiliary cancer" as disease_state
+- Cholangiocarcinoma would be captured in disease_type field at Stage 2
+- Roll up to parent disease state for consistency
+
+### Example 28: Treatment-Specific Inference (Mirvetuximab → Ovarian)
+**Question:** "What are the 3 most common ocular toxicities associated with the use of mirvetuximab soravtansine-gynx compared with chemotherapy?"
+**Answer:** "Blurred vision, keratopathy, dry eye"
+**Activity Title:** "Managing Ocular Toxicities in Patients With Cancer"
+
+**Output:**
+```json
+{
+    "is_oncology": true,
+    "disease_state": "Ovarian cancer"
+}
+```
+
+**Rationale:**
+- Mirvetuximab soravtansine is ONLY FDA-approved for ovarian cancer (FRα+ platinum-resistant)
+- Even though activity title is generic, treatment-specific knowledge determines disease_state
+- is_oncology = true, disease_state = "Ovarian cancer"
+
+### Example 29: Lung Cancer Meeting + Pan-Tumor Topic → NSCLC
+**Question:** "When offered the opportunity to participate in a clinical trial, how did the rate of agreement to participate of minority patients compare to that of White patients in a meta-analysis?"
+**Answer:** "Similar"
+**Activity Title:** "Community Practice Connections: 24th Annual International Lung Cancer Congress"
+
+**Output:**
+```json
+{
+    "is_oncology": true,
+    "disease_state": "NSCLC"
+}
+```
+
+**Rationale:**
+- While clinical trial participation is a pan-tumor topic, this is a LUNG CANCER meeting
+- The study referenced was presented in lung cancer context, so findings are specific to that population
+- Default to NSCLC when lung cancer meeting context but question seems pan-tumor
+
+### Example 30: SOBO Diploma Track → Breast Cancer
+**Question:** "Which of the following agents is the best option for treating nausea/vomiting that is unrelated to chemotherapy or radiation in a patient with advanced cancer?"
+**Answer:** "Olanzapine"
+**Activity Title:** "Module 6: Adjuvant/Neoadjuvant Chemotherapy and Endocrine Therapy"
+
+**Output:**
+```json
+{
+    "is_oncology": true,
+    "disease_state": "Breast cancer"
+}
+```
+
+**Rationale:**
+- Activity title format "Module X: [topic]" indicates School of Breast Oncology diploma track
+- All SOBO diploma track questions are breast cancer context
+- is_oncology = true, disease_state = "Breast cancer"
+
+### Example 31: NHL Umbrella for Multi-Subtype Lymphoma Study
+**Question:** "In the EPCORE NHL-1 phase 2 study of epcoritamab, a CD3xCD20 bispecific antibody, 51% of patients developed CRS. What was the most common time for CRS?"
+**Answer:** "After receiving the first full dose"
+**Activity Title:** "Burst CME: Tackling Adverse Events With Targeted Therapies for Diffuse B-Cell Lymphoma"
+
+**Output:**
+```json
+{
+    "is_oncology": true,
+    "disease_state": "NHL"
+}
+```
+
+**Rationale:**
+- EPCORE NHL-1 included multiple B-cell lymphoma subtypes: DLBCL, high-grade B-cell lymphoma, PMBCL, and FL
+- Use "NHL" umbrella when study covers multiple lymphoma subtypes
+- Even though activity mentions "Diffuse B-Cell Lymphoma", the trial data is multi-subtype
+
+### Example 32: OB/GYN (Non-Oncology)
+**Question:** "Which of the following is a correct statement regarding OB/GYN care for LGBTQ individuals?"
+**Answer:** "Transgender men with a cervix require guideline-based cervical cancer screening"
+**Activity Title:** "4th Annual International Congress on the Future of Women's Health"
+
+**Output:**
+```json
+{
+    "is_oncology": false,
+    "disease_state": null
+}
+```
+
+**Rationale:**
+- This is an OB/GYN question about routine care, not oncology
+- Even though cervical cancer screening is mentioned, this is routine OB/GYN care
+- Target audience is OB/GYN providers, not oncologists
+- is_oncology = false
+
+### Example 33: Multi-Disease Question (Waldenström + MZL)
+**Question:** "Regarding lymphoplasmacytic lymphoma (Waldenström) and marginal zone lymphoma with plasmacytic differentiation, which of the following statements about MYD88 mutation is correct?"
+**Answer:** "It assists diagnosis, but it is not definitive"
+**Activity Title:** "Community Practice Connections: 6th Annual Live Medical Crossfire: Hematologic Malignancies"
+
+**Output:**
+```json
+{
+    "is_oncology": true,
+    "disease_state": "Waldenström",
+    "disease_state_secondary": "MZL"
+}
+```
+
+**Rationale:**
+- This question explicitly addresses differential diagnosis between TWO distinct diseases
+- Both Waldenström and MZL are relevant to answering the question
+- Use disease_state_secondary for the second disease
+- Do NOT use umbrella "NHL" when two specific diseases are explicitly named
+
+### Example 34: MPN Umbrella (Multiple MPNs)
+**Question:** "Which of the following symptoms are included in the MPN Total Symptom Score?"
+**Answer:** "Early satiety, abdominal discomfort, inactivity, concentration problems, night sweats, itching, bone pain, fever, unintentional weight loss, and fatigue"
+**Activity Title:** "Cases and Conversations: Real-World Insights on Advances in the Management of Myeloproliferative Neoplasms"
+
+**Output:**
+```json
+{
+    "is_oncology": true,
+    "disease_state": "MPN",
+    "disease_state_secondary": null
+}
+```
+
+**Rationale:**
+- Activity is about "Myeloproliferative Neoplasms" (the whole category)
+- MPN Total Symptom Score is used across all MPNs (MF, ET, PV)
+- Use umbrella "MPN" when question/activity applies broadly to all MPNs
+- Do NOT default to MF unless specifically about MF
+
+### Example 35: EP-NEC (Extrapulmonary Neuroendocrine Carcinoma)
+**Question:** "A 68-year-old man presents with poorly differentiated neuroendocrine carcinoma of the prostate. Which of the following is TRUE regarding treatment approach?"
+**Answer:** "Platinum-based chemotherapy is typically recommended"
+**Activity Title:** "Neuroendocrine Tumors Update"
+
+**Output:**
+```json
+{
+    "is_oncology": true,
+    "disease_state": "EP-NECs",
+    "disease_state_secondary": null
+}
+```
+
+**Rationale:**
+- Neuroendocrine carcinoma of the prostate is an extrapulmonary NEC (EP-NEC)
+- Do NOT classify as "Prostate cancer" - EP-NECs are treated differently than adenocarcinomas
+- EP-NECs include high-grade NECs arising outside the lung (prostate, bladder, GI tract, etc.)
+- Use "EP-NECs" as disease_state, not the organ of origin
+
+### Example 36: Pan-Tumor Trial at Disease-Specific Meeting → Use Meeting's Disease
+**Question:** "In DESTINY-PanTumor01, what was the confirmed objective response rate in patients with HER2-positive solid tumors?"
+**Answer:** "37.1%"
+**Activity Title:** "5th Annual Winter Lung Cancer Conference"
+
+**Output:**
+```json
+{
+    "is_oncology": true,
+    "disease_state": "NSCLC",
+    "disease_state_secondary": null
+}
+```
+
+**Rationale:**
+- DESTINY-PanTumor01 is a pan-tumor trial, but this is at a LUNG CANCER meeting
+- The audience is lung cancer specialists; the data is being applied to lung cancer context
+- Use the meeting's disease state (NSCLC), not "Pan-tumor"
+- This applies whenever pan-tumor data is presented at a disease-specific meeting
+
+### Example 37: COPE ADC Ocular Toxicity (Exception - ONCOLOGY)
+**Question:** "Which antibody-drug conjugate has been associated with the highest rates of ocular toxicity requiring dose modification?"
+**Answer:** "Belantamab mafodotin"
+**Activity Title:** "COPE: Managing Ocular Adverse Events in Patients Receiving Antibody-Drug Conjugates"
+
+**Output:**
+```json
+{
+    "is_oncology": true,
+    "disease_state": "Pan-tumor",
+    "disease_state_secondary": null
+}
+```
+
+**Rationale:**
+- COPE activities are typically NON-ONCOLOGY (optometry/ophthalmology education)
+- **Exception**: ADC ocular toxicity programs are ONCOLOGY because ADCs are cancer drugs
+- Belantamab (myeloma), mirvetuximab (ovarian), tisotumab (cervical) all cause ocular toxicities
+- Since ADCs from DIFFERENT cancer categories are discussed → Pan-tumor
+- If only ONE ADC discussed, use that drug's disease (e.g., mirvetuximab → Ovarian cancer)
+- If ADCs are all within same category (e.g., all gyn cancers), use that umbrella
+
+### Example 37b: COPE ADC Ocular Toxicity - Same Category ADCs (Gyn cancers)
+**Question:** "In general, if a patient were to have ocular adverse events related to therapy with mirvetuximab soravtansine or tisotumab vedotin, which of the following would be a consideration for the multispecialty team when discussing discontinuing treatment?"
+**Answer:** "These agents are used in patients who have already tried other cancer therapies, and their clinical trial efficacy may be better than patients' remaining options"
+**Activity Title:** "(COPE) Optimizing Management of Ocular Toxicity in Cancer Patients: The Role of Ophthalmologists in the Spectrum of Care"
+
+**Output:**
+```json
+{
+    "is_oncology": true,
+    "disease_state": "Gyn cancers",
+    "disease_state_secondary": null
+}
+```
+
+**Rationale:**
+- COPE ADC ocular toxicity = ONCOLOGY (exception to normal COPE rule)
+- Question specifically mentions mirvetuximab (ovarian cancer) and tisotumab (cervical cancer)
+- Both drugs are for GYNECOLOGIC cancers - same umbrella category
+- Use "Gyn cancers" umbrella, NOT "Pan-tumor"
+- Pan-tumor is only appropriate when ADCs span different cancer categories (e.g., belantamab for myeloma + mirvetuximab for ovarian)
+
+### Example 38: Activity Name Red Herring - Sickle Cell (NON-ONCOLOGY)
+**Question:** "Hydroxyurea can reduce the formation of sickle hemoglobin by increasing fetal hemoglobin production. Which of the following is true of hydroxyurea?"
+**Answer:** "Patients should use contraception while on hydroxyurea"
+**Activity Title:** "Medical Crossfire: How Can We Maximize Outcomes With PI3K Inhibitors Across Hematologic Malignancies?; Sickle Cell Disease: Improving the Quality and Continuum of Acute and Ambulatory Patient Care"
+
+**Output:**
+```json
+{
+    "is_oncology": false,
+    "disease_state": null,
+    "disease_state_secondary": null
+}
+```
+
+**Rationale:**
+- **CRITICAL**: The question is about SICKLE CELL DISEASE (hydroxyurea for sickle hemoglobin)
+- Sickle cell disease is BENIGN HEMATOLOGY, not a malignancy
+- The activity title mentioning "Hematologic Malignancies" is a RED HERRING
+- This question appeared at multiple activities - one mentions malignancies, one mentions sickle cell
+- Always look at what the question is actually asking about, not just the activity title
+- is_oncology = false because sickle cell is non-malignant
+
+### Example 39: Specific Dual Diseases - MM + NHL (NOT Umbrella)
+**Question:** "Which of the following is true regarding the results of the phase 3 study evaluating stem cell mobilization after treatment with plerixafor and granulocyte colony-stimulating factor (G-CSF) vs placebo?"
+**Answer:** "Patients with NHL and MM mobilized significantly more CD34+ cells on the plerixafor-containing arm"
+**Activity Title:** "Optimizing ASCT in Patients With Multiple myeloma and Non-Hodgkin Lymphoma Through Stem Cell Mobilization Techniques"
+
+**Output:**
+```json
+{
+    "is_oncology": true,
+    "disease_state": "Multiple myeloma",
+    "disease_state_secondary": "NHL"
+}
+```
+
+**Rationale:**
+- Activity title explicitly names TWO SPECIFIC diseases: "Multiple myeloma and Non-Hodgkin Lymphoma"
+- Answer also explicitly mentions both: "NHL and MM"
+- Do NOT use "Heme malignancies" umbrella when two specific diseases are explicitly named
+- Use disease_state for the first mentioned disease, disease_state_secondary for the second
+- Both diseases are equally relevant to this question about stem cell mobilization
+
+### Example 40: Cancer Screening Disparities - NON-ONCOLOGY (Business Rule)
+**Question:** "Your patient is a 39-year-old Hispanic woman, who presents to clinic for a routine visit and inquires about MCED testing. She is caring for 3 young children and an elderly parent. English is her second language, and she is living below the poverty line. Based on her current situation, which of the following factors is most likely to contribute to disparities in cancer screening for this patient?"
+**Answer:** "Her financial situation"
+**Activity Title:** "Addressing Healthcare Inequities: Tailoring Cancer Screening Plans to Address Inequities in Care"
+
+**Output:**
+```json
+{
+    "is_oncology": false,
+    "disease_state": null,
+    "disease_state_secondary": null
+}
+```
+
+**Rationale:**
+- **BUSINESS RULE**: Cancer screening programs focused on healthcare disparities/inequities are NON-ONCOLOGY
+- The primary audience for cancer screening education is PRIMARY CARE PHYSICIANS (PCPs), not oncologists
+- Although the topic mentions "cancer screening" and "MCED testing" (multi-cancer early detection), this is about healthcare equity and access barriers
+- Questions about socioeconomic factors, language barriers, or disparities in screening access = multispecialty/non-oncology
+- The question is NOT about treating or diagnosing cancer - it's about barriers to screening
+- is_oncology = false because this content targets PCPs who do preventive care, not oncologists who treat cancer
+
+### Example 41: Activity Title Indicates Oncology for Generic-Sounding Question
+**Question:** "Infusion reactions are known adverse effects associated with the administration of monoclonal antibodies. In addition to monitoring vital signs, which of the following measures should be used to mitigate this toxicity?"
+**Answer:** "Premedicate with acetaminophen, histamine type-2 (H2) antagonists, and dexamethasone"
+**Activity Title:** "Myeloma Management Considerations"
+
+**Output:**
+```json
+{
+    "is_oncology": true,
+    "disease_state": "Multiple myeloma",
+    "disease_state_secondary": null
+}
+```
+
+**Rationale:**
+- Question stem sounds generic (infusion reactions with monoclonal antibodies could apply to many diseases)
+- **CRITICAL**: Activity title "Myeloma Management Considerations" clearly indicates this is a Multiple Myeloma program
+- Monoclonal antibodies like daratumumab and isatuximab are key treatments for Multiple Myeloma
+- The activity context determines the disease_state - this is oncology supportive care in myeloma context
+- Do NOT classify as non-oncology just because the question stem doesn't explicitly mention cancer
+- Always use activity title as a strong contextual signal for disease classification
 
 ---
 

@@ -60,10 +60,10 @@ HER2 IHC 0 with some membrane staining → HER2-ultralow
 HER2 IHC 0 OR negative → HER2-negative
 ```
 
-#### Step 2: If HER2-positive → disease_type: `"HER2+"`
-- **DO NOT** also tag biomarker: "HER2" (redundant)
-- Regardless of HR status (can be HR+/HER2+ or HR-/HER2+)
-- **Rule:** HER2 status takes precedence over HR status
+#### Step 2: If HER2-positive, determine HR status:
+- If HR+ and HER2+ both explicit → disease_type: `"HR+/HER2+"`
+- If HR- or HR status not specified → disease_type: `"HER2+"`
+- **DO NOT** also tag biomarker: "HER2" (redundant for both cases)
 
 #### Step 3: If HER2-negative, determine HR status:
 ```
@@ -77,23 +77,38 @@ ER- and PR- → Triple-negative (TNBC)
 - **Distinct from HER2+** - not eligible for traditional HER2-targeted therapy (trastuzumab, pertuzumab)
 - Eligible for HER2-low ADCs (trastuzumab deruxtecan)
 
-#### Step 5: HER2-ultralow (Emerging Category):
+#### Step 5: HER2-ultralow (Actionable Category):
 - HER2 IHC 0 with some membrane staining
-- Less common, usually mentioned explicitly in research contexts
-- Investigational ADC eligibility
+- Actionable per DESTINY-Breast06 trial results
+- T-DXd approved for HER2-ultralow (2024+)
 
 ### Valid disease_type Values:
 
+**Receptor-based subtypes (most common):**
 | Value | Definition | Redundant Biomarker |
 |-------|------------|---------------------|
-| `"HR+/HER2-"` | ER+ and/or PR+, HER2- | HER2 (don't tag) |
-| `"HER2+"` or `"HER2-positive"` | HER2 IHC 3+ or 2+/ISH+ | HER2 (don't tag) |
+| `"HR+/HER2-"` | ER+ and/or PR+, HER2- (IHC 0 without membrane staining) | HER2 (don't tag) |
+| `"HR+/HER2+"` | ER+ and/or PR+, HER2 IHC 3+ or 2+/ISH+ | HER2 (don't tag) |
+| `"HER2+"` or `"HER2-positive"` | HER2 IHC 3+ or 2+/ISH+ (HR-negative or HR status not specified) | HER2 (don't tag) |
 | `"HER2-low"` | HER2 IHC 1+ or 2+/ISH- | None |
 | `"HER2-ultralow"` | HER2 IHC 0 with membrane staining | None |
 | `"Triple-negative"` or `"TNBC"` | ER-, PR-, HER2- | None |
-| `"Invasive ductal carcinoma"` or `"IDC"` | Histology (use if subtype not specified) | None |
-| `"Invasive lobular carcinoma"` or `"ILC"` | Histology (use if subtype not specified) | None |
-| `null` | If truly not mentioned | N/A |
+
+**Histologic subtypes (use when question focuses on histology):**
+| Value | Definition | Notes |
+|-------|------------|-------|
+| `"DCIS"` | Ductal carcinoma in situ | Non-invasive (stage 0), disease_stage is always "Early-stage" |
+| `"ILC"` | Invasive lobular carcinoma | ~10-15% of breast cancers, distinct biology, may have different imaging/treatment considerations |
+
+**General fallback:**
+| Value | Definition | Notes |
+|-------|------------|-------|
+| `null` | If truly not mentioned | Use only after exhausting inference |
+
+**Subtyping hierarchy when both histology and receptor status are mentioned:**
+1. If question focuses on histologic characteristics (e.g., "management of DCIS", "lobular carcinoma imaging") → use histologic subtype
+2. If question focuses on systemic therapy for invasive cancer → use receptor-based subtype (receptor status drives treatment)
+3. Example: "HR+ ILC" - if question is about endocrine therapy, use `"HR+/HER2-"`; if question is about lobular-specific features, use `"ILC"`
 
 ### Common Patterns & Examples:
 
@@ -166,86 +181,89 @@ ER- and PR- → Triple-negative (TNBC)
 
 ## Field: treatment
 
-### Common Breast Cancer Treatments:
+### CRITICAL: Fundable Drugs Only
+
+The treatment tag is designed to identify drugs of interest to **pharmaceutical CME funders**.
+
+**DO NOT tag:**
+- Chemotherapy agents (capecitabine, carboplatin, docetaxel, paclitaxel, doxorubicin, etc.)
+- Hormonal backbone therapies when combined with a fundable drug (fulvestrant, letrozole, anastrozole, exemestane, tamoxifen)
+- Radiation therapy
+- Surgical procedures
+
+**DO tag:**
+- Targeted therapies (TKIs, mAbs, ADCs)
+- Immunotherapies (checkpoint inhibitors)
+- Novel agents
+
+### Multi-Drug Format
+- Use semicolon separator: `"drug1; drug2"`
+- Only include fundable drugs in the list
+
+### Fundable Breast Cancer Treatments:
 
 #### HER2+ Breast Cancer:
-**Targeted Therapies:**
-- `"trastuzumab"` (Herceptin)
-- `"pertuzumab"` (Perjeta)
-- `"trastuzumab deruxtecan"` or `"T-DXd"` (Enhertu) - ADC
-- `"trastuzumab emtansine"` or `"T-DM1"` (Kadcyla) - ADC
-- `"neratinib"` (Nerlynx)
-- `"tucatinib"` (Tukysa)
-- `"lapatinib"` (Tykerb)
-- `"margetuximab"` (Margenza)
-
-**Common Combinations:**
-- `"trastuzumab + pertuzumab + chemotherapy"` (1L metastatic or neoadjuvant)
-- `"trastuzumab + pertuzumab"` (maintenance)
-- `"trastuzumab deruxtecan"` (2L+ metastatic)
-- `"tucatinib + trastuzumab + capecitabine"` (brain mets)
+- `"trastuzumab"` - mAb
+- `"pertuzumab"` - mAb
+- `"trastuzumab deruxtecan"` (T-DXd) - ADC
+- `"trastuzumab emtansine"` (T-DM1) - ADC
+- `"tucatinib"` - TKI
+- `"neratinib"` - TKI
+- `"lapatinib"` - TKI
+- `"margetuximab"` - mAb
 
 #### HR+/HER2- Breast Cancer:
-**Endocrine Therapy:**
-- `"letrozole"` (aromatase inhibitor)
-- `"anastrozole"` (aromatase inhibitor)
-- `"exemestane"` (aromatase inhibitor)
-- `"tamoxifen"` (SERM)
-- `"fulvestrant"` (Faslodex - SERD)
-
 **CDK4/6 Inhibitors:**
-- `"palbociclib"` (Ibrance)
-- `"ribociclib"` (Kisqali)
-- `"abemaciclib"` (Verzenio)
-
-**Common Combinations:**
-- `"palbociclib + letrozole"` (1L metastatic)
-- `"ribociclib + letrozole"` (1L metastatic)
-- `"abemaciclib + fulvestrant"` (2L+ metastatic)
-- `"abemaciclib"` (adjuvant for high-risk early-stage)
-- `"CDK4/6 inhibitor + endocrine therapy"` (when specific drug not mentioned)
-- `"CDK4/6 inhibitor + aromatase inhibitor"` (when specific drugs not mentioned)
+- `"palbociclib"`
+- `"ribociclib"`
+- `"abemaciclib"`
 
 **Other Targeted Therapies:**
-- `"everolimus"` (mTOR inhibitor) - usually with exemestane
-- `"alpelisib"` (PI3K inhibitor) - for PIK3CA-mutated
-- `"elacestrant"` (oral SERD) - for ESR1-mutated
+- `"everolimus"` - mTOR inhibitor
+- `"alpelisib"` - PI3K inhibitor (PIK3CA-mutated)
+- `"elacestrant"` - oral SERD (ESR1-mutated)
+- `"capivasertib"` - AKT inhibitor
+- `"inavolisib"` - PI3K inhibitor (PIK3CA-mutated)
 
 #### Triple-Negative Breast Cancer (TNBC):
 **Immunotherapy:**
-- `"pembrolizumab"` (Keytruda)
-- `"atezolizumab"` (Tecentriq)
+- `"pembrolizumab"`
+- `"atezolizumab"`
 
 **ADCs:**
-- `"sacituzumab govitecan"` (Trodelvy) - TROP2-directed
-- `"datopotamab deruxtecan"` (TROP2-directed, investigational)
+- `"sacituzumab govitecan"` - TROP2-directed
+- `"datopotamab deruxtecan"` - TROP2-directed
 
-**PARP Inhibitors (for BRCA-mutated TNBC):**
-- `"olaparib"` (Lynparza)
-- `"talazoparib"` (Talzenna)
+**PARP Inhibitors (BRCA-mutated):**
+- `"olaparib"`
+- `"talazoparib"`
 
-**Common Combinations:**
-- `"pembrolizumab + chemotherapy"` (1L metastatic, PD-L1+)
-- `"atezolizumab + nab-paclitaxel"` (1L metastatic, PD-L1+)
-- `"sacituzumab govitecan"` (2L+ metastatic)
+### Treatment Tagging Examples:
 
-#### Chemotherapy Regimens:
-- `"AC"` (doxorubicin + cyclophosphamide)
-- `"TC"` (docetaxel + cyclophosphamide)
-- `"AC-T"` or `"AC followed by paclitaxel"` (adjuvant)
-- `"nab-paclitaxel"` (Abraxane)
-- `"paclitaxel"`
-- `"docetaxel"`
-- `"capecitabine"` (Xeloda)
-- `"carboplatin"`
-- `"doxorubicin"`
+**Single fundable drug in combination:**
+- "ribociclib + letrozole" → `"ribociclib"` (letrozole not tagged)
+- "capivasertib + fulvestrant" → `"capivasertib"` (fulvestrant not tagged)
+- "pembrolizumab + chemotherapy" → `"pembrolizumab"` (chemo not tagged)
+- "tucatinib + trastuzumab + capecitabine" → `"tucatinib; trastuzumab"` (capecitabine not tagged)
 
-#### Drug Class (when specific agent not mentioned):
-- `"CDK4/6 inhibitor"`
-- `"aromatase inhibitor"`
-- `"PARP inhibitor"`
-- `"ADC"` (antibody-drug conjugate)
-- `"chemotherapy"` (when no specific regimen mentioned)
+**Multiple fundable drugs:**
+- "T-DXd or SG for mTNBC" → `"trastuzumab deruxtecan; sacituzumab govitecan"`
+- "trastuzumab + pertuzumab" → `"trastuzumab; pertuzumab"`
+- "SG + pembrolizumab" → `"sacituzumab govitecan; pembrolizumab"`
+- "inavolisib + palbociclib + fulvestrant" → `"inavolisib; palbociclib"`
+
+**Drug class expansion (when specific drug not named):**
+- "CDK4/6 inhibitor" for 1L mBC → `"palbociclib; ribociclib; abemaciclib"` (all 3 approved)
+- "CDK4/6 inhibitor" for adjuvant → `"abemaciclib; ribociclib"` (both approved for adjuvant)
+- "anti-HER2 ADC" → `"trastuzumab deruxtecan; trastuzumab emtansine"`
+- "PARP inhibitor" for BRCA+ mBC → `"olaparib; talazoparib"`
+
+### No Treatment Scenarios
+Many questions legitimately have `treatment: null`:
+- Biomarker testing questions
+- Diagnostic workup questions
+- Prognostic questions (Oncotype DX, etc.)
+- Some Clinical efficacy questions focusing on endpoints without drug context
 
 ---
 
@@ -266,21 +284,28 @@ ER- and PR- → Triple-negative (TNBC)
 **EXCEPTION: Biomarker testing questions**
 - If topic is `"Biomarker testing"` and question is about HER2 testing → OK to tag biomarker: `"HER2"`
 
-### Valid Biomarker Values:
+### Valid Biomarker Values (not exhaustive):
 
 **Predictive:**
 - `"PD-L1"` (for immunotherapy in TNBC)
 - `"ESR1"` (for elacestrant eligibility)
-- `"PIK3CA"` (for alpelisib eligibility)
+- `"PIK3CA"` (for alpelisib/inavolisib eligibility)
 - `"BRCA1/2"` (for PARP inhibitors)
-- `"TROP2"` (for sacituzumab govitecan - though all TNBC expresses TROP2)
+- `"AKT1"` (for capivasertib eligibility)
+- `"HER2 mutation"` (rare, distinct from HER2 overexpression - may be actionable)
+- `"TROP2"` (for sacituzumab govitecan - though broadly expressed)
 
-**Prognostic:**
-- `"Ki-67"` (proliferation marker)
+**Genomic assays (early-stage prognostic/predictive):**
 - `"Oncotype DX"` (21-gene recurrence score)
 - `"MammaPrint"` (70-gene signature)
+- `"Breast Cancer Index"` (BCI, includes HOXB13:IL17BR)
+- `"EndoPredict"` (EPclin)
+- `"Prosigna"` (PAM50-based)
 
-**Testing Methods:**
+**Multiple biomarkers:**
+- Use semicolon separator when patient has concurrent mutations: e.g., `"ESR1; PIK3CA"`
+
+**Testing Methods (generally not tagged as biomarker):**
 - `"IHC"` (immunohistochemistry)
 - `"FISH"` (fluorescence in situ hybridization)
 - `"NGS"` (next-generation sequencing)
@@ -297,43 +322,87 @@ ER- and PR- → Triple-negative (TNBC)
 
 ## Field: trial
 
-### Key Breast Cancer Trials:
+### Explicit vs Inferred Trials
+
+**Explicit mention:** Always tag if trial name is explicitly stated in question or answer.
+
+**Trial Inference (ALLOWED for Clinical efficacy & Study design topics):**
+When the topic is "Clinical efficacy" or "Study design", INFER the trial name based on:
+- Drug + indication + efficacy data mentioned
+- High confidence that the combination uniquely identifies a trial
+
+**DO NOT infer trials for:**
+- Treatment selection topics (just asking which drug to use)
+- Generic statements without specific population/indication
+
+### Key Breast Cancer Trials for Inference:
 
 #### HER2+ Disease:
-- `"CLEOPATRA"` - Trastuzumab + pertuzumab + docetaxel (1L metastatic)
-- `"DESTINY-Breast03"` - Trastuzumab deruxtecan vs T-DM1 (2L metastatic)
-- `"DESTINY-Breast04"` - Trastuzumab deruxtecan in HER2-low
-- `"EMILIA"` - T-DM1 vs capecitabine + lapatinib
-- `"KATHERINE"` - T-DM1 vs trastuzumab adjuvant (residual disease post-neoadjuvant)
-- `"HER2CLIMB"` - Tucatinib + trastuzumab + capecitabine (brain mets)
-- `"APHINITY"` - Pertuzumab adjuvant
-- `"NALA"` - Neratinib + capecitabine
-- `"SOPHIA"` - Margetuximab vs trastuzumab
+| Drug + Context | Trial |
+|----------------|-------|
+| Trastuzumab + pertuzumab + chemo in 1L HER2+ mBC | `"CLEOPATRA"` |
+| T-DXd vs T-DM1 in HER2+ mBC | `"DESTINY-Breast03"` |
+| T-DXd in HER2+ 2L+ mBC | `"DESTINY-Breast01"` or `"DESTINY-Breast02"` |
+| T-DM1 vs capecitabine + lapatinib in HER2+ mBC | `"EMILIA"` |
+| T-DM1 adjuvant in HER2+ residual disease | `"KATHERINE"` |
+| Tucatinib + trastuzumab in HER2+ brain mets | `"HER2CLIMB"` |
+| Pertuzumab adjuvant in HER2+ early BC | `"APHINITY"` |
+| Neratinib + capecitabine in HER2+ mBC | `"NALA"` |
+| Margetuximab vs trastuzumab | `"SOPHIA"` |
+
+#### HER2-low Disease:
+| Drug + Context | Trial |
+|----------------|-------|
+| T-DXd in HER2-low mBC | `"DESTINY-Breast04"` |
+| T-DXd in HER2-ultralow | `"DESTINY-Breast06"` |
 
 #### HR+/HER2- Disease:
-- `"MONALEESA-2"` - Ribociclib + letrozole (1L)
-- `"MONALEESA-3"` - Ribociclib + fulvestrant
-- `"MONALEESA-7"` - Ribociclib in premenopausal women
-- `"MONARCH-2"` - Abemaciclib + fulvestrant (2L+)
-- `"MONARCH-3"` - Abemaciclib + AI (1L)
-- `"monarchE"` - Abemaciclib adjuvant (high-risk early-stage)
-- `"PALOMA-2"` - Palbociclib + letrozole (1L)
-- `"PALOMA-3"` - Palbociclib + fulvestrant (2L+)
-- `"EMERALD"` - Elacestrant (ESR1-mutated)
-- `"SOLAR-1"` - Alpelisib + fulvestrant (PIK3CA-mutated)
+| Drug + Context | Trial |
+|----------------|-------|
+| Ribociclib + letrozole in 1L HR+/HER2- mBC | `"MONALEESA-2"` |
+| Ribociclib + fulvestrant in 2L+ HR+/HER2- mBC | `"MONALEESA-3"` |
+| Ribociclib in premenopausal HR+/HER2- mBC | `"MONALEESA-7"` |
+| Abemaciclib + fulvestrant in 2L+ HR+/HER2- mBC | `"MONARCH-2"` |
+| Abemaciclib + AI in 1L HR+/HER2- mBC | `"MONARCH-3"` |
+| Abemaciclib adjuvant in high-risk HR+/HER2- | `"monarchE"` |
+| Ribociclib adjuvant in HR+/HER2- | `"NATALEE"` |
+| Palbociclib + letrozole in 1L HR+/HER2- mBC | `"PALOMA-2"` |
+| Palbociclib + fulvestrant in 2L+ HR+/HER2- mBC | `"PALOMA-3"` |
+| Elacestrant in ESR1-mutated HR+/HER2- | `"EMERALD"` |
+| Alpelisib + fulvestrant in PIK3CA-mutated | `"SOLAR-1"` |
+| Capivasertib + fulvestrant in HR+/HER2- | `"CAPItello-291"` |
+| Inavolisib + palbociclib + fulvestrant in PIK3CA-mutated | `"INAVO120"` |
 
 #### Triple-Negative Disease:
-- `"KEYNOTE-355"` - Pembrolizumab + chemotherapy (1L, PD-L1+)
-- `"IMpassion130"` - Atezolizumab + nab-paclitaxel (1L, PD-L1+)
-- `"ASCENT"` - Sacituzumab govitecan (2L+)
-- `"TROPiCS-02"` - Datopotamab deruxtecan
-- `"OlympiAD"` - Olaparib (BRCA-mutated)
-- `"EMBRACA"` - Talazoparib (BRCA-mutated)
-- `"KEYNOTE-522"` - Pembrolizumab neoadjuvant
+| Drug + Context | Trial |
+|----------------|-------|
+| Pembrolizumab + chemo in 1L mTNBC (PD-L1+) | `"KEYNOTE-355"` |
+| Pembrolizumab neoadjuvant in early TNBC | `"KEYNOTE-522"` |
+| Pembrolizumab + SG in 1L mTNBC | `"KEYNOTE-756"` |
+| SG + pembrolizumab in 1L mTNBC | `"ASCENT-04"` |
+| Atezolizumab + nab-paclitaxel in 1L mTNBC | `"IMpassion130"` |
+| Sacituzumab govitecan in 2L+ mTNBC | `"ASCENT"` |
+| Dato-DXd in HR+/HER2- mBC | `"TROPION-Breast01"` |
+| Dato-DXd in mTNBC | `"TROPION-Breast02"` |
+| Olaparib in BRCA-mutated mBC | `"OlympiAD"` |
+| Talazoparib in BRCA-mutated mBC | `"EMBRACA"` |
 
 #### Pan-Subtype:
 - `"I-SPY 2"` - Neoadjuvant adaptive trial (multiple subtypes)
 - `"CREATE-X"` - Capecitabine adjuvant (residual disease after neoadjuvant)
+
+### Trial Inference Example:
+
+**Question:** "Which of the following is correct regarding SG + pembrolizumab in 1L mTNBC?"
+**Answer:** "Superior PFS compared to pembrolizumab + chemotherapy in the phase 3 trial"
+
+**Inference logic:**
+1. Topic: Clinical efficacy (asking about trial results)
+2. Drug: sacituzumab govitecan + pembrolizumab
+3. Setting: 1L mTNBC
+4. Match: SG + pembrolizumab in 1L mTNBC → **ASCENT-04**
+
+**Result:** trial: `"ASCENT-04"` (inferred)
 
 ---
 
@@ -347,18 +416,19 @@ ER- and PR- → Triple-negative (TNBC)
 **Tags:**
 ```json
 {
-  "topic": "Treatment selection",
+  "topic": "Treatment indication",
   "disease_state": "Breast cancer",
   "disease_stage": "Metastatic",
   "disease_type": "HER2+",
   "treatment_line": "1L",
-  "treatment": "trastuzumab + pertuzumab + chemotherapy",
+  "treatment": "trastuzumab; pertuzumab",
   "biomarker": null,
   "trial": "CLEOPATRA"
 }
 ```
 
 **Rationale:**
+- **Treatment indication** (not Treatment selection) - question asks about preferred/approved treatment, not a patient vignette
 - HER2+ in disease_type → Don't tag HER2 as biomarker (redundant)
 - Metastatic → treatment_line uses "1L" not "Adjuvant"
 - First-line → "1L"
@@ -521,9 +591,17 @@ ER- and PR- → Triple-negative (TNBC)
 
 ### Edge Case 1: HR+/HER2+ Disease
 - Technically both HR+ and HER2+
-- **Rule:** Use disease_type: `"HER2+"` (HER2 status takes precedence)
-- **Rationale:** HER2+ drives treatment selection regardless of HR status
-- Treatment approach is HER2-directed therapy (not endocrine therapy)
+- **Rule:** Use disease_type: `"HR+/HER2+"` when both are explicitly stated
+- **Rationale:** This subtype has distinct biology and treatment considerations (dual HR and HER2 targeting)
+- Treatment approach includes HER2-directed therapy plus endocrine therapy
+
+### Edge Case 1b: HR+/HER2-low or HR+/HER2-ultralow Classification
+- **Critical decision point for Treatment selection questions:**
+  - If answer involves **T-DXd** (trastuzumab deruxtecan) → Use `"HER2-low"` or `"HER2-ultralow"`
+  - Otherwise → Use `"HR+/HER2-"` (CDK4/6 inhibitors, endocrine therapy drive treatment)
+- **Rationale:** T-DXd is the only approved drug specifically for HER2-low/-ultralow. When T-DXd is the treatment, the HER2 status is clinically actionable and should be tagged as HER2-low/-ultralow. For all other treatments (CDK4/6i, AI, etc.), the HR+ status drives treatment selection.
+- **Example 1:** "HR+/HER2-low patient, best treatment?" Answer: "Ribociclib + letrozole" → disease_type: `"HR+/HER2-"`
+- **Example 2:** "HR+/HER2-low patient, best treatment?" Answer: "Trastuzumab deruxtecan" → disease_type: `"HER2-low"`
 
 ### Edge Case 2: TNBC vs Triple-Negative
 - Both are acceptable

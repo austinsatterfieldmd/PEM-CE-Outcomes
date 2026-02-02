@@ -1,0 +1,442 @@
+metadata:
+  generated_at: '2026-01-31T23:16:41.506070'
+  total_corrections_analyzed: 168
+correction_patterns:
+- field: metastatic_site_1
+  pattern: Extramedullary plasmacytoma -> (cleared)
+  count: 2
+  action: review
+- field: efficacy_endpoint_1
+  pattern: Overall response rate (ORR) -> (cleared)
+  count: 2
+  action: review
+- field: efficacy_endpoint_1
+  pattern: Minimal residual disease (MRD) -> (cleared)
+  count: 2
+  action: review
+- field: efficacy_endpoint_1
+  pattern: Progression-free survival (PFS) -> (cleared)
+  count: 2
+  action: review
+- field: answer_length_pattern
+  pattern: Variable -> Uniform
+  count: 32
+  action: review
+- field: answer_length_pattern
+  pattern: (null) -> Uniform
+  count: 7
+  action: review
+- field: answer_length_pattern
+  pattern: Correct longest -> Uniform
+  count: 3
+  action: review
+- field: answer_length_pattern
+  pattern: (null) -> Variable
+  count: 3
+  action: review
+- field: drug_class_3
+  pattern: Anti-CD38 mAb -> (cleared)
+  count: 4
+  action: review
+- field: drug_class_3
+  pattern: (null) -> IMiD
+  count: 4
+  action: review
+- field: age_group
+  pattern: Younger (<65) -> Young
+  count: 15
+  action: review
+- field: age_group
+  pattern: Elderly (65-74) -> Transitional
+  count: 7
+  action: review
+- field: age_group
+  pattern: (null) -> Young
+  count: 2
+  action: review
+- field: age_group
+  pattern: (null) -> Transitional
+  count: 2
+  action: review
+- field: treatment_eligibility
+  pattern: (null) -> CAR-T eligible
+  count: 9
+  action: review
+- field: treatment_eligibility
+  pattern: Transplant-eligible -> CAR-T eligible
+  count: 2
+  action: review
+- field: treatment_eligibility
+  pattern: (null) -> Transplant-eligible
+  count: 2
+  action: review
+- field: treatment_eligibility
+  pattern: CAR-T eligible -> (cleared)
+  count: 2
+  action: review
+- field: stem_type
+  pattern: (null) -> Clinical vignette
+  count: 3
+  action: review
+- field: evidence_type
+  pattern: (null) -> Phase 3 RCT
+  count: 9
+  action: review
+- field: evidence_type
+  pattern: (null) -> Real-world evidence
+  count: 2
+  action: review
+- field: disease_type_1
+  pattern: Smoldering -> Smoldering MM
+  count: 3
+  action: review
+- field: disease_type_1
+  pattern: (null) -> Smoldering
+  count: 2
+  action: review
+- field: symptom_2
+  pattern: (null) -> Lytic lesions
+  count: 3
+  action: review
+- field: disease_type_2
+  pattern: (null) -> High-risk
+  count: 4
+  action: review
+- field: disease_type_2
+  pattern: (null) -> Standard-risk
+  count: 2
+  action: review
+- field: symptom_1
+  pattern: (null) -> Lytic lesions
+  count: 3
+  action: review
+- field: cme_outcome_level
+  pattern: (null) -> 4 - Competence
+  count: 3
+  action: review
+- field: cme_outcome_level
+  pattern: 4 - Competence -> 3 - Knowledge
+  count: 3
+  action: review
+- field: answer_format
+  pattern: (null) -> Single best
+  count: 4
+  action: review
+- field: treatment_4
+  pattern: lenalidomide -> Lenalidomide
+  count: 2
+  action: review
+- field: treatment_4
+  pattern: (null) -> Carfilzomib
+  count: 2
+  action: review
+- field: treatment_2
+  pattern: (null) -> Idecabtagene vicleucel
+  count: 6
+  action: review
+- field: treatment_2
+  pattern: bortezomib -> Bortezomib
+  count: 5
+  action: review
+- field: treatment_2
+  pattern: lenalidomide -> Lenalidomide
+  count: 3
+  action: review
+- field: treatment_2
+  pattern: (null) -> Isatuximab
+  count: 3
+  action: review
+- field: treatment_2
+  pattern: (null) -> Teclistamab
+  count: 3
+  action: review
+- field: treatment_2
+  pattern: (null) -> Daratumumab
+  count: 3
+  action: review
+- field: treatment_2
+  pattern: ciltacabtagene autoleucel -> Ciltacabtagene autoleucel
+  count: 2
+  action: review
+- field: treatment_2
+  pattern: isatuximab -> Isatuximab
+  count: 2
+  action: review
+- field: treatment_2
+  pattern: carfilzomib -> Carfilzomib
+  count: 2
+  action: review
+- field: treatment_2
+  pattern: (null) -> Ciltacabtagene autoleucel
+  count: 2
+  action: review
+- field: treatment_3
+  pattern: lenalidomide -> Lenalidomide
+  count: 4
+  action: review
+- field: treatment_3
+  pattern: bortezomib -> Bortezomib
+  count: 3
+  action: review
+- field: treatment_3
+  pattern: (null) -> Lenalidomide
+  count: 3
+  action: review
+- field: treatment_3
+  pattern: daratumumab -> (cleared)
+  count: 2
+  action: review
+- field: treatment_3
+  pattern: (null) -> Linvoseltamab
+  count: 2
+  action: review
+- field: drug_target_3
+  pattern: (null) -> Cereblon
+  count: 4
+  action: review
+- field: drug_target_3
+  pattern: CD38 -> (cleared)
+  count: 3
+  action: review
+- field: drug_class_1
+  pattern: (null) -> Bispecific antibody
+  count: 3
+  action: review
+- field: trial_1
+  pattern: (null) -> CARTITUDE-4
+  count: 3
+  action: review
+- field: topic
+  pattern: AE management -> Safety profile
+  count: 3
+  action: review
+- field: topic
+  pattern: (null) -> AE management
+  count: 3
+  action: review
+- field: guideline_source_1
+  pattern: FDA label -> (cleared)
+  count: 3
+  action: review
+- field: toxicity_organ
+  pattern: (null) -> Dermatologic
+  count: 3
+  action: review
+- field: toxicity_organ
+  pattern: Neurologic -> (cleared)
+  count: 2
+  action: review
+- field: resistance_mechanism
+  pattern: Triple-class refractory -> (cleared)
+  count: 2
+  action: review
+- field: outcome_context
+  pattern: (null) -> Secondary endpoint
+  count: 2
+  action: review
+- field: treatment_5
+  pattern: (null) -> Lenalidomide
+  count: 3
+  action: review
+- field: prior_therapy_1
+  pattern: Prior PI -> (cleared)
+  count: 3
+  action: review
+- field: distractor_homogeneity
+  pattern: Homogeneous -> Heterogeneous
+  count: 21
+  action: review
+- field: distractor_homogeneity
+  pattern: Heterogeneous -> Homogeneous
+  count: 6
+  action: review
+- field: distractor_homogeneity
+  pattern: (null) -> Heterogeneous
+  count: 2
+  action: review
+- field: distractor_homogeneity
+  pattern: (null) -> Homogeneous
+  count: 2
+  action: review
+- field: trial_2
+  pattern: (null) -> GMMG-HD7
+  count: 2
+  action: review
+- field: biomarker_1
+  pattern: BCMA -> (cleared)
+  count: 8
+  action: review
+- field: biomarker_1
+  pattern: (null) -> MRD
+  count: 2
+  action: review
+- field: toxicity_type_2
+  pattern: ICANS -> (cleared)
+  count: 4
+  action: review
+- field: toxicity_type_2
+  pattern: CRS -> (cleared)
+  count: 2
+  action: review
+- field: toxicity_type_2
+  pattern: (null) -> Dysgeusia
+  count: 2
+  action: review
+- field: drug_target_1
+  pattern: (null) -> BCMA
+  count: 5
+  action: review
+- field: drug_target_1
+  pattern: (null) -> CD38
+  count: 2
+  action: review
+- field: data_response_type
+  pattern: (null) -> Qualitative
+  count: 3
+  action: review
+- field: fitness_status
+  pattern: Frail -> (cleared)
+  count: 2
+  action: review
+- field: drug_class_2
+  pattern: BCMA bispecific -> (cleared)
+  count: 2
+  action: review
+- field: drug_class_2
+  pattern: (null) -> Monoclonal antibody
+  count: 2
+  action: review
+- field: drug_class_2
+  pattern: (null) -> IMiD
+  count: 2
+  action: review
+- field: drug_class_2
+  pattern: Bispecific antibody -> (cleared)
+  count: 2
+  action: review
+- field: disease_specific_factor
+  pattern: (null) -> Extramedullary disease
+  count: 2
+  action: review
+- field: lead_in_type
+  pattern: (null) -> Standard
+  count: 3
+  action: review
+- field: lead_in_type
+  pattern: (null) -> Best answer
+  count: 2
+  action: review
+- field: treatment_1
+  pattern: daratumumab -> Daratumumab
+  count: 11
+  action: review
+- field: treatment_1
+  pattern: (null) -> Ciltacabtagene autoleucel
+  count: 6
+  action: review
+- field: treatment_1
+  pattern: (null) -> Isatuximab
+  count: 4
+  action: review
+- field: treatment_1
+  pattern: (null) -> ASCT
+  count: 3
+  action: review
+- field: treatment_1
+  pattern: teclistamab -> Teclistamab
+  count: 3
+  action: review
+- field: treatment_1
+  pattern: idecabtagene vicleucel -> Idecabtagene vicleucel
+  count: 3
+  action: review
+- field: treatment_1
+  pattern: (null) -> Elranatamab
+  count: 3
+  action: review
+- field: treatment_1
+  pattern: talquetamab -> Talquetamab
+  count: 2
+  action: review
+- field: treatment_1
+  pattern: (null) -> Daratumumab
+  count: 2
+  action: review
+- field: treatment_1
+  pattern: (null) -> Teclistamab
+  count: 2
+  action: review
+- field: symptom_3
+  pattern: (null) -> Lytic lesions
+  count: 2
+  action: review
+- field: efficacy_endpoint_2
+  pattern: Stringent complete response (sCR) -> (cleared)
+  count: 2
+  action: review
+- field: toxicity_type_1
+  pattern: (null) -> Skin toxicity
+  count: 4
+  action: review
+- field: toxicity_type_1
+  pattern: CRS -> (cleared)
+  count: 2
+  action: review
+- field: treatment_line
+  pattern: (null) -> R/R
+  count: 8
+  action: review
+- field: treatment_line
+  pattern: (null) -> Newly diagnosed
+  count: 5
+  action: review
+- field: drug_target_2
+  pattern: CD3 -> (cleared)
+  count: 7
+  action: review
+- field: drug_target_2
+  pattern: (null) -> CD38
+  count: 2
+  action: review
+- field: drug_target_2
+  pattern: (null) -> GPRC5D
+  count: 2
+  action: review
+- field: drug_target_2
+  pattern: (null) -> Cereblon
+  count: 2
+  action: review
+field_normalization_rules:
+  answer_length_pattern:
+    Variable: Uniform
+    Correct longest: Uniform
+  age_group:
+    Elderly (65-74): Transitional
+    Younger (<65): Young
+  treatment_eligibility:
+    Transplant-eligible: CAR-T eligible
+  disease_type_1:
+    Smoldering: Smoldering MM
+  cme_outcome_level:
+    4 - Competence: 3 - Knowledge
+  treatment_4:
+    lenalidomide: Lenalidomide
+  treatment_2:
+    bortezomib: Bortezomib
+    lenalidomide: Lenalidomide
+    ciltacabtagene autoleucel: Ciltacabtagene autoleucel
+    isatuximab: Isatuximab
+    carfilzomib: Carfilzomib
+  treatment_3:
+    lenalidomide: Lenalidomide
+    bortezomib: Bortezomib
+  topic:
+    AE management: Safety profile
+  distractor_homogeneity:
+    Heterogeneous: Homogeneous
+    Homogeneous: Heterogeneous
+  treatment_1:
+    daratumumab: Daratumumab
+    teclistamab: Teclistamab
+    idecabtagene vicleucel: Idecabtagene vicleucel
+    talquetamab: Talquetamab

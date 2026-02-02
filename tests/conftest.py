@@ -83,119 +83,230 @@ def sample_tags() -> Dict[str, Any]:
 
 @pytest.fixture
 def sample_gpt_response() -> Dict[str, Any]:
-    """Sample GPT response tags."""
+    """Sample GPT response tags (66-field schema)."""
     return {
+        # Core Classification (4)
         "topic": "Treatment selection",
-        "disease_state": "NSCLC",
         "disease_stage": "Metastatic",
         "disease_type": "EGFR-mutated",
-        "treatment_line": "First-line",
-        "treatment": "osimertinib",
-        "biomarker": "EGFR",
-        "trial": "FLAURA"
+        "treatment_line": "1L",
+        # Multi-value Existing Fields (15)
+        "treatment_1": "osimertinib", "treatment_2": None, "treatment_3": None, "treatment_4": None, "treatment_5": None,
+        "biomarker_1": "EGFR exon 19 deletion", "biomarker_2": None, "biomarker_3": None, "biomarker_4": None, "biomarker_5": None,
+        "trial_1": "FLAURA", "trial_2": None, "trial_3": None, "trial_4": None, "trial_5": None,
+        # Group A: Treatment Metadata (10)
+        "drug_class_1": "EGFR TKI", "drug_class_2": None, "drug_class_3": None,
+        "drug_target_1": "EGFR", "drug_target_2": None, "drug_target_3": None,
+        "prior_therapy_1": None, "prior_therapy_2": None, "prior_therapy_3": None,
+        "resistance_mechanism": None,
+        # Group B: Clinical Context (9)
+        "metastatic_site_1": None, "metastatic_site_2": None, "metastatic_site_3": None,
+        "symptom_1": None, "symptom_2": None, "symptom_3": None,
+        "special_population_1": None, "special_population_2": None,
+        "performance_status": None,
+        # Group C: Safety/Toxicity (7)
+        "toxicity_type_1": None, "toxicity_type_2": None, "toxicity_type_3": None, "toxicity_type_4": None, "toxicity_type_5": None,
+        "toxicity_organ": None,
+        "toxicity_grade": None,
+        # Group D: Efficacy/Outcomes (5)
+        "efficacy_endpoint_1": "Overall survival (OS)", "efficacy_endpoint_2": "Progression-free survival (PFS)", "efficacy_endpoint_3": None,
+        "outcome_context": "Primary endpoint met",
+        "clinical_benefit": "Statistically significant",
+        # Group E: Evidence/Guidelines (3)
+        "guideline_source_1": "NCCN", "guideline_source_2": None,
+        "evidence_type": "Phase 3 RCT",
+        # Group F: Question Format/Quality (13)
+        "cme_outcome_level": "4 - Competence",
+        "data_response_type": "Comparative",
+        "stem_type": "Clinical vignette",
+        "lead_in_type": "Best answer",
+        "answer_format": "Single best",
+        "answer_length_pattern": "Variable",
+        "distractor_homogeneity": "Homogeneous",
+        "flaw_absolute_terms": False,
+        "flaw_grammatical_cue": False,
+        "flaw_implausible_distractor": False,
+        "flaw_clang_association": False,
+        "flaw_convergence_vulnerability": False,
+        "flaw_double_negative": False,
     }
 
 
 @pytest.fixture
 def sample_claude_response() -> Dict[str, Any]:
-    """Sample Claude response tags."""
+    """Sample Claude response tags (66-field schema)."""
     return {
+        # Core Classification (4)
         "topic": "Treatment selection",
-        "disease_state": "NSCLC",
         "disease_stage": "Metastatic",
         "disease_type": "EGFR-mutated",
-        "treatment_line": "First-line",
-        "treatment": "osimertinib",
-        "biomarker": "EGFR",
-        "trial": "FLAURA"
+        "treatment_line": "1L",
+        # Multi-value Existing Fields (15)
+        "treatment_1": "osimertinib", "treatment_2": None, "treatment_3": None, "treatment_4": None, "treatment_5": None,
+        "biomarker_1": "EGFR exon 19 deletion", "biomarker_2": None, "biomarker_3": None, "biomarker_4": None, "biomarker_5": None,
+        "trial_1": "FLAURA", "trial_2": None, "trial_3": None, "trial_4": None, "trial_5": None,
+        # Group A: Treatment Metadata (10)
+        "drug_class_1": "EGFR TKI", "drug_class_2": None, "drug_class_3": None,
+        "drug_target_1": "EGFR", "drug_target_2": None, "drug_target_3": None,
+        "prior_therapy_1": None, "prior_therapy_2": None, "prior_therapy_3": None,
+        "resistance_mechanism": None,
+        # Group B: Clinical Context (9)
+        "metastatic_site_1": None, "metastatic_site_2": None, "metastatic_site_3": None,
+        "symptom_1": None, "symptom_2": None, "symptom_3": None,
+        "special_population_1": None, "special_population_2": None,
+        "performance_status": None,
+        # Group C: Safety/Toxicity (7)
+        "toxicity_type_1": None, "toxicity_type_2": None, "toxicity_type_3": None, "toxicity_type_4": None, "toxicity_type_5": None,
+        "toxicity_organ": None,
+        "toxicity_grade": None,
+        # Group D: Efficacy/Outcomes (5)
+        "efficacy_endpoint_1": "Overall survival (OS)", "efficacy_endpoint_2": "Progression-free survival (PFS)", "efficacy_endpoint_3": None,
+        "outcome_context": "Primary endpoint met",
+        "clinical_benefit": "Statistically significant",
+        # Group E: Evidence/Guidelines (3)
+        "guideline_source_1": "NCCN", "guideline_source_2": None,
+        "evidence_type": "Phase 3 RCT",
+        # Group F: Question Format/Quality (13)
+        "cme_outcome_level": "4 - Competence",
+        "data_response_type": "Comparative",
+        "stem_type": "Clinical vignette",
+        "lead_in_type": "Best answer",
+        "answer_format": "Single best",
+        "answer_length_pattern": "Variable",
+        "distractor_homogeneity": "Homogeneous",
+        "flaw_absolute_terms": False,
+        "flaw_grammatical_cue": False,
+        "flaw_implausible_distractor": False,
+        "flaw_clang_association": False,
+        "flaw_convergence_vulnerability": False,
+        "flaw_double_negative": False,
     }
 
 
 @pytest.fixture
 def sample_gemini_response() -> Dict[str, Any]:
-    """Sample Gemini response tags."""
+    """Sample Gemini response tags (66-field schema)."""
     return {
+        # Core Classification (4)
         "topic": "Treatment selection",
-        "disease_state": "NSCLC",
         "disease_stage": "Metastatic",
         "disease_type": "EGFR-mutated",
-        "treatment_line": "First-line",
-        "treatment": "osimertinib",
-        "biomarker": "EGFR",
-        "trial": "FLAURA"
+        "treatment_line": "1L",
+        # Multi-value Existing Fields (15)
+        "treatment_1": "osimertinib", "treatment_2": None, "treatment_3": None, "treatment_4": None, "treatment_5": None,
+        "biomarker_1": "EGFR exon 19 deletion", "biomarker_2": None, "biomarker_3": None, "biomarker_4": None, "biomarker_5": None,
+        "trial_1": "FLAURA", "trial_2": None, "trial_3": None, "trial_4": None, "trial_5": None,
+        # Group A: Treatment Metadata (10)
+        "drug_class_1": "EGFR TKI", "drug_class_2": None, "drug_class_3": None,
+        "drug_target_1": "EGFR", "drug_target_2": None, "drug_target_3": None,
+        "prior_therapy_1": None, "prior_therapy_2": None, "prior_therapy_3": None,
+        "resistance_mechanism": None,
+        # Group B: Clinical Context (9)
+        "metastatic_site_1": None, "metastatic_site_2": None, "metastatic_site_3": None,
+        "symptom_1": None, "symptom_2": None, "symptom_3": None,
+        "special_population_1": None, "special_population_2": None,
+        "performance_status": None,
+        # Group C: Safety/Toxicity (7)
+        "toxicity_type_1": None, "toxicity_type_2": None, "toxicity_type_3": None, "toxicity_type_4": None, "toxicity_type_5": None,
+        "toxicity_organ": None,
+        "toxicity_grade": None,
+        # Group D: Efficacy/Outcomes (5)
+        "efficacy_endpoint_1": "Overall survival (OS)", "efficacy_endpoint_2": "Progression-free survival (PFS)", "efficacy_endpoint_3": None,
+        "outcome_context": "Primary endpoint met",
+        "clinical_benefit": "Statistically significant",
+        # Group E: Evidence/Guidelines (3)
+        "guideline_source_1": "NCCN", "guideline_source_2": None,
+        "evidence_type": "Phase 3 RCT",
+        # Group F: Question Format/Quality (13)
+        "cme_outcome_level": "4 - Competence",
+        "data_response_type": "Comparative",
+        "stem_type": "Clinical vignette",
+        "lead_in_type": "Best answer",
+        "answer_format": "Single best",
+        "answer_length_pattern": "Variable",
+        "distractor_homogeneity": "Homogeneous",
+        "flaw_absolute_terms": False,
+        "flaw_grammatical_cue": False,
+        "flaw_implausible_distractor": False,
+        "flaw_clang_association": False,
+        "flaw_convergence_vulnerability": False,
+        "flaw_double_negative": False,
     }
 
 
 @pytest.fixture
-def sample_disagreement_responses() -> tuple:
-    """Sample responses with majority disagreement."""
-    gpt = {
-        "topic": "Treatment selection",
-        "disease_state": "NSCLC",
-        "disease_stage": "Metastatic",
-        "disease_type": "EGFR-mutated",
-        "treatment_line": "First-line",
-        "treatment": "osimertinib",
-        "biomarker": "EGFR",
-        "trial": "FLAURA"
-    }
-    claude = {
-        "topic": "Treatment selection",
-        "disease_state": "NSCLC",
-        "disease_stage": "Metastatic",
-        "disease_type": "EGFR-mutated",
-        "treatment_line": "First-line",
-        "treatment": "osimertinib",
-        "biomarker": "EGFR",
-        "trial": "FLAURA"
-    }
-    gemini = {
-        "topic": "Clinical efficacy",  # Different
-        "disease_state": "NSCLC",
-        "disease_stage": "Metastatic",
-        "disease_type": "EGFR-mutated",
-        "treatment_line": "First-line",
-        "treatment": "osimertinib",
-        "biomarker": "EGFR",
-        "trial": "FLAURA"
-    }
+def sample_disagreement_responses(sample_gpt_response, sample_claude_response, sample_gemini_response) -> tuple:
+    """Sample responses with majority disagreement (66-field schema)."""
+    gpt = sample_gpt_response.copy()
+    claude = sample_claude_response.copy()
+    gemini = sample_gemini_response.copy()
+    # Gemini disagrees on topic
+    gemini["topic"] = "Clinical efficacy"
     return gpt, claude, gemini
 
 
 @pytest.fixture
-def sample_conflict_responses() -> tuple:
-    """Sample responses with all three models disagreeing."""
-    gpt = {
-        "topic": "Treatment selection",
-        "disease_state": "NSCLC",
-        "disease_stage": "Metastatic",
-        "disease_type": "EGFR-mutated",
-        "treatment_line": "First-line",
-        "treatment": "osimertinib",
-        "biomarker": "EGFR",
-        "trial": "FLAURA"
-    }
-    claude = {
-        "topic": "Clinical efficacy",  # Different
-        "disease_state": "NSCLC",
-        "disease_stage": "Metastatic",
-        "disease_type": "EGFR-mutated",
-        "treatment_line": "First-line",
-        "treatment": "osimertinib",
-        "biomarker": "EGFR",
-        "trial": "FLAURA"
-    }
-    gemini = {
-        "topic": "Emerging therapies",  # Different
-        "disease_state": "NSCLC",
-        "disease_stage": "Metastatic",
-        "disease_type": "EGFR-mutated",
-        "treatment_line": "First-line",
-        "treatment": "osimertinib",
-        "biomarker": "EGFR",
-        "trial": "FLAURA"
-    }
+def sample_conflict_responses(sample_gpt_response, sample_claude_response, sample_gemini_response) -> tuple:
+    """Sample responses with all three models disagreeing (66-field schema)."""
+    gpt = sample_gpt_response.copy()
+    claude = sample_claude_response.copy()
+    gemini = sample_gemini_response.copy()
+    # All three disagree on topic
+    gpt["topic"] = "Treatment selection"
+    claude["topic"] = "Clinical efficacy"
+    gemini["topic"] = "Emerging therapies"
     return gpt, claude, gemini
+
+
+@pytest.fixture
+def sample_66_field_response() -> Dict[str, Any]:
+    """Complete 66-field response fixture for testing all fields."""
+    return {
+        # Core Classification (4)
+        "topic": "Treatment selection",
+        "disease_stage": "Metastatic",
+        "disease_type": "HER2+",
+        "treatment_line": "2L+",
+        # Multi-value Existing Fields (15)
+        "treatment_1": "trastuzumab deruxtecan", "treatment_2": None, "treatment_3": None, "treatment_4": None, "treatment_5": None,
+        "biomarker_1": None, "biomarker_2": None, "biomarker_3": None, "biomarker_4": None, "biomarker_5": None,
+        "trial_1": "DESTINY-Breast03", "trial_2": None, "trial_3": None, "trial_4": None, "trial_5": None,
+        # Group A: Treatment Metadata (10)
+        "drug_class_1": "HER2-directed ADC", "drug_class_2": None, "drug_class_3": None,
+        "drug_target_1": "HER2", "drug_target_2": None, "drug_target_3": None,
+        "prior_therapy_1": "Prior trastuzumab", "prior_therapy_2": "Prior pertuzumab", "prior_therapy_3": None,
+        "resistance_mechanism": None,
+        # Group B: Clinical Context (9)
+        "metastatic_site_1": "Brain metastases", "metastatic_site_2": None, "metastatic_site_3": None,
+        "symptom_1": None, "symptom_2": None, "symptom_3": None,
+        "special_population_1": None, "special_population_2": None,
+        "performance_status": "ECOG 1",
+        # Group C: Safety/Toxicity (7)
+        "toxicity_type_1": "Interstitial lung disease", "toxicity_type_2": "Nausea", "toxicity_type_3": None, "toxicity_type_4": None, "toxicity_type_5": None,
+        "toxicity_organ": "Pulmonary",
+        "toxicity_grade": "Grade >=3",
+        # Group D: Efficacy/Outcomes (5)
+        "efficacy_endpoint_1": "Progression-free survival (PFS)", "efficacy_endpoint_2": "Overall survival (OS)", "efficacy_endpoint_3": None,
+        "outcome_context": "Primary endpoint met",
+        "clinical_benefit": "Superior",
+        # Group E: Evidence/Guidelines (3)
+        "guideline_source_1": "NCCN", "guideline_source_2": "ASCO",
+        "evidence_type": "Phase 3 RCT",
+        # Group F: Question Format/Quality (13)
+        "cme_outcome_level": "4 - Competence",
+        "data_response_type": "Comparative",
+        "stem_type": "Clinical vignette",
+        "lead_in_type": "Best answer",
+        "answer_format": "Single best",
+        "answer_length_pattern": "Variable",
+        "distractor_homogeneity": "Homogeneous",
+        "flaw_absolute_terms": False,
+        "flaw_grammatical_cue": False,
+        "flaw_implausible_distractor": True,  # Has a flaw
+        "flaw_clang_association": False,
+        "flaw_convergence_vulnerability": False,
+        "flaw_double_negative": False,
+    }
 
 
 # ============== Database Fixtures ==============
