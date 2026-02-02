@@ -19,7 +19,7 @@ A comprehensive medical education (CME) question tagging and analytics platform 
 ### 3. Interactive Dashboard
 - **Question Explorer**: Search, filter, and browse tagged questions
 - **Review Tab**: Deduplication review, tag proposals, LLM evaluation metrics
-- **QBoost Tab**: Question quality analysis with data-driven scoring
+- **Q-Suite Tab**: Question quality analysis with data-driven scoring
 - Performance visualization by activity and audience segment
 
 ### 4. Disease-Specific Prompts
