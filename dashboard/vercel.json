@@ -1,67 +1,21 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "frontend/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
-    },
-    {
-      "src": "api/**/*.py",
-      "use": "@vercel/python"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/questions/search",
-      "dest": "/api/questions/search.py"
-    },
-    {
-      "src": "/api/questions/filters/options",
-      "dest": "/api/questions/filters/options.py"
-    },
-    {
-      "src": "/api/questions/filters/options/dynamic",
-      "dest": "/api/questions/filters/dynamic.py"
-    },
-    {
-      "src": "/api/questions/stats/summary",
-      "dest": "/api/questions/stats/summary.py"
-    },
-    {
-      "src": "/api/questions/(\\d+)",
-      "dest": "/api/questions/[id].py?id=$1"
-    },
-    {
-      "src": "/api/reports/aggregate/by-tag",
-      "dest": "/api/reports/aggregate/by-tag.py"
-    },
-    {
-      "src": "/api/reports/aggregate/by-demographic",
-      "dest": "/api/reports/aggregate/by-demographic.py"
-    },
-    {
-      "src": "/api/reports/trends",
-      "dest": "/api/reports/trends.py"
-    },
-    {
-      "src": "/api/reports/activities",
-      "dest": "/api/reports/activities.py"
-    },
-    {
-      "src": "/api/reports/options/demographics",
-      "dest": "/api/reports/options/demographics.py"
-    },
-    {
-      "src": "/api/reports/stats/summary",
-      "dest": "/api/reports/stats/summary.py"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/frontend/$1"
-    }
+  "buildCommand": "cd frontend && npm install && npm run build",
+  "outputDirectory": "frontend/dist",
+  "framework": null,
+  "rewrites": [
+    { "source": "/api/questions/search", "destination": "/api/questions/search" },
+    { "source": "/api/questions/filters/options", "destination": "/api/questions/filters/options" },
+    { "source": "/api/questions/filters/options/dynamic", "destination": "/api/questions/filters/dynamic" },
+    { "source": "/api/questions/stats/summary", "destination": "/api/questions/stats/summary" },
+    { "source": "/api/questions/:id", "destination": "/api/questions/[id]?id=:id" },
+    { "source": "/api/reports/aggregate/by-tag", "destination": "/api/reports/aggregate/by-tag" },
+    { "source": "/api/reports/aggregate/by-demographic", "destination": "/api/reports/aggregate/by-demographic" },
+    { "source": "/api/reports/trends", "destination": "/api/reports/trends" },
+    { "source": "/api/reports/activities", "destination": "/api/reports/activities" },
+    { "source": "/api/reports/options/demographics", "destination": "/api/reports/options/demographics" },
+    { "source": "/api/reports/stats/summary", "destination": "/api/reports/stats/summary" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [
     {
