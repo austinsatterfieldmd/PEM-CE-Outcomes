@@ -99,7 +99,7 @@ Three integrated review interfaces:
 - Field group breakdown
 - Top problem fields identification
 
-### QBoost Tab
+### Q-Suite Tab
 Question quality analysis engine:
 - Data-driven flaw penalty scoring (0-100)
 - Grade calculation (A-F) by CME level
@@ -148,7 +148,7 @@ CE-Outcomes-Dashboard/
 ├── src/
 │   ├── core/
 │   │   ├── taggers/           # 3-model voting, disease classifier
-│   │   ├── preprocessing/     # QBoost scorer, tag normalizer
+│   │   ├── preprocessing/     # Q-Suite scorer, tag normalizer
 │   │   ├── knowledge/         # Disease states, constants
 │   │   └── services/          # Prompt manager, analyzers
 │   ├── api/                   # API schemas
@@ -162,12 +162,12 @@ CE-Outcomes-Dashboard/
 ├── dashboard/
 │   ├── backend/               # FastAPI backend
 │   │   ├── main.py
-│   │   ├── routers/           # questions, dedup, proposals, eval, qboost
+│   │   ├── routers/           # questions, dedup, proposals, eval, Q-Suite
 │   │   └── services/          # database, checkpoint, corrections
 │   └── frontend/              # React + TypeScript + Vite
 │       └── src/
 │           ├── App.tsx
-│           └── components/    # Explorer, Review, QBoost tabs
+│           └── components/    # Explorer, Review, Q-Suite tabs
 ├── scripts/                   # Batch processing utilities
 ├── deduplication_v2/          # Hierarchical validation system
 ├── config/                    # YAML configuration files
@@ -199,7 +199,7 @@ API_PORT=8000
 ### Config Files
 - `config/models.yaml` - LLM model configurations
 - `config/canonical_values.yaml` - Standardized tag values
-- `config/qboost_calibration.yaml` - Quality scoring weights
+- `config/QBoost_calibration.yaml` - Quality scoring weights
 - `config/excluded_questions.yaml` - Permanent exclusion list
 
 ---
@@ -221,14 +221,14 @@ API_PORT=8000
 ┌─────────────────────────────────────────────────────────────┐
 │                    React Dashboard                           │
 │  ┌─────────┐  ┌─────────┐  ┌─────────┐                      │
-│  │Explorer │  │ Review  │  │ QBoost  │                      │
+│  │Explorer │  │ Review  │  │ Q-Suite  │                      │
 │  └────┬────┘  └────┬────┘  └────┬────┘                      │
 └───────┼────────────┼────────────┼───────────────────────────┘
         │            │            │
         ▼            ▼            ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                   FastAPI Backend                            │
-│  /questions  /dedup  /proposals  /eval  /qboost  /reports   │
+│  /questions  /dedup  /proposals  /eval  /Q-Suite  /reports   │
 └─────────────────────────────────────────────────────────────┘
         │
         ▼
