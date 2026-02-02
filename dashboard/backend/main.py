@@ -18,6 +18,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import logging
 import traceback
+import os
 
 from .routers import questions, reports, novel_entities, user_values, dedup, proposals, eval, qboost
 from .services.database import get_database
@@ -36,21 +37,34 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# Build CORS origins list
+cors_origins = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:5175",
+    "http://localhost:5176",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:5174",
+    "http://127.0.0.1:5175",
+    "http://127.0.0.1:5176",
+]
+
+# Add Vercel frontend URL from environment variable
+frontend_url = os.environ.get('FRONTEND_URL')
+if frontend_url:
+    cors_origins.append(frontend_url)
+    cors_origins.append(frontend_url.rstrip('/'))
+    logger.info(f"Added CORS origin from FRONTEND_URL: {frontend_url}")
+
+# Also allow the deployed Vercel URL
+cors_origins.append("https://ce-outcomes-dashboard.vercel.app")
+
 # Configure CORS for frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://localhost:5173",
-        "http://localhost:5174",
-        "http://localhost:5175",
-        "http://localhost:5176",
-        "http://127.0.0.1:3000",
-        "http://127.0.0.1:5173",
-        "http://127.0.0.1:5174",
-        "http://127.0.0.1:5175",
-        "http://127.0.0.1:5176",
-    ],
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

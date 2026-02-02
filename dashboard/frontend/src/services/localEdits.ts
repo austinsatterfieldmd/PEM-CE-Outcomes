@@ -232,18 +232,28 @@ export function getAllLocalCustomValues(): Record<string, string[]> {
 
 let isVercelModeCache: boolean | null = null
 
+// API base URL - if configured via env var, we have a backend
+const API_BASE = import.meta.env.VITE_API_URL || '/api'
+
 /**
  * Check if running in Vercel (read-only) mode
  * This is detected by checking if the backend API is unavailable
+ * If VITE_API_URL is set, we have an external backend (Railway) and are NOT in Vercel mode
  */
 export async function checkVercelMode(): Promise<boolean> {
   if (isVercelModeCache !== null) {
     return isVercelModeCache
   }
 
+  // If we have an external API URL configured, we're not in pure Vercel mode
+  if (import.meta.env.VITE_API_URL) {
+    isVercelModeCache = false
+    return false
+  }
+
   try {
     // Try a simple health check to the API
-    const response = await fetch('/api/questions/stats/summary', {
+    const response = await fetch(`${API_BASE}/questions/stats/summary`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' }
     })

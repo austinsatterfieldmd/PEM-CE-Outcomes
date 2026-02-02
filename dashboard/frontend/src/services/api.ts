@@ -26,7 +26,8 @@ import {
   getPendingEditForQuestion
 } from './localEdits'
 
-const API_BASE = '/api'
+// API_BASE: Use VITE_API_URL env var if set (for Railway backend), otherwise use relative /api
+const API_BASE = import.meta.env.VITE_API_URL || '/api'
 const STATIC_DATA_BASE = '/data'
 
 // Cache for static data

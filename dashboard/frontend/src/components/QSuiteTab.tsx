@@ -1,5 +1,6 @@
-import React, { useState, useCallback, useRef } from 'react';
-import { Zap, Upload, FileText, AlertCircle, CheckCircle, ChevronDown, ChevronUp, Download, Target, BookOpen, Activity, TrendingUp, Shield, Globe, ExternalLink } from 'lucide-react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { Zap, Upload, FileText, AlertCircle, CheckCircle, ChevronDown, ChevronUp, Download, Target, BookOpen, Activity, TrendingUp, Shield, Globe, ExternalLink, CloudOff } from 'lucide-react';
+import { checkVercelMode, isVercelMode } from '../services/localEdits';
 
 const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
@@ -139,6 +140,12 @@ export default function QSuiteTab() {
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [expandedQuestion, setExpandedQuestion] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [vercelMode, setVercelMode] = useState(false);
+
+  // Check if running in Vercel read-only mode
+  useEffect(() => {
+    checkVercelMode().then(setVercelMode);
+  }, []);
 
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -276,6 +283,47 @@ export default function QSuiteTab() {
     const multiplier = includeQBoost ? 1 : 0.6; // QCore only is cheaper
     return baseCost * multiplier;
   };
+
+  // Show message when in Vercel read-only mode
+  if (vercelMode) {
+    return (
+      <div className="h-full flex flex-col bg-gray-50">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 text-white p-6 shadow-lg">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-white/20 rounded-lg">
+              <Activity className="w-6 h-6" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold">Q-Suite</h1>
+              <p className="text-purple-100 text-sm">
+                Comprehensive Question Quality Analysis
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex-1 flex items-center justify-center p-6">
+          <div className="max-w-md text-center">
+            <div className="flex justify-center mb-4">
+              <div className="p-4 bg-amber-100 rounded-full">
+                <CloudOff className="w-12 h-12 text-amber-600" />
+              </div>
+            </div>
+            <h2 className="text-xl font-bold text-gray-800 mb-2">
+              Q-Suite Not Available
+            </h2>
+            <p className="text-gray-600 mb-4">
+              Q-Suite requires a backend server for LLM-powered analysis and is not available in read-only mode.
+            </p>
+            <p className="text-sm text-gray-500">
+              To use Q-Suite, please run the dashboard locally with the full backend server.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-full flex flex-col bg-gray-50">
