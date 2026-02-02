@@ -109,6 +109,10 @@ data/output/
 # Dashboard data
 dashboard/data/
 
+# EXCEPTION: Static data for Vercel deployment (must be tracked)
+!dashboard/frontend/public/data/
+!dashboard/frontend/public/data/*.json
+
 # Deduplication data
 deduplication_v2/data/*.parquet
 deduplication_v2/data/*.json
