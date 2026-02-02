@@ -6,6 +6,7 @@ import {
   logout,
   subscribeToAuthState,
   isDevMode,
+  setCachedUser,
   UserInfo,
   AuthContextType,
 } from '../services/auth';
@@ -44,15 +45,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     // Skip auth check in dev mode
     if (isDevMode()) {
+      const devUser = {
+        sub: 'dev-user',
+        email: 'dev@example.com',
+        name: 'Development User',
+        groups: ['admin'],
+      };
+      setCachedUser(devUser);
       setAuthState({
         isAuthenticated: true,
         isLoading: false,
-        user: {
-          sub: 'dev-user',
-          email: 'dev@example.com',
-          name: 'Development User',
-          groups: ['admin'],
-        },
+        user: devUser,
       });
       return;
     }
@@ -68,12 +71,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
         const authenticated = await isAuthenticated();
         if (authenticated) {
           const user = await getUserInfo();
+          setCachedUser(user);
           setAuthState({
             isAuthenticated: true,
             isLoading: false,
             user,
           });
         } else {
+          setCachedUser(null);
           setAuthState({
             isAuthenticated: false,
             isLoading: false,
@@ -82,6 +87,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         }
       } catch (error) {
         console.error('Auth check failed:', error);
+        setCachedUser(null);
         setAuthState({
           isAuthenticated: false,
           isLoading: false,
@@ -96,6 +102,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const unsubscribe = subscribeToAuthState((state) => {
       if (state.isAuthenticated !== undefined) {
         getUserInfo().then((user) => {
+          setCachedUser(user);
           setAuthState({
             isAuthenticated: state.isAuthenticated ?? false,
             isLoading: false,
@@ -112,15 +119,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Handle dev mode login
   const handleDevModeLogin = () => {
+    const devUser = {
+      sub: 'dev-user',
+      email: 'dev@example.com',
+      name: 'Development User',
+      groups: ['admin'],
+    };
+    setCachedUser(devUser);
     setAuthState({
       isAuthenticated: true,
       isLoading: false,
-      user: {
-        sub: 'dev-user',
-        email: 'dev@example.com',
-        name: 'Development User',
-        groups: ['admin'],
-      },
+      user: devUser,
     });
   };
 

@@ -211,3 +211,29 @@ export async function getAuthHeaders(): Promise<Record<string, string>> {
 
   return {};
 }
+
+// Cached current user for synchronous access
+let cachedCurrentUser: UserInfo | null = null;
+
+/**
+ * Set the cached current user (called by AuthProvider)
+ */
+export function setCachedUser(user: UserInfo | null): void {
+  cachedCurrentUser = user;
+}
+
+/**
+ * Get current user synchronously (from cache)
+ * Returns null if user hasn't been loaded yet
+ */
+export function getCurrentUser(): UserInfo | null {
+  if (isDevMode()) {
+    return {
+      sub: 'dev-user',
+      email: 'dev@localhost',
+      name: 'Development User',
+      groups: ['admin'],
+    };
+  }
+  return cachedCurrentUser;
+}

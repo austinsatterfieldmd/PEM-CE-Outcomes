@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import { X, Check, AlertCircle, Tag, Activity, FileText, TrendingUp, Pencil, Save, XCircle, Flag, ChevronDown, ChevronRight, Info, RefreshCw, Layers } from 'lucide-react'
+import { X, Check, AlertCircle, Tag, Activity, FileText, TrendingUp, Pencil, Save, XCircle, Flag, ChevronDown, ChevronRight, Info, RefreshCw, Layers, CloudOff } from 'lucide-react'
 import { getQuestionDetail, updateQuestionTags, flagQuestion } from '../services/api'
+import { isVercelMode, getPendingEditForQuestion, applyPendingEditsToTags } from '../services/localEdits'
 import CreateProposalModal from './CreateProposalModal'
 import CreateDedupClusterModal from './CreateDedupClusterModal'
 import type { QuestionDetailData, PerformanceMetric } from '../types'
@@ -472,15 +473,34 @@ export function QuestionDetail({ questionId, onClose, onTagsUpdated }: QuestionD
         updates.question_stem = editedQuestionStem
       }
 
-      await updateQuestionTags(questionId, updates)
+      // Capture previous values for edit tracking (in Vercel mode)
+      const previousValues: Record<string, string | null> = {}
+      if (data?.tags) {
+        for (const key of Object.keys(updates)) {
+          if (key !== 'mark_as_reviewed' && key !== 'question_stem') {
+            previousValues[key] = (data.tags as any)[key] ?? null
+          }
+        }
+      }
 
-      // Refresh data
-      const updated = await getQuestionDetail(questionId)
-      setData(updated)
-      setEditedQuestionStem(updated.question_stem)
-      setIsEditing(false)
-      setIsEditingQuestion(false)
-      onTagsUpdated?.()
+      const result = await updateQuestionTags(questionId, updates, previousValues)
+
+      if (result.savedLocally) {
+        // In Vercel mode - show local save confirmation
+        alert('Edit saved locally. Use "Export Edits" in the header to download your changes.')
+        setIsEditing(false)
+        setIsEditingQuestion(false)
+        // Don't refresh from server (data won't change), but notify parent
+        onTagsUpdated?.()
+      } else {
+        // Normal mode - refresh from server
+        const updated = await getQuestionDetail(questionId)
+        setData(updated)
+        setEditedQuestionStem(updated.question_stem)
+        setIsEditing(false)
+        setIsEditingQuestion(false)
+        onTagsUpdated?.()
+      }
 
       // If marked as reviewed, close the detail panel
       if (markAsReviewed) {

@@ -10,6 +10,7 @@ import ReportBuilder from './components/ReportBuilder'
 import ReviewTab from './components/ReviewTab'
 import QSuiteTab from './components/QSuiteTab'
 import { UserMenu } from './components/AuthProvider'
+import { ExportEditsButton } from './components/ExportEditsButton'
 import { searchQuestions, getFilterOptions, getDynamicFilterOptions, getStats, exportQuestions, exportQuestionsFull } from './services/api'
 import type { Question, FilterOptions, SearchFilters, Stats } from './types'
 import { loadUserDefinedValues } from './config/userDefinedValues'
@@ -493,8 +494,9 @@ function App() {
               </button>
             </div>
 
-            {/* User Menu */}
+            {/* Export Edits (Vercel Mode) + User Menu */}
             <div className="flex items-center gap-4">
+              <ExportEditsButton />
               <UserMenu />
             </div>
           </div>

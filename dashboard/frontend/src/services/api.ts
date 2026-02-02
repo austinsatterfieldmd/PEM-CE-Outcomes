@@ -16,9 +16,158 @@ import type {
   Activity,
   ReportStatsResponse
 } from '../types'
-import { getAuthHeaders } from './auth'
+import { getAuthHeaders, getCurrentUser } from './auth'
+import {
+  saveLocalEdit,
+  saveLocalCustomValue,
+  getLocalCustomValues,
+  isVercelMode,
+  applyPendingEditsToTags,
+  getPendingEditForQuestion
+} from './localEdits'
 
 const API_BASE = '/api'
+const STATIC_DATA_BASE = '/data'
+
+// Cache for static data
+let staticQuestionsCache: any[] | null = null
+let staticFiltersCache: any | null = null
+let staticStatsCache: any | null = null
+let staticPerformanceCache: Record<number, any[]> | null = null
+
+/**
+ * Load static questions data (for Vercel read-only mode)
+ */
+async function loadStaticQuestions(): Promise<any[]> {
+  if (staticQuestionsCache) return staticQuestionsCache
+
+  try {
+    const response = await fetch(`${STATIC_DATA_BASE}/questions.json`)
+    if (!response.ok) throw new Error('Static data not available')
+    const data = await response.json()
+    staticQuestionsCache = data.questions || []
+    return staticQuestionsCache
+  } catch (error) {
+    console.warn('Failed to load static questions:', error)
+    return []
+  }
+}
+
+/**
+ * Load static filter options (for Vercel read-only mode)
+ */
+async function loadStaticFilters(): Promise<any> {
+  if (staticFiltersCache) return staticFiltersCache
+
+  try {
+    const response = await fetch(`${STATIC_DATA_BASE}/filters.json`)
+    if (!response.ok) throw new Error('Static filters not available')
+    staticFiltersCache = await response.json()
+    return staticFiltersCache
+  } catch (error) {
+    console.warn('Failed to load static filters:', error)
+    return {}
+  }
+}
+
+/**
+ * Load static stats (for Vercel read-only mode)
+ */
+async function loadStaticStats(): Promise<any> {
+  if (staticStatsCache) return staticStatsCache
+
+  try {
+    const response = await fetch(`${STATIC_DATA_BASE}/stats.json`)
+    if (!response.ok) throw new Error('Static stats not available')
+    staticStatsCache = await response.json()
+    return staticStatsCache
+  } catch (error) {
+    console.warn('Failed to load static stats:', error)
+    return { total_questions: 0, unique_diseases: 0, needs_review: 0 }
+  }
+}
+
+/**
+ * Load static performance data (for Vercel read-only mode)
+ */
+async function loadStaticPerformance(): Promise<Record<number, any[]>> {
+  if (staticPerformanceCache) return staticPerformanceCache
+
+  try {
+    const response = await fetch(`${STATIC_DATA_BASE}/performance.json`)
+    if (!response.ok) throw new Error('Static performance not available')
+    staticPerformanceCache = await response.json()
+    return staticPerformanceCache || {}
+  } catch (error) {
+    console.warn('Failed to load static performance:', error)
+    return {}
+  }
+}
+
+/**
+ * Filter and paginate static questions (client-side search)
+ */
+function searchStaticQuestions(
+  questions: any[],
+  params: {
+    query?: string
+    page?: number
+    page_size?: number
+    sort_by?: string
+    sort_desc?: boolean
+    disease_states?: string[]
+    topics?: string[]
+    source_files?: string[]
+    needs_review?: boolean
+  }
+): { questions: any[]; total: number; total_pages: number } {
+  const { query, page = 1, page_size = 20, sort_by = 'id', sort_desc = false } = params
+
+  // Filter
+  let filtered = questions
+
+  if (query) {
+    const lowerQuery = query.toLowerCase()
+    filtered = filtered.filter(q =>
+      q.question_stem?.toLowerCase().includes(lowerQuery) ||
+      q.correct_answer?.toLowerCase().includes(lowerQuery)
+    )
+  }
+
+  if (params.disease_states?.length) {
+    filtered = filtered.filter(q => params.disease_states?.includes(q.disease_state))
+  }
+
+  if (params.topics?.length) {
+    filtered = filtered.filter(q => params.topics?.includes(q.topic))
+  }
+
+  if (params.source_files?.length) {
+    filtered = filtered.filter(q => params.source_files?.includes(q.source_file))
+  }
+
+  if (params.needs_review !== undefined) {
+    filtered = filtered.filter(q => q.needs_review === (params.needs_review ? 1 : 0))
+  }
+
+  // Sort
+  const sortField = sort_by || 'id'
+  filtered.sort((a, b) => {
+    const aVal = a[sortField] ?? ''
+    const bVal = b[sortField] ?? ''
+    if (aVal < bVal) return sort_desc ? 1 : -1
+    if (aVal > bVal) return sort_desc ? -1 : 1
+    return 0
+  })
+
+  // Paginate
+  const total = filtered.length
+  const total_pages = Math.ceil(total / page_size)
+  const start = (page - 1) * page_size
+  const paged = filtered.slice(start, start + page_size)
+
+  return { questions: paged, total, total_pages }
+}
 
 /**
  * Fetch wrapper that includes authentication headers
@@ -44,6 +193,7 @@ async function authFetch(url: string, options: RequestInit = {}): Promise<Respon
 }
 
 // Search questions with filters
+// Falls back to static JSON data when API is unavailable (Vercel mode)
 export async function searchQuestions(params: SearchFilters & {
   query?: string
   page?: number
@@ -53,41 +203,72 @@ export async function searchQuestions(params: SearchFilters & {
 }): Promise<SearchResponse> {
   const { query, page = 1, page_size = 20, sort_by = 'id', sort_desc = false, ...filters } = params
 
-  const body: Record<string, unknown> = {
-    filters: {
-      query,
-      ...filters
-    },
-    pagination: {
-      page,
-      page_size
-    },
-    sort_by,
-    sort_desc
+  // Try API first
+  try {
+    const body: Record<string, unknown> = {
+      filters: {
+        query,
+        ...filters
+      },
+      pagination: {
+        page,
+        page_size
+      },
+      sort_by,
+      sort_desc
+    }
+
+    const response = await authFetch(`${API_BASE}/questions/search`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    })
+
+    if (response.ok) {
+      return response.json()
+    }
+    // If API fails, fall through to static data
+  } catch (error) {
+    console.warn('API unavailable, using static data:', error)
   }
 
-  const response = await authFetch(`${API_BASE}/questions/search`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
+  // Fallback to static JSON data (Vercel mode)
+  const questions = await loadStaticQuestions()
+  const result = searchStaticQuestions(questions, {
+    query,
+    page,
+    page_size,
+    sort_by,
+    sort_desc,
+    disease_states: filters.disease_states,
+    topics: filters.topics,
+    source_files: filters.source_files,
+    needs_review: filters.needs_review
   })
-  
-  if (!response.ok) {
-    throw new Error(`Search failed: ${response.statusText}`)
+
+  return {
+    questions: result.questions,
+    total: result.total,
+    total_pages: result.total_pages,
+    page,
+    page_size
   }
-  
-  return response.json()
 }
 
 // Get filter options
+// Falls back to static JSON data when API is unavailable (Vercel mode)
 export async function getFilterOptions(): Promise<FilterOptions> {
-  const response = await authFetch(`${API_BASE}/questions/filters/options`)
-  
-  if (!response.ok) {
-    throw new Error(`Failed to get filter options: ${response.statusText}`)
+  try {
+    const response = await authFetch(`${API_BASE}/questions/filters/options`)
+    if (response.ok) {
+      return response.json()
+    }
+  } catch (error) {
+    console.warn('API unavailable, using static filters:', error)
   }
-  
-  return response.json()
+
+  // Fallback to static data
+  return loadStaticFilters()
 }
 
 // Get dynamic filter options based on current selections
@@ -106,29 +287,153 @@ export async function getDynamicFilterOptions(currentFilters: SearchFilters): Pr
 }
 
 // Get question details
+// Falls back to static JSON data when API is unavailable (Vercel mode)
 export async function getQuestionDetail(id: number): Promise<QuestionDetailData> {
-  const response = await authFetch(`${API_BASE}/questions/${id}`)
-  
-  if (!response.ok) {
-    throw new Error(`Failed to get question details: ${response.statusText}`)
+  try {
+    const response = await authFetch(`${API_BASE}/questions/${id}`)
+    if (response.ok) {
+      return response.json()
+    }
+  } catch (error) {
+    console.warn('API unavailable, using static data:', error)
   }
-  
-  return response.json()
+
+  // Fallback to static data
+  const questions = await loadStaticQuestions()
+  const question = questions.find(q => q.id === id)
+
+  if (!question) {
+    throw new Error(`Question ${id} not found`)
+  }
+
+  // Load performance data
+  const performanceData = await loadStaticPerformance()
+  const performance = performanceData[id] || []
+
+  // Build QuestionDetailData structure from flat static data
+  return {
+    id: question.id,
+    source_id: question.source_id,
+    source_question_id: question.source_question_id,
+    question_stem: question.question_stem,
+    correct_answer: question.correct_answer,
+    incorrect_answers: question.incorrect_answers ? JSON.parse(question.incorrect_answers) : null,
+    source_file: question.source_file,
+    qcore_score: question.qcore_score,
+    qcore_grade: question.qcore_grade,
+    qcore_breakdown: question.qcore_breakdown ? JSON.parse(question.qcore_breakdown) : null,
+    tags: {
+      topic: question.topic,
+      topic_confidence: question.topic_confidence,
+      disease_state: question.disease_state,
+      disease_state_confidence: question.disease_state_confidence,
+      disease_state_1: question.disease_state_1,
+      disease_state_2: question.disease_state_2,
+      disease_stage: question.disease_stage,
+      disease_type_1: question.disease_type_1,
+      disease_type_2: question.disease_type_2,
+      treatment_line: question.treatment_line,
+      treatment_1: question.treatment_1,
+      treatment_2: question.treatment_2,
+      treatment_3: question.treatment_3,
+      treatment_4: question.treatment_4,
+      treatment_5: question.treatment_5,
+      biomarker_1: question.biomarker_1,
+      biomarker_2: question.biomarker_2,
+      biomarker_3: question.biomarker_3,
+      biomarker_4: question.biomarker_4,
+      biomarker_5: question.biomarker_5,
+      trial_1: question.trial_1,
+      trial_2: question.trial_2,
+      trial_3: question.trial_3,
+      trial_4: question.trial_4,
+      trial_5: question.trial_5,
+      treatment_eligibility: question.treatment_eligibility,
+      age_group: question.age_group,
+      organ_dysfunction: question.organ_dysfunction,
+      fitness_status: question.fitness_status,
+      disease_specific_factor: question.disease_specific_factor,
+      comorbidity_1: question.comorbidity_1,
+      comorbidity_2: question.comorbidity_2,
+      comorbidity_3: question.comorbidity_3,
+      drug_class_1: question.drug_class_1,
+      drug_class_2: question.drug_class_2,
+      drug_class_3: question.drug_class_3,
+      drug_target_1: question.drug_target_1,
+      drug_target_2: question.drug_target_2,
+      drug_target_3: question.drug_target_3,
+      prior_therapy_1: question.prior_therapy_1,
+      prior_therapy_2: question.prior_therapy_2,
+      prior_therapy_3: question.prior_therapy_3,
+      resistance_mechanism: question.resistance_mechanism,
+      metastatic_site_1: question.metastatic_site_1,
+      metastatic_site_2: question.metastatic_site_2,
+      metastatic_site_3: question.metastatic_site_3,
+      symptom_1: question.symptom_1,
+      symptom_2: question.symptom_2,
+      symptom_3: question.symptom_3,
+      performance_status: question.performance_status,
+      toxicity_type_1: question.toxicity_type_1,
+      toxicity_type_2: question.toxicity_type_2,
+      toxicity_type_3: question.toxicity_type_3,
+      toxicity_type_4: question.toxicity_type_4,
+      toxicity_type_5: question.toxicity_type_5,
+      toxicity_organ: question.toxicity_organ,
+      toxicity_grade: question.toxicity_grade,
+      efficacy_endpoint_1: question.efficacy_endpoint_1,
+      efficacy_endpoint_2: question.efficacy_endpoint_2,
+      efficacy_endpoint_3: question.efficacy_endpoint_3,
+      outcome_context: question.outcome_context,
+      clinical_benefit: question.clinical_benefit,
+      guideline_source_1: question.guideline_source_1,
+      guideline_source_2: question.guideline_source_2,
+      evidence_type: question.evidence_type,
+      cme_outcome_level: question.cme_outcome_level,
+      data_response_type: question.data_response_type,
+      stem_type: question.stem_type,
+      lead_in_type: question.lead_in_type,
+      answer_format: question.answer_format,
+      answer_length_pattern: question.answer_length_pattern,
+      distractor_homogeneity: question.distractor_homogeneity,
+      flaw_absolute_terms: question.flaw_absolute_terms,
+      flaw_grammatical_cue: question.flaw_grammatical_cue,
+      flaw_implausible_distractor: question.flaw_implausible_distractor,
+      flaw_clang_association: question.flaw_clang_association,
+      flaw_convergence_vulnerability: question.flaw_convergence_vulnerability,
+      flaw_double_negative: question.flaw_double_negative,
+      answer_option_count: question.answer_option_count,
+      correct_answer_position: question.correct_answer_position,
+      needs_review: question.needs_review,
+      review_flags: question.review_flags,
+      review_reason: question.review_reason,
+      agreement_level: question.agreement_level,
+      tag_status: question.tag_status,
+      worst_case_agreement: question.worst_case_agreement
+    },
+    performance,
+    activities: [],
+    activity_details: []
+  }
 }
 
 // Get stats
+// Falls back to static JSON data when API is unavailable (Vercel mode)
 export async function getStats(): Promise<Stats> {
-  const response = await authFetch(`${API_BASE}/questions/stats/summary`)
-  
-  if (!response.ok) {
-    throw new Error(`Failed to get stats: ${response.statusText}`)
+  try {
+    const response = await authFetch(`${API_BASE}/questions/stats/summary`)
+    if (response.ok) {
+      return response.json()
+    }
+  } catch (error) {
+    console.warn('API unavailable, using static stats:', error)
   }
-  
-  return response.json()
+
+  // Fallback to static data
+  return loadStaticStats()
 }
 
-// Update question tags (70-field schema)
-export async function updateQuestionTags(id: number, tags: {
+// Tag update payload type (70-field schema)
+export type TagUpdatePayload = {
   // Core Classification
   topic?: string | null
   disease_state?: string | null
@@ -216,7 +521,51 @@ export async function updateQuestionTags(id: number, tags: {
   mark_as_reviewed?: boolean
   // User-defined values to persist (custom values not in static dropdown lists)
   custom_values?: Array<{ field_name: string; value: string }>
-}): Promise<void> {
+}
+
+// Update question tags (70-field schema)
+// In Vercel mode, saves to localStorage instead of API
+export async function updateQuestionTags(
+  id: number,
+  tags: TagUpdatePayload,
+  previousValues?: Record<string, string | null>
+): Promise<{ savedLocally: boolean }> {
+  // Check if we're in Vercel (read-only) mode
+  if (isVercelMode()) {
+    // Save to localStorage instead of API
+    const user = getCurrentUser()
+
+    // Extract the changes (non-meta fields)
+    const changes: Record<string, string | null> = {}
+    const metaFields = ['mark_as_reviewed', 'custom_values', 'question_stem']
+
+    for (const [key, value] of Object.entries(tags)) {
+      if (!metaFields.includes(key)) {
+        changes[key] = value as string | null
+      }
+    }
+
+    // Save custom values to local storage
+    if (tags.custom_values) {
+      for (const cv of tags.custom_values) {
+        saveLocalCustomValue(cv.field_name, cv.value)
+      }
+    }
+
+    // Save the edit
+    saveLocalEdit({
+      questionId: id,
+      editor: user?.email || user?.name || 'unknown',
+      changes,
+      previousValues,
+      markAsReviewed: tags.mark_as_reviewed,
+      questionStem: tags.question_stem || undefined
+    })
+
+    return { savedLocally: true }
+  }
+
+  // Normal mode - save to API
   const response = await authFetch(`${API_BASE}/questions/${id}/tags`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
@@ -226,6 +575,8 @@ export async function updateQuestionTags(id: number, tags: {
   if (!response.ok) {
     throw new Error(`Failed to update tags: ${response.statusText}`)
   }
+
+  return { savedLocally: false }
 }
 
 // Flag question for review
