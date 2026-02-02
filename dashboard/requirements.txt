@@ -10,11 +10,11 @@ pydantic>=2.0.0
 # Database
 # SQLite is built into Python, no additional package needed
 
-# Data processing (may already be installed in parent project)
-pandas>=2.0.0
-openpyxl>=3.1.0
-
 # CORS middleware included in fastapi
 
-# Authentication (Okta JWT validation)
-python-jose[cryptography]>=3.3.0
+# NOTE: The following dependencies are disabled to reduce Vercel bundle size
+# Uncomment when enabling Okta authentication:
+# python-jose[cryptography]>=3.3.0
+
+# NOTE: pandas/openpyxl were removed as they're not used in API routes
+# If data processing is needed in serverless functions, consider lighter alternatives

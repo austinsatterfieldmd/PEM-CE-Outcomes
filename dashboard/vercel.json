@@ -27,10 +27,5 @@
         { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }
       ]
     }
-  ],
-  "env": {
-    "OKTA_ISSUER": "@okta_issuer",
-    "OKTA_CLIENT_ID": "@okta_client_id",
-    "OKTA_AUDIENCE": "@okta_audience"
-  }
+  ]
 }

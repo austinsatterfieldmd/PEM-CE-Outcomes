@@ -48,7 +48,7 @@ export function FilterPanel({ options, filters, onChange, advancedCategories = [
   // Build advanced filter sections from selected categories
   const advancedFilterSections = advancedCategories
     .map(catKey => {
-      const catOptions = (options as Record<string, unknown>)[catKey] as { value: string; count: number }[] | undefined
+      const catOptions = (options as unknown as Record<string, unknown>)[catKey] as { value: string; count: number }[] | undefined
       return {
         key: catKey,
         label: CATEGORY_LABEL_MAP.get(catKey) || catKey,

@@ -178,14 +178,14 @@ const CustomXAxisTick = ({ x, y, payload, data, whiteBackground, segments }: any
 export default function PerformanceBarChart({
   data,
   title,
-  xAxisLabel,
+  xAxisLabel: _xAxisLabel,
   yAxisLabel = 'Score (%)',
   showPerformanceChange = true,
   height = 400,
   compact = false,
   segments,
   chartFormat = 'single',
-  showN = false,
+  showN: _showN = false,
   whiteBackground = false
 }: PerformanceBarChartProps) {
   // Check if this is segment comparison data
@@ -257,7 +257,6 @@ export default function PerformanceBarChart({
 
   // Text colors based on background
   const textColor = whiteBackground ? '#374151' : '#94a3b8'
-  const titleColor = whiteBackground ? '#111827' : '#ffffff'
   const gridColor = whiteBackground ? '#e5e7eb' : '#334155'
 
   // Stacked format: render multiple separate charts

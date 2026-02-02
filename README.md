@@ -8,7 +8,7 @@ A comprehensive medical education (CME) question tagging and analytics platform 
 - **Stage 1**: 3-model voting (GPT, Claude, Gemini) classifies oncology status + disease state
 - **Stage 2**: Disease-specific prompts generate 66 metadata fields
 - Web search fallback via Perplexity Sonar for novel entities
-- Cost: ~$0.14 per canonical question
+- Cost: ~$0.14 per canonical question 
 
 ### 2. Question Deduplication
 - Semantic embedding comparison (OpenAI text-embedding-3-small)

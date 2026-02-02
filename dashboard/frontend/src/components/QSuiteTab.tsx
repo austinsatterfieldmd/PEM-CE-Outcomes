@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef } from 'react';
-import { Zap, Upload, FileText, AlertCircle, CheckCircle, Clock, ChevronDown, ChevronUp, Download, Target, BookOpen, Activity, TrendingUp, Shield, Globe, ExternalLink } from 'lucide-react';
+import { Zap, Upload, FileText, AlertCircle, CheckCircle, ChevronDown, ChevronUp, Download, Target, BookOpen, Activity, TrendingUp, Shield, Globe, ExternalLink } from 'lucide-react';
 
 const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
@@ -131,10 +131,10 @@ export default function QSuiteTab() {
   const [file, setFile] = useState<File | null>(null);
   const [model, setModel] = useState<string>('gpt');
   const [includeQBoost, setIncludeQBoost] = useState(true);
-  const [includeQPredict, setIncludeQPredict] = useState(false);
+  const [_includeQPredict, _setIncludeQPredict] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [_progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [expandedQuestion, setExpandedQuestion] = useState<number | null>(null);
@@ -217,7 +217,7 @@ export default function QSuiteTab() {
       formData.append('file', file);
       formData.append('model', model);
       formData.append('include_qboost', String(includeQBoost));
-      formData.append('include_qpredict', String(includeQPredict));
+      formData.append('include_qpredict', String(_includeQPredict));
 
       const response = await fetch(`${API_BASE}/qsuite/upload`, {
         method: 'POST',
