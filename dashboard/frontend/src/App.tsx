@@ -14,6 +14,7 @@ import { ExportEditsButton } from './components/ExportEditsButton'
 import { searchQuestions, getFilterOptions, getDynamicFilterOptions, getStats, exportQuestions, exportQuestionsFull } from './services/api'
 import type { Question, FilterOptions, SearchFilters, Stats } from './types'
 import { loadUserDefinedValues } from './config/userDefinedValues'
+import { checkVercelMode } from './services/localEdits'
 import perLogoWhite from './assets/per-logo-white.png'
 
 type TabView = 'explorer' | 'reports' | 'review' | 'qsuite'
@@ -94,6 +95,9 @@ function App() {
   useEffect(() => {
     // Load user-defined values early so they're available for dropdowns
     loadUserDefinedValues()
+
+    // Check Vercel mode early so isVercelMode() returns correct value
+    checkVercelMode()
 
     Promise.all([getFilterOptions(), getStats()])
       .then(([options, statsData]) => {
