@@ -394,7 +394,7 @@ def import_stage2_upsert(db: DatabaseService, results: list, force_overwrite: bo
                 # Insert activities if present
                 activities = result.get('activities', '')
                 if activities:
-                    for activity_name in activities.split(', '):
+                    for activity_name in activities.split('; '):
                         if activity_name.strip():
                             db.insert_activity(db_question_id, activity_name.strip())
 
@@ -546,7 +546,12 @@ def main():
     for file_path in files_to_import:
         logger.info(f"Loading {file_path.name}...")
         with open(file_path, encoding='utf-8') as f:
-            results = json.load(f)
+            data = json.load(f)
+        # Handle both flat list and nested {"results": [...]} format
+        if isinstance(data, dict) and 'results' in data:
+            results = data['results']
+        else:
+            results = data
         logger.info(f"  {len(results)} results")
         all_results.extend(results)
 
