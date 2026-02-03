@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { Zap, Upload, FileText, AlertCircle, CheckCircle, ChevronDown, ChevronUp, Download, Target, BookOpen, Activity, TrendingUp, Shield, Globe, ExternalLink, CloudOff } from 'lucide-react';
-import { checkVercelMode, isVercelMode } from '../services/localEdits';
+import { checkVercelMode } from '../services/localEdits';
 
 const API_BASE = import.meta.env.VITE_API_URL || '/api';
 

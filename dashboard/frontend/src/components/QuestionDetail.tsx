@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
-import { X, Check, AlertCircle, Tag, Activity, FileText, TrendingUp, Pencil, Save, XCircle, Flag, ChevronDown, ChevronRight, Info, RefreshCw, Layers, CloudOff } from 'lucide-react'
+import { X, Check, AlertCircle, Tag, Activity, FileText, TrendingUp, Pencil, Save, XCircle, Flag, ChevronDown, ChevronRight, Info, RefreshCw, Layers } from 'lucide-react'
 import { getQuestionDetail, updateQuestionTags, flagQuestion } from '../services/api'
-import { isVercelMode, getPendingEditForQuestion, applyPendingEditsToTags } from '../services/localEdits'
 import CreateProposalModal from './CreateProposalModal'
 import CreateDedupClusterModal from './CreateDedupClusterModal'
 import type { QuestionDetailData, PerformanceMetric } from '../types'

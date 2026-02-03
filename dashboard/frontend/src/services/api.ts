@@ -20,10 +20,7 @@ import { getAuthHeaders, getCurrentUser } from './auth'
 import {
   saveLocalEdit,
   saveLocalCustomValue,
-  getLocalCustomValues,
-  isVercelMode,
-  applyPendingEditsToTags,
-  getPendingEditForQuestion
+  isVercelMode
 } from './localEdits'
 
 // API_BASE: Use VITE_API_URL env var if set (for Railway backend), otherwise use relative /api
@@ -46,8 +43,9 @@ async function loadStaticQuestions(): Promise<any[]> {
     const response = await fetch(`${STATIC_DATA_BASE}/questions.json`)
     if (!response.ok) throw new Error('Static data not available')
     const data = await response.json()
-    staticQuestionsCache = data.questions || []
-    return staticQuestionsCache
+    const questions = data.questions || []
+    staticQuestionsCache = questions
+    return questions
   } catch (error) {
     console.warn('Failed to load static questions:', error)
     return []
@@ -326,29 +324,36 @@ export async function getQuestionDetail(id: number): Promise<QuestionDetailData>
     tags: {
       topic: question.topic,
       topic_confidence: question.topic_confidence,
+      topic_method: question.topic_method,
       disease_state: question.disease_state,
       disease_state_confidence: question.disease_state_confidence,
       disease_state_1: question.disease_state_1,
       disease_state_2: question.disease_state_2,
       disease_stage: question.disease_stage,
+      disease_stage_confidence: question.disease_stage_confidence,
       disease_type_1: question.disease_type_1,
       disease_type_2: question.disease_type_2,
+      disease_type_confidence: question.disease_type_confidence,
       treatment_line: question.treatment_line,
+      treatment_line_confidence: question.treatment_line_confidence,
       treatment_1: question.treatment_1,
       treatment_2: question.treatment_2,
       treatment_3: question.treatment_3,
       treatment_4: question.treatment_4,
       treatment_5: question.treatment_5,
+      treatment_confidence: question.treatment_confidence,
       biomarker_1: question.biomarker_1,
       biomarker_2: question.biomarker_2,
       biomarker_3: question.biomarker_3,
       biomarker_4: question.biomarker_4,
       biomarker_5: question.biomarker_5,
+      biomarker_confidence: question.biomarker_confidence,
       trial_1: question.trial_1,
       trial_2: question.trial_2,
       trial_3: question.trial_3,
       trial_4: question.trial_4,
       trial_5: question.trial_5,
+      trial_confidence: question.trial_confidence,
       treatment_eligibility: question.treatment_eligibility,
       age_group: question.age_group,
       organ_dysfunction: question.organ_dysfunction,
@@ -407,6 +412,7 @@ export async function getQuestionDetail(id: number): Promise<QuestionDetailData>
       needs_review: question.needs_review,
       review_flags: question.review_flags,
       review_reason: question.review_reason,
+      flagged_at: question.flagged_at,
       agreement_level: question.agreement_level,
       tag_status: question.tag_status,
       worst_case_agreement: question.worst_case_agreement

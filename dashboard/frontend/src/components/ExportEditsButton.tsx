@@ -4,7 +4,6 @@ import {
   getPendingEditCount,
   exportPendingEdits,
   clearPendingEdits,
-  isVercelMode,
   checkVercelMode
 } from '../services/localEdits'
 
