@@ -1578,6 +1578,18 @@ class DatabaseService:
             """, (question_id,))
             activity_rows = cursor.fetchall()
 
+            # Fallback to question_activities if no performance data exists
+            # (for newly imported questions without outcomes data yet)
+            if not activity_rows:
+                cursor.execute("""
+                    SELECT DISTINCT qa.activity_id, a.activity_name, a.activity_date, a.quarter
+                    FROM question_activities qa
+                    JOIN activities a ON qa.activity_id = a.id
+                    WHERE qa.question_id = ?
+                    ORDER BY a.activity_date DESC NULLS LAST
+                """, (question_id,))
+                activity_rows = cursor.fetchall()
+
             # Legacy activities list for backwards compatibility
             activities = [r["activity_name"] for r in activity_rows]
 
