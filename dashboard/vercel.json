@@ -16,7 +16,7 @@
     { "source": "/api/reports/options/demographics", "destination": "/api/reports/options/demographics" },
     { "source": "/api/reports/stats/summary", "destination": "/api/reports/stats/summary" },
     { "source": "/data/:path*", "destination": "/data/:path*" },
-    { "source": "/((?!data|assets).*)", "destination": "/index.html" }
+    { "source": "/((?!api|data|assets).*)", "destination": "/index.html" }
   ],
   "headers": [
     {
