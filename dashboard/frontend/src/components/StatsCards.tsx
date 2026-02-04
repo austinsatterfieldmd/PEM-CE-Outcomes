@@ -1,5 +1,7 @@
-import { FileText, Calendar, AlertCircle } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { FileText, Calendar, AlertCircle, CloudOff, Download } from 'lucide-react'
 import type { Stats } from '../types'
+import { getPendingEditCount, exportPendingEdits, checkVercelMode } from '../services/localEdits'
 
 interface StatsCardsProps {
   stats: Stats
@@ -7,6 +9,20 @@ interface StatsCardsProps {
 }
 
 export function StatsCards({ stats, onNeedsReviewClick }: StatsCardsProps) {
+  const [pendingEdits, setPendingEdits] = useState(0)
+  const [isVercelMode, setIsVercelMode] = useState(false)
+
+  useEffect(() => {
+    checkVercelMode().then(setIsVercelMode)
+    setPendingEdits(getPendingEditCount())
+
+    const handleEditsChanged = (event: Event) => {
+      const customEvent = event as CustomEvent<{ count: number }>
+      setPendingEdits(customEvent.detail.count)
+    }
+    window.addEventListener('localEditsChanged', handleEditsChanged)
+    return () => window.removeEventListener('localEditsChanged', handleEditsChanged)
+  }, [])
   // Safeguard against undefined values and division by zero
   const totalQuestions = stats?.total_questions ?? 0
   const taggedQuestions = stats?.tagged_questions ?? 0
@@ -51,8 +67,22 @@ export function StatsCards({ stats, onNeedsReviewClick }: StatsCardsProps) {
     },
   ]
 
+  // Add pending edits card in Vercel mode
+  if (isVercelMode) {
+    cards.push({
+      label: 'Pending Edits',
+      value: pendingEdits.toLocaleString(),
+      subtext: pendingEdits > 0 ? 'Click to export' : 'Saved locally',
+      icon: CloudOff,
+      bgColor: pendingEdits > 0 ? 'bg-emerald-50' : 'bg-slate-50',
+      textColor: pendingEdits > 0 ? 'text-emerald-600' : 'text-slate-500',
+      clickable: pendingEdits > 0,
+      onClick: pendingEdits > 0 ? exportPendingEdits : undefined,
+    })
+  }
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className={`grid grid-cols-1 sm:grid-cols-2 ${isVercelMode ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-4`}>
       {cards.map((card, index) => (
         <div
           key={card.label}

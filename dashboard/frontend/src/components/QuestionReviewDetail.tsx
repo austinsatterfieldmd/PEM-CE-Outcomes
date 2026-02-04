@@ -488,20 +488,30 @@ export function QuestionReviewDetail({ questionId, onClose, onReviewComplete }: 
         payload.question_stem = editedQuestionStem
       }
 
-      await updateQuestionTags(questionId, payload)
+      const result = await updateQuestionTags(questionId, payload)
 
       // Update local cache with custom values so they appear immediately in dropdowns
       customValues.forEach(cv => addToLocalCache(cv.field_name, cv.value))
 
-      // Refresh data
-      const updated = await getQuestionDetail(questionId)
-      setData(updated)
-      setEditedQuestionStem(updated.question_stem)
-      setIsEditing(false)
-      setIsEditingQuestion(false)
+      if (result.savedLocally) {
+        // In Vercel mode - don't try to refresh from API
+        // Just update local state and close editing mode
+        setIsEditing(false)
+        setIsEditingQuestion(false)
+        if (markAsReviewed && onReviewComplete) {
+          onReviewComplete()
+        }
+      } else {
+        // Normal mode - refresh data from API
+        const updated = await getQuestionDetail(questionId)
+        setData(updated)
+        setEditedQuestionStem(updated.question_stem)
+        setIsEditing(false)
+        setIsEditingQuestion(false)
 
-      if (markAsReviewed && onReviewComplete) {
-        onReviewComplete()
+        if (markAsReviewed && onReviewComplete) {
+          onReviewComplete()
+        }
       }
     } catch (error) {
       console.error('Failed to save tags:', error)

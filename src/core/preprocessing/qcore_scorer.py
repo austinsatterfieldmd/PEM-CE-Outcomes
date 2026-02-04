@@ -96,18 +96,19 @@ class QCoreConfig:
         # Empty - no bonuses, only deductions from 100
     }
 
-    # Grade thresholds by level (no F grade - D is the floor)
+    # Grade thresholds - unified scale for both L3 and L4 (traditional grading)
+    # No F grade - D is the floor
     GRADE_THRESHOLDS = {
-        'L3': {  # Level 3 (Knowledge) - more lenient
-            'A': 85,
-            'B': 70,
-            'C': 55,
-            'D': 0,  # D is the floor (no F grade)
-        },
-        'L4': {  # Level 4 (Competence) - stricter
+        'L3': {  # Level 3 (Knowledge) - same scale as L4
             'A': 90,
             'B': 80,
-            'C': 67,  # Updated based on calibration data
+            'C': 70,
+            'D': 0,  # D is the floor (no F grade)
+        },
+        'L4': {  # Level 4 (Competence) - same scale as L3
+            'A': 90,
+            'B': 80,
+            'C': 70,
             'D': 0,  # D is the floor (no F grade)
         },
     }

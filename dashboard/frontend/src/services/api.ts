@@ -671,7 +671,24 @@ export async function updateQuestionTags(
 }
 
 // Flag question for review
-export async function flagQuestion(id: number, reasons: string[]): Promise<void> {
+// In Vercel mode, saves the flag to localStorage
+export async function flagQuestion(id: number, reasons: string[]): Promise<{ savedLocally: boolean }> {
+  // Check if we're in Vercel (read-only) mode
+  if (isVercelMode()) {
+    const user = getCurrentUser()
+    // Save as a local edit with the flag information
+    saveLocalEdit({
+      questionId: id,
+      editor: user?.email || user?.name || 'unknown',
+      changes: {
+        needs_review: 'true',
+        review_flags: reasons.join(', ')
+      },
+      previousValues: {}
+    })
+    return { savedLocally: true }
+  }
+
   const response = await authFetch(`${API_BASE}/questions/${id}/flag`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -681,6 +698,8 @@ export async function flagQuestion(id: number, reasons: string[]): Promise<void>
   if (!response.ok) {
     throw new Error(`Failed to flag question: ${response.statusText}`)
   }
+
+  return { savedLocally: false }
 }
 
 // Update question oncology status

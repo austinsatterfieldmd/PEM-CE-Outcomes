@@ -358,13 +358,20 @@ export function QuestionDetail({ questionId, onClose, onTagsUpdated }: QuestionD
 
     setSaving(true)
     try {
-      await flagQuestion(questionId, selectedFlagReasons)
+      const result = await flagQuestion(questionId, selectedFlagReasons)
       setShowFlagDialog(false)
       setSelectedFlagReasons([])
-      // Refresh data to show updated state
-      const updated = await getQuestionDetail(questionId)
-      setData(updated)
-      onTagsUpdated?.()
+
+      if (result.savedLocally) {
+        // In Vercel mode - show success message but don't try to refresh from API
+        // The pending edits badge will update automatically
+        onTagsUpdated?.()
+      } else {
+        // Normal mode - refresh data to show updated state
+        const updated = await getQuestionDetail(questionId)
+        setData(updated)
+        onTagsUpdated?.()
+      }
     } catch (error) {
       console.error('Failed to flag question:', error)
       alert('Failed to flag question. Please try again.')

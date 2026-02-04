@@ -15,22 +15,23 @@ calibration_date: "2026-02-01"
 calibration_type: "expert_defaults"
 questions_analyzed: 250
 
-# Two grading scales based on CME outcome level
+# Unified grading scale for both CME outcome levels (traditional grading)
+# A: 90+, B: 80-89, C: 70-79, D: <70
 # Note: No F grade - D is the floor
 grading_scales:
   L3_knowledge:
     description: "Level 3 (Knowledge) - Recall/recognition questions"
     thresholds:
-      A: 85
-      B: 70
-      C: 55
+      A: 90
+      B: 80
+      C: 70
       D: 0  # D is the floor (no F grade)
   L4_competence:
     description: "Level 4 (Competence) - Application/decision questions"
     thresholds:
       A: 90
       B: 80
-      C: 67
+      C: 70
       D: 0  # D is the floor (no F grade)
 
 # Item writing flaw penalties (Tier 2-4)
