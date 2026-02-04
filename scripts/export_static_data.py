@@ -162,6 +162,46 @@ def export_data():
             for row in cursor
         ]
 
+    # Export multi-value fields (treatment_1-5, trial_1-5, biomarker_1-5, drug_class_1-3, etc.)
+    multi_value_fields = [
+        (["treatment_1", "treatment_2", "treatment_3", "treatment_4", "treatment_5"], "treatments"),
+        (["trial_1", "trial_2", "trial_3", "trial_4", "trial_5"], "trials"),
+        (["biomarker_1", "biomarker_2", "biomarker_3", "biomarker_4", "biomarker_5"], "biomarkers"),
+        (["drug_class_1", "drug_class_2", "drug_class_3"], "drug_classes"),
+        (["drug_target_1", "drug_target_2", "drug_target_3"], "drug_targets"),
+        (["prior_therapy_1", "prior_therapy_2", "prior_therapy_3"], "prior_therapies"),
+        (["metastatic_site_1", "metastatic_site_2", "metastatic_site_3"], "metastatic_sites"),
+        (["symptom_1", "symptom_2", "symptom_3"], "symptoms"),
+        (["toxicity_type_1", "toxicity_type_2", "toxicity_type_3", "toxicity_type_4", "toxicity_type_5"], "toxicity_types"),
+        (["efficacy_endpoint_1", "efficacy_endpoint_2", "efficacy_endpoint_3"], "efficacy_endpoints"),
+        (["guideline_source_1", "guideline_source_2"], "guideline_sources"),
+        (["comorbidity_1", "comorbidity_2", "comorbidity_3"], "comorbidities"),
+    ]
+
+    for field_columns, option_name in multi_value_fields:
+        # Build UNION ALL query to aggregate values from all columns
+        union_parts = []
+        for col in field_columns:
+            union_parts.append(f"""
+                SELECT t.{col} as value
+                FROM tags t
+                JOIN questions q ON q.id = t.question_id
+                WHERE t.{col} IS NOT NULL AND t.{col} != '' AND q.is_oncology = 1
+            """)
+        union_query = " UNION ALL ".join(union_parts)
+
+        cursor = conn.execute(f"""
+            SELECT value, COUNT(*) as count
+            FROM ({union_query})
+            GROUP BY value
+            ORDER BY count DESC
+        """)
+        filter_options[option_name] = [
+            {"value": row[0], "count": row[1]}
+            for row in cursor
+        ]
+        print(f"    {option_name}: {len(filter_options[option_name])} unique values")
+
     filters_file = output_dir / "filters.json"
     with open(filters_file, "w", encoding="utf-8") as f:
         json.dump(filter_options, f)
