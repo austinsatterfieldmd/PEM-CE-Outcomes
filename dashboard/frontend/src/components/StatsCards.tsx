@@ -7,13 +7,23 @@ interface StatsCardsProps {
 }
 
 export function StatsCards({ stats, onNeedsReviewClick }: StatsCardsProps) {
-  const taggedPercentage = ((stats.tagged_questions / stats.total_questions) * 100).toFixed(1)
-  const needsReviewPercentage = ((stats.questions_need_review / stats.total_questions) * 100).toFixed(1)
+  // Safeguard against undefined values and division by zero
+  const totalQuestions = stats?.total_questions ?? 0
+  const taggedQuestions = stats?.tagged_questions ?? 0
+  const questionsNeedReview = stats?.questions_need_review ?? 0
+  const totalActivities = stats?.total_activities ?? 0
+
+  const taggedPercentage = totalQuestions > 0
+    ? ((taggedQuestions / totalQuestions) * 100).toFixed(1)
+    : '0.0'
+  const needsReviewPercentage = totalQuestions > 0
+    ? ((questionsNeedReview / totalQuestions) * 100).toFixed(1)
+    : '0.0'
 
   const cards = [
     {
       label: 'Total Questions',
-      value: stats.total_questions.toLocaleString(),
+      value: totalQuestions.toLocaleString(),
       subtext: `${taggedPercentage}% tagged`,
       icon: FileText,
       bgColor: 'bg-blue-50',
@@ -22,7 +32,7 @@ export function StatsCards({ stats, onNeedsReviewClick }: StatsCardsProps) {
     },
     {
       label: 'Activities',
-      value: stats.total_activities.toLocaleString(),
+      value: totalActivities.toLocaleString(),
       subtext: 'Unique activities',
       icon: Calendar,
       bgColor: 'bg-amber-50',
@@ -31,7 +41,7 @@ export function StatsCards({ stats, onNeedsReviewClick }: StatsCardsProps) {
     },
     {
       label: 'Questions Needing Review',
-      value: stats.questions_need_review.toLocaleString(),
+      value: questionsNeedReview.toLocaleString(),
       subtext: `${needsReviewPercentage}% of total`,
       icon: AlertCircle,
       bgColor: 'bg-red-50',
