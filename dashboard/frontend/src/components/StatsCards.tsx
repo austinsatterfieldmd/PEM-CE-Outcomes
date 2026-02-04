@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { FileText, Calendar, AlertCircle, CloudOff, Download } from 'lucide-react'
+import { FileText, Calendar, AlertCircle, CloudOff } from 'lucide-react'
 import type { Stats } from '../types'
 import { getPendingEditCount, exportPendingEdits, checkVercelMode } from '../services/localEdits'
 
