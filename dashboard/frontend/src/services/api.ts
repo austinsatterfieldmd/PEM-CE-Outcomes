@@ -296,7 +296,28 @@ export async function searchQuestions(params: SearchFilters & {
 
   // Fallback to static JSON data (Vercel mode)
   const questions = await loadStaticQuestions()
-  const result = searchStaticQuestions(questions, {
+  const performanceData = await loadStaticPerformance()
+
+  // Merge performance data with questions
+  const questionsWithPerformance = questions.map(q => {
+    const perf = performanceData[q.id]
+    if (perf && perf.length > 0) {
+      // Find 'overall' segment or use first available
+      const overall = perf.find((p: any) => p.activity_name === 'overall') || perf[0]
+      return {
+        ...q,
+        pre_score: overall?.pre_score ?? null,
+        post_score: overall?.post_score ?? null,
+        knowledge_gain: overall?.pre_score != null && overall?.post_score != null
+          ? parseFloat((overall.post_score - overall.pre_score).toFixed(1))
+          : null,
+        sample_size: overall?.sample_size ?? null
+      }
+    }
+    return q
+  })
+
+  const result = searchStaticQuestions(questionsWithPerformance, {
     query,
     page,
     page_size,
