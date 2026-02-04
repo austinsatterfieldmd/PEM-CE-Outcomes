@@ -47,9 +47,9 @@ def export_data():
             q.incorrect_answers,
             q.source_file,
             q.is_oncology,
-            q.qcore_score,
-            q.qcore_grade,
-            q.qcore_breakdown,
+            t.qcore_score,
+            t.qcore_grade,
+            t.qcore_breakdown,
             -- Tags
             t.topic,
             t.topic_confidence,

@@ -4721,15 +4721,15 @@ class DatabaseService:
             # Get grade distribution
             cursor.execute("""
                 SELECT
-                    qcore_grade,
+                    t.qcore_grade,
                     COUNT(*) as count,
-                    AVG(qcore_score) as avg_score
+                    AVG(t.qcore_score) as avg_score
                 FROM tags t
                 JOIN questions q ON t.question_id = q.id
-                WHERE qcore_score IS NOT NULL
+                WHERE t.qcore_score IS NOT NULL
                   AND (q.canonical_source_id IS NULL OR q.canonical_source_id = CAST(q.source_id AS TEXT))
-                GROUP BY qcore_grade
-                ORDER BY qcore_grade
+                GROUP BY t.qcore_grade
+                ORDER BY t.qcore_grade
             """)
             grade_rows = cursor.fetchall()
 
@@ -4737,13 +4737,13 @@ class DatabaseService:
             cursor.execute("""
                 SELECT
                     COUNT(*) as total_scored,
-                    AVG(qcore_score) as avg_score,
-                    MIN(qcore_score) as min_score,
-                    MAX(qcore_score) as max_score,
-                    SUM(CASE WHEN qcore_score >= 80 THEN 1 ELSE 0 END) as ready_count
+                    AVG(t.qcore_score) as avg_score,
+                    MIN(t.qcore_score) as min_score,
+                    MAX(t.qcore_score) as max_score,
+                    SUM(CASE WHEN t.qcore_score >= 80 THEN 1 ELSE 0 END) as ready_count
                 FROM tags t
                 JOIN questions q ON t.question_id = q.id
-                WHERE qcore_score IS NOT NULL
+                WHERE t.qcore_score IS NOT NULL
                   AND (q.canonical_source_id IS NULL OR q.canonical_source_id = CAST(q.source_id AS TEXT))
             """)
             stats_row = cursor.fetchone()
@@ -4753,7 +4753,7 @@ class DatabaseService:
                 SELECT COUNT(*) as unscored
                 FROM tags t
                 JOIN questions q ON t.question_id = q.id
-                WHERE qcore_score IS NULL
+                WHERE t.qcore_score IS NULL
                   AND (q.canonical_source_id IS NULL OR q.canonical_source_id = CAST(q.source_id AS TEXT))
             """)
             unscored_row = cursor.fetchone()
