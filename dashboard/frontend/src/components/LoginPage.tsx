@@ -55,15 +55,15 @@ export function LoginPage({ onDevModeLogin }: LoginPageProps) {
             </div>
           )}
 
-          {/* Okta Not Configured Warning */}
+          {/* SSO Not Configured Warning */}
           {!isConfigured && (
             <div className="mb-6 p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg flex items-start gap-3">
               <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="text-amber-400 text-sm font-medium">Okta Not Configured</p>
+                <p className="text-amber-400 text-sm font-medium">SSO Not Configured</p>
                 <p className="text-amber-300/80 text-sm mt-1">
-                  Set VITE_OKTA_ISSUER and VITE_OKTA_CLIENT_ID environment variables to enable
-                  authentication.
+                  Set VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY, and VITE_SSO_PROVIDER_ID environment
+                  variables to enable Okta SSO authentication.
                 </p>
               </div>
             </div>

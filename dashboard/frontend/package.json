@@ -11,14 +11,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@okta/okta-auth-js": "^7.5.0",
+    "@supabase/supabase-js": "^2.94.0",
+    "clsx": "^2.0.0",
+    "html2canvas": "^1.4.1",
+    "lucide-react": "^0.294.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "lucide-react": "^0.294.0",
     "recharts": "^2.10.3",
-    "clsx": "^2.0.0",
     "tailwind-merge": "^2.1.0",
-    "@okta/okta-auth-js": "^7.5.0",
-    "html2canvas": "^1.4.1",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {

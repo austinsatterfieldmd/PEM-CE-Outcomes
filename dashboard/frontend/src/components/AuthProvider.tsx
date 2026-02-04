@@ -39,8 +39,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     user: null,
   });
 
-  // Check if we're on the login callback route
-  const isLoginCallback = window.location.pathname === '/login/callback';
+  // Check if we're on the auth callback route (Supabase SSO uses /auth/callback)
+  const isLoginCallback = window.location.pathname === '/auth/callback' || window.location.pathname === '/login/callback';
 
   useEffect(() => {
     // Skip auth check in dev mode

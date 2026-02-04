@@ -54,35 +54,98 @@ async function loadStaticQuestions(): Promise<any[]> {
 
 /**
  * Load static filter options (for Vercel read-only mode)
+ * Ensures all required arrays exist to prevent iteration errors
  */
-async function loadStaticFilters(): Promise<any> {
+async function loadStaticFilters(): Promise<FilterOptions> {
   if (staticFiltersCache) return staticFiltersCache
+
+  // Default empty filter options to prevent "not iterable" errors
+  const defaultFilters: FilterOptions = {
+    topics: [],
+    disease_states: [],
+    disease_stages: [],
+    disease_types: [],
+    treatment_lines: [],
+    treatments: [],
+    biomarkers: [],
+    trials: [],
+    activities: [],
+    source_files: [],
+    // Patient Characteristics
+    treatment_eligibilities: [],
+    age_groups: [],
+    fitness_statuses: [],
+    organ_dysfunctions: [],
+    disease_specific_factors: [],
+    comorbidities: [],
+    // Treatment Details
+    drug_classes: [],
+    drug_targets: [],
+    prior_therapies: [],
+    resistance_mechanisms: [],
+    // Clinical Context
+    metastatic_sites: [],
+    symptoms: [],
+    performance_statuses: [],
+    // Safety/Toxicity
+    toxicity_types: [],
+    toxicity_organs: [],
+    toxicity_grades: [],
+    // Efficacy/Outcomes
+    efficacy_endpoints: [],
+    outcome_contexts: [],
+    clinical_benefits: [],
+    // Evidence/Guidelines
+    guideline_sources: [],
+    evidence_types: [],
+    // Question Format
+    cme_outcome_levels: [],
+    stem_types: [],
+    lead_in_types: [],
+    answer_formats: [],
+    distractor_homogeneities: []
+  }
 
   try {
     const response = await fetch(`${STATIC_DATA_BASE}/filters.json`)
     if (!response.ok) throw new Error('Static filters not available')
-    staticFiltersCache = await response.json()
+    const rawFilters = await response.json()
+
+    // Merge with defaults to ensure all arrays exist
+    staticFiltersCache = {
+      ...defaultFilters,
+      ...rawFilters
+    }
     return staticFiltersCache
   } catch (error) {
     console.warn('Failed to load static filters:', error)
-    return {}
+    return defaultFilters
   }
 }
 
 /**
  * Load static stats (for Vercel read-only mode)
+ * Transforms static file format to match Stats interface
  */
-async function loadStaticStats(): Promise<any> {
+async function loadStaticStats(): Promise<Stats> {
   if (staticStatsCache) return staticStatsCache
 
   try {
     const response = await fetch(`${STATIC_DATA_BASE}/stats.json`)
     if (!response.ok) throw new Error('Static stats not available')
-    staticStatsCache = await response.json()
+    const rawStats = await response.json()
+
+    // Transform static file format to match Stats interface
+    staticStatsCache = {
+      total_questions: rawStats.total_questions ?? 0,
+      tagged_questions: rawStats.tagged_questions ?? rawStats.total_questions ?? 0,
+      total_activities: rawStats.total_activities ?? 0,
+      questions_need_review: rawStats.questions_need_review ?? rawStats.needs_review ?? 0
+    }
     return staticStatsCache
   } catch (error) {
     console.warn('Failed to load static stats:', error)
-    return { total_questions: 0, unique_diseases: 0, needs_review: 0 }
+    return { total_questions: 0, tagged_questions: 0, total_activities: 0, questions_need_review: 0 }
   }
 }
 

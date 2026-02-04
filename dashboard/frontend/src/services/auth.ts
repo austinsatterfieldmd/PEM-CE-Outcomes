@@ -1,87 +1,72 @@
 /**
- * Okta Authentication Service
+ * Authentication Service
  *
  * Provides login, logout, and token management for the CME Dashboard.
- * Uses Okta Auth JS SDK for authentication flow.
+ * Uses Supabase SSO with SAML for Okta integration.
  *
  * NOTE: For local development, set VITE_DISABLE_AUTH=true in .env to bypass authentication
  */
 
-// Types for when Okta is not installed
-type OktaAuth = any;
-type AuthState = any;
-type TokenResponse = any;
+import {
+  getSupabaseClient,
+  isSupabaseConfigured,
+  isSSOConfigured,
+  signInWithSSO,
+  handleAuthCallback as handleSupabaseCallback,
+  getSession,
+  getUser,
+  signOut,
+  onAuthStateChange,
+  getAccessToken as getSupabaseToken
+} from './supabase'
 
 // Development mode helper - bypasses auth for local testing
-// Also bypasses auth when Okta is not configured (e.g., initial deployment)
 export function isDevMode(): boolean {
   // Explicit disable via env var
   if (import.meta.env.VITE_DISABLE_AUTH === 'true') {
-    return true;
+    return true
   }
   // Dev mode with no auth configured
   if (import.meta.env.DEV) {
-    return true;
+    return true
   }
-  // Production but Okta not configured - bypass auth gracefully
-  const issuer = import.meta.env.VITE_OKTA_ISSUER;
-  const clientId = import.meta.env.VITE_OKTA_CLIENT_ID;
-  if (!issuer || !clientId || issuer === 'https://your-org.okta.com/oauth2/default' || clientId === 'your-client-id') {
-    return true;
+  // Production but Supabase not configured - bypass auth gracefully
+  if (!isSupabaseConfigured()) {
+    return true
   }
-  return false;
-}
-
-// Okta configuration from environment variables
-const oktaConfig = {
-  issuer: import.meta.env.VITE_OKTA_ISSUER || 'https://your-org.okta.com/oauth2/default',
-  clientId: import.meta.env.VITE_OKTA_CLIENT_ID || 'your-client-id',
-  redirectUri: `${window.location.origin}/login/callback`,
-  postLogoutRedirectUri: window.location.origin,
-  scopes: ['openid', 'profile', 'email'],
-  pkce: true,
-};
-
-// Create Okta Auth instance
-let oktaAuth: OktaAuth | null = null;
-
-function getOktaAuth(): OktaAuth {
-  if (isDevMode()) {
-    // Return mock auth object for dev mode
-    return {} as OktaAuth;
-  }
-
-  if (!oktaAuth) {
-    // Only import and initialize Okta in production
-    throw new Error('Okta authentication not configured. Please install @okta/okta-auth-js or set VITE_DISABLE_AUTH=true');
-  }
-  return oktaAuth;
+  return false
 }
 
 /**
- * Check if Okta is properly configured
+ * Check if SSO is properly configured
+ * (Replaces isOktaConfigured)
  */
 export function isOktaConfigured(): boolean {
-  return (
-    oktaConfig.issuer !== 'https://your-org.okta.com/oauth2/default' &&
-    oktaConfig.clientId !== 'your-client-id'
-  );
+  return isSSOConfigured()
 }
 
 /**
- * Redirect to Okta login page
+ * Redirect to Okta login via Supabase SSO
  */
 export async function login(): Promise<void> {
-  const auth = getOktaAuth();
-  await auth.signInWithRedirect();
+  const { error } = await signInWithSSO()
+  if (error) {
+    throw error
+  }
+  // User will be redirected to Okta
 }
 
 /**
- * Handle the callback from Okta after login
+ * Handle the callback from SSO after login
  */
-export async function handleLoginCallback(): Promise<TokenResponse> {
-  const auth = getOktaAuth();
-  return auth.handleLoginRedirect();
+export async function handleLoginCallback(): Promise<void> {
+  const { session, error } = await handleSupabaseCallback()
+  if (error) {
+    throw error
+  }
+  if (!session) {
+    throw new Error('No session returned from callback')
+  }
 }
 
 /**
@@ -89,126 +74,106 @@ export async function handleLoginCallback(): Promise<TokenResponse> {
  */
 export async function isAuthenticated(): Promise<boolean> {
   if (isDevMode()) {
-    return true; // Always authenticated in dev mode
+    return true
   }
-  const auth = getOktaAuth();
-  return auth.isAuthenticated();
+
+  const session = await getSession()
+  return session !== null
 }
 
 /**
  * Get the current auth state
  */
-export function getAuthState(): Promise<AuthState> {
-  const auth = getOktaAuth();
-  return auth.authStateManager.getAuthState() || Promise.resolve({ isAuthenticated: false });
+export async function getAuthState(): Promise<{ isAuthenticated: boolean }> {
+  const session = await getSession()
+  return { isAuthenticated: session !== null }
 }
 
 /**
  * Get the access token for API calls
  */
 export async function getAccessToken(): Promise<string | undefined> {
-  const auth = getOktaAuth();
-  const tokenManager = auth.tokenManager;
-
-  try {
-    const accessToken = await tokenManager.get('accessToken');
-    return accessToken?.accessToken;
-  } catch {
-    return undefined;
+  if (isDevMode()) {
+    return undefined
   }
+
+  const token = await getSupabaseToken()
+  return token || undefined
 }
 
 /**
- * Get user information from the ID token
+ * Get user information from Supabase session
  */
 export async function getUserInfo(): Promise<UserInfo | null> {
   if (isDevMode()) {
-    // Return mock user in dev mode
     return {
       sub: 'dev-user',
       email: 'dev@localhost',
       name: 'Development User',
-      groups: ['admin'],
-    };
-  }
-
-  const auth = getOktaAuth();
-
-  try {
-    const idToken = await auth.tokenManager.get('idToken');
-    if (idToken && 'claims' in idToken) {
-      const claims = idToken.claims as Record<string, unknown>;
-      return {
-        sub: claims.sub as string,
-        email: claims.email as string,
-        name: claims.name as string || claims.preferred_username as string,
-        groups: claims.groups as string[] || [],
-      };
+      groups: ['admin']
     }
-  } catch {
-    // Token not available
   }
 
-  return null;
+  const user = await getUser()
+  if (!user) {
+    return null
+  }
+
+  // Extract user metadata from Supabase user object
+  const metadata = user.user_metadata || {}
+
+  return {
+    sub: user.id,
+    email: user.email || '',
+    name: metadata.name || metadata.full_name || metadata.first_name || user.email?.split('@')[0] || '',
+    groups: metadata.groups || []
+  }
 }
 
 /**
  * Logout the user
  */
 export async function logout(): Promise<void> {
-  const auth = getOktaAuth();
-  await auth.signOut();
+  await signOut()
+  // Redirect to login page
+  window.location.href = '/'
 }
 
 /**
  * Subscribe to auth state changes
  */
-export function subscribeToAuthState(callback: (state: AuthState) => void): () => void {
-  const auth = getOktaAuth();
-  auth.authStateManager.subscribe(callback);
-
-  // Start the auth state service
-  auth.start();
-
-  // Return unsubscribe function
-  return () => {
-    auth.authStateManager.unsubscribe(callback);
-  };
+export function subscribeToAuthState(callback: (state: { isAuthenticated?: boolean }) => void): () => void {
+  return onAuthStateChange((_event, session) => {
+    callback({ isAuthenticated: session !== null })
+  })
 }
 
 /**
- * Refresh tokens if needed
+ * Refresh tokens if needed (Supabase handles this automatically)
  */
 export async function refreshTokens(): Promise<void> {
-  const auth = getOktaAuth();
-
-  try {
-    await auth.tokenManager.renew('accessToken');
-    await auth.tokenManager.renew('idToken');
-  } catch (error) {
-    console.error('Failed to refresh tokens:', error);
-    // If refresh fails, redirect to login
-    await login();
-  }
+  // Supabase auto-refreshes tokens, but we can force a refresh
+  const supabase = getSupabaseClient()
+  await supabase.auth.refreshSession()
 }
 
 // Types
 export interface UserInfo {
-  sub: string;
-  email: string;
-  name: string;
-  groups: string[];
+  sub: string
+  email: string
+  name: string
+  groups: string[]
 }
 
 // Auth context for React
 export interface AuthContextType {
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  user: UserInfo | null;
-  isAdmin: boolean;
-  login: () => Promise<void>;
-  logout: () => Promise<void>;
-  getAccessToken: () => Promise<string | undefined>;
+  isAuthenticated: boolean
+  isLoading: boolean
+  user: UserInfo | null
+  isAdmin: boolean
+  login: () => Promise<void>
+  logout: () => Promise<void>
+  getAccessToken: () => Promise<string | undefined>
 }
 
 /**
@@ -216,25 +181,25 @@ export interface AuthContextType {
  */
 export async function getAuthHeaders(): Promise<Record<string, string>> {
   if (isDevMode()) {
-    return {};
+    return {}
   }
 
-  const token = await getAccessToken();
+  const token = await getAccessToken()
   if (token) {
-    return { Authorization: `Bearer ${token}` };
+    return { Authorization: `Bearer ${token}` }
   }
 
-  return {};
+  return {}
 }
 
 // Cached current user for synchronous access
-let cachedCurrentUser: UserInfo | null = null;
+let cachedCurrentUser: UserInfo | null = null
 
 /**
  * Set the cached current user (called by AuthProvider)
  */
 export function setCachedUser(user: UserInfo | null): void {
-  cachedCurrentUser = user;
+  cachedCurrentUser = user
 }
 
 /**
@@ -247,8 +212,8 @@ export function getCurrentUser(): UserInfo | null {
       sub: 'dev-user',
       email: 'dev@localhost',
       name: 'Development User',
-      groups: ['admin'],
-    };
+      groups: ['admin']
+    }
   }
-  return cachedCurrentUser;
+  return cachedCurrentUser
 }
