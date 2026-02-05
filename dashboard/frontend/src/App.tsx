@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Search, Filter, ChevronDown, X, BarChart3, Database, ClipboardCheck, Download, ArrowUpDown, SlidersHorizontal, Zap } from 'lucide-react'
 import { QuestionTable } from './components/QuestionTable'
 import { FilterPanel } from './components/FilterPanel'
@@ -11,6 +12,7 @@ import ReviewTab from './components/ReviewTab'
 import QSuiteTab from './components/QSuiteTab'
 import { UserMenu } from './components/AuthProvider'
 import { ExportEditsButton } from './components/ExportEditsButton'
+import AuthCallback from './components/AuthCallback'
 import { searchQuestions, getFilterOptions, getDynamicFilterOptions, getStats, exportQuestions, exportQuestionsFull } from './services/api'
 import type { Question, FilterOptions, SearchFilters, Stats } from './types'
 import { loadUserDefinedValues } from './config/userDefinedValues'
@@ -1039,5 +1041,17 @@ function App() {
   )
 }
 
-export default App
+// Wrap with Router for auth callback handling
+function AppWithRouter() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/auth/callback" element={<AuthCallback />} />
+        <Route path="/*" element={<App />} />
+      </Routes>
+    </BrowserRouter>
+  )
+}
+
+export default AppWithRouter
 
