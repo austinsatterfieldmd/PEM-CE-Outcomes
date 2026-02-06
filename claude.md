@@ -4,7 +4,134 @@ This file provides context and guidelines for Claude Code when working on this p
 
 ## Working Style Preferences
 
-**IMPORTANT**: When the user makes open-ended statements or asks investigative questions, prioritize fact-finding and reporting results BEFORE making any changes. Do NOT make fixes or edits without consulting the user first, even in auto-edit mode. Always present findings and proposed solutions, then wait for user approval before implementing changes.
+### ⚠️ CRITICAL: No Edits Without Explicit Approval
+
+**When the user asks a QUESTION (ends with "?") or makes an investigative statement, DO NOT EDIT FILES.**
+
+Instead:
+1. Research/analyze the issue
+2. Report findings
+3. Propose changes (describe, don't implement)
+4. WAIT for explicit user approval like "yes, make those changes" or "go ahead"
+
+**Examples of investigative questions (NO EDITS):**
+- "Is there no induction or consolidation around transplant in CLL?" → REPORT findings only
+- "What does the ALL prompt show?" → READ and REPORT only
+- "Why weren't those treatment lines used?" → EXPLAIN only
+- "Are the directions clear enough?" → ANALYZE and REPORT only
+
+**Examples of directive statements (EDITS OK):**
+- "Update all heme prompts to match the ALL template"
+- "Add the INFERENCE section to FL and MCL"
+- "Fix the treatment_line section in DLBCL"
+
+When in doubt, ASK before editing.
+
+---
+
+## Service Management
+
+**Claude CAN and SHOULD restart backend services when needed.** This includes:
+
+- Restarting the dashboard backend when database changes aren't reflected
+- Starting services that have stopped
+- Checking service health via API endpoints
+
+### Restart Backend Command
+```bash
+cd "c:\Dev\CE-Outcomes-Dashboard\dashboard" && python -m uvicorn backend.main:app --reload --host 127.0.0.1 --port 8000
+```
+
+Run with `run_in_background: true` to keep it running.
+
+### Verify Backend Health
+```bash
+curl -s "http://127.0.0.1:8000/health"
+```
+
+Expected response includes `total_questions` matching the database count.
+
+---
+
+## Review Queue Logic
+
+**User-edited questions (`edited_by_user=1`) are NEVER shown in the review queue**, regardless of the `needs_review` flag. This is enforced at the database query level.
+
+### Key Fields
+- `edited_by_user` - Set to 1 when user clicks "Save & Mark Reviewed"
+- `needs_review` - Set to 1 when tagging has conflicts/majority votes
+- `tag_status` - 'verified', 'unanimous', 'majority', 'conflict'
+
+### Bug Fix (Feb 6, 2026)
+The database queries in [database.py](dashboard/backend/services/database.py) now explicitly exclude `edited_by_user=1` from needs_review filters. This prevents user-reviewed questions from reappearing in the queue even if `needs_review` wasn't properly cleared.
+
+### Session Logs
+Detailed session logs are saved in `docs/SESSION_LOG_YYYY-MM-DD.md` for audit trail.
+
+---
+
+## ⚠️ CRITICAL: Tagging Workflow Rules
+
+**NEVER re-tag questions that already have tags in the database.**
+
+### Before ANY Tagging Operation:
+
+1. **QUERY THE DATABASE FIRST** to identify which questions are UNTAGGED:
+   ```sql
+   -- Find untagged questions for a disease
+   SELECT q.id, q.qgd
+   FROM questions q
+   LEFT JOIN tags t ON q.id = t.question_id
+   WHERE q.disease_state = 'Multiple Myeloma'
+   AND t.id IS NULL;
+   ```
+
+2. **REPORT the count** of untagged questions to the user BEFORE proceeding
+
+3. **Only tag questions that have NO existing tags** (LEFT JOIN...IS NULL)
+
+### What "Tag Questions" Means:
+- User says "tag the remaining questions" → Find UNTAGGED questions, run Stage 2 tagging on them
+- User says "import tagged questions" → Import from checkpoint files (rare, only after fresh tagging)
+
+### Checkpoint Files:
+- Located in `data/checkpoints/stage2_tagged_*.json`
+- These contain PREVIOUSLY TAGGED results
+- **NEVER import checkpoint files** without verifying they contain NEW tagging results
+- If checkpoint files exist from a previous session, they are STALE - do not use them
+
+### The Import Script Protection:
+- `import_stage2_results.py --upsert` protects questions with `edited_by_user=TRUE`
+- But it will OVERWRITE questions that were tagged but not yet human-reviewed
+- This is why we NEVER re-tag - even "protected" imports can cause data loss
+
+### Recovery:
+- If tags are accidentally overwritten, check git history for database backups
+- The `edited_by_user` flag is the ONLY protection - ensure human-reviewed questions have this set
+
+### Automatic Exclusion (Script Protection)
+
+The `run_stage2_batch.py` script **automatically excludes** questions already in `dashboard/data/questions.db` via the `--exclude-db` flag (enabled by default).
+
+**Expected output when running tagging:**
+```
+Found 367 existing questions in dashboard database
+Filtered to 26 MCL questions
+Excluding 18 questions that already exist in dashboard database
+Remaining: 8 new questions to tag
+```
+
+**If you see 0 exclusions but know questions exist:**
+1. Check `dashboard/data/questions.db` exists
+2. Verify running from correct directory
+3. Run: `python -c "import sqlite3; print(sqlite3.connect('dashboard/data/questions.db').execute('SELECT COUNT(*) FROM questions').fetchone()[0])"`
+
+**To force re-tagging (DANGEROUS - wastes money):**
+```bash
+python scripts/run_stage2_batch.py --disease "MCL" --no-exclude-db
+```
+
+---
 
 **TERMINAL COMMANDS**: When asking the user to run commands in their terminal:
 1. ALWAYS provide full absolute paths - never use relative paths

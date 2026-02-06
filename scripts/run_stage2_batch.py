@@ -49,6 +49,7 @@ load_dotenv(PROJECT_ROOT / ".env")
 from src.core.taggers.multi_model_tagger import MultiModelTagger
 from src.core.taggers.vote_aggregator import AggregatedVote, AgreementLevel
 from src.core.preprocessing.tag_normalizer import normalize_results
+import sqlite3
 
 # Configure logging
 logging.basicConfig(
@@ -62,11 +63,35 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+def get_existing_qgds_from_db() -> set:
+    """
+    Get QGDs (source_ids) already in dashboard database.
+
+    This prevents re-tagging questions that already exist in the database,
+    saving API costs and avoiding accidental overwrites.
+    """
+    db_path = PROJECT_ROOT / "dashboard" / "data" / "questions.db"
+    if not db_path.exists():
+        logger.warning(f"Dashboard database not found: {db_path}")
+        return set()
+
+    try:
+        conn = sqlite3.connect(db_path)
+        existing = {str(row[0]) for row in conn.execute('SELECT source_id FROM questions')}
+        conn.close()
+        logger.info(f"Found {len(existing)} existing questions in dashboard database")
+        return existing
+    except Exception as e:
+        logger.error(f"Error reading dashboard database: {e}")
+        return set()
+
+
 def load_questions_from_excel(
     file_path: str,
     disease_filter: Optional[str] = None,
     start: int = 0,
-    limit: Optional[int] = None
+    limit: Optional[int] = None,
+    exclude_qgds: Optional[set] = None
 ) -> List[Dict]:
     """
     Load questions from stage2_ready Excel file.
@@ -76,6 +101,7 @@ def load_questions_from_excel(
         disease_filter: Filter by STAGE1_disease_state
         start: Starting index (after disease filter)
         limit: Maximum number of questions to load
+        exclude_qgds: Set of QGDs (source_ids) to exclude (already in database)
 
     Returns:
         List of question dicts with: id, source_id, question_stem, correct_answer,
@@ -89,6 +115,15 @@ def load_questions_from_excel(
     if disease_filter:
         df = df[df['STAGE1_disease_state'] == disease_filter]
         logger.info(f"Filtered to {len(df)} {disease_filter} questions")
+
+    # Exclude questions already in database
+    if exclude_qgds:
+        before_count = len(df)
+        df = df[~df['QUESTIONGROUPDESIGNATION'].astype(str).isin(exclude_qgds)]
+        excluded_count = before_count - len(df)
+        if excluded_count > 0:
+            logger.info(f"Excluding {excluded_count} questions that already exist in dashboard database")
+        logger.info(f"Remaining: {len(df)} new questions to tag")
 
     # Apply start offset
     if start > 0:
@@ -347,6 +382,18 @@ def main():
         action="store_true",
         help="Enable web search on disagreements (disabled by default - adds cost without clear value)"
     )
+    parser.add_argument(
+        "--exclude-db",
+        action="store_true",
+        default=True,
+        help="Exclude questions already in dashboard database (default: True)"
+    )
+    parser.add_argument(
+        "--no-exclude-db",
+        action="store_false",
+        dest="exclude_db",
+        help="Disable automatic exclusion of existing questions (DANGEROUS - will re-tag and waste money)"
+    )
     args = parser.parse_args()
 
     # Set default paths based on disease
@@ -356,9 +403,22 @@ def main():
     if args.checkpoint is None:
         args.checkpoint = f"data/checkpoints/stage2_{disease_slug}_checkpoint.json"
 
+    # Get existing QGDs to exclude (if enabled)
+    exclude_qgds = set()
+    if args.exclude_db:
+        exclude_qgds = get_existing_qgds_from_db()
+        if not exclude_qgds:
+            logger.warning("No existing questions found in database - proceeding without exclusion")
+
     # Load questions
     input_path = PROJECT_ROOT / args.input
-    questions = load_questions_from_excel(str(input_path), args.disease, args.start, args.limit)
+    questions = load_questions_from_excel(
+        str(input_path),
+        args.disease,
+        args.start,
+        args.limit,
+        exclude_qgds=exclude_qgds
+    )
 
     if not questions:
         logger.error(f"No questions found for disease: {args.disease}")

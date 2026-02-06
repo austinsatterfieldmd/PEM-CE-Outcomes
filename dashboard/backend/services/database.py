@@ -1341,7 +1341,8 @@ class DatabaseService:
                 params.append(min_sample_size)
 
             if needs_review is True:
-                where_clauses.append("t.needs_review = 1")
+                # User-edited questions should never appear in review queue
+                where_clauses.append("t.needs_review = 1 AND (t.edited_by_user IS NULL OR t.edited_by_user = 0)")
             elif needs_review is False:
                 where_clauses.append("(t.needs_review IS NULL OR t.needs_review = 0)")
 
@@ -2827,11 +2828,13 @@ class DatabaseService:
             cursor.execute("SELECT COUNT(DISTINCT activity_name) FROM question_activities")
             total_activities = cursor.fetchone()[0]
 
-            # Count questions needing review (flagged for review, excluding non-oncology and duplicates)
+            # Count questions needing review (flagged for review, excluding non-oncology, duplicates, and user-edited)
+            # Note: User-edited questions (edited_by_user=1) should never be in review queue
             cursor.execute("""
                 SELECT COUNT(*) FROM tags t
                 JOIN questions q ON t.question_id = q.id
                 WHERE t.needs_review = 1
+                AND (t.edited_by_user IS NULL OR t.edited_by_user = 0)
                 AND (q.is_oncology IS NULL OR q.is_oncology = 1)
                 AND (q.canonical_source_id IS NULL OR q.canonical_source_id = CAST(q.source_id AS TEXT))
             """)
@@ -3376,7 +3379,8 @@ class DatabaseService:
                 params.extend(source_files)
 
             if needs_review is True:
-                where_clauses.append("t.needs_review = 1")
+                # User-edited questions should never appear in review queue
+                where_clauses.append("t.needs_review = 1 AND (t.edited_by_user IS NULL OR t.edited_by_user = 0)")
             elif needs_review is False:
                 where_clauses.append("(t.needs_review IS NULL OR t.needs_review = 0)")
 

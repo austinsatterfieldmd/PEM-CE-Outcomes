@@ -1,25 +1,40 @@
 import { useState, useEffect } from 'react'
-import { CloudOff } from 'lucide-react'
+import { CloudOff, Database } from 'lucide-react'
 import { checkVercelMode } from '../services/localEdits'
 
 /**
  * Export Edits Button Component
  *
- * Displays a minimal read-only indicator in the header when running in Vercel mode.
- * Export functionality has been moved to the StatsCards component.
+ * Displays connection status indicator in the header:
+ * - "SQLite" badge (green) when connected to backend
+ * - "Read-Only" badge (gray) when in Vercel/offline mode
  */
 export function ExportEditsButton() {
-  const [vercelMode, setVercelMode] = useState(false)
+  const [vercelMode, setVercelMode] = useState<boolean | null>(null)
 
   useEffect(() => {
     checkVercelMode().then(setVercelMode)
   }, [])
 
-  // Don't show anything if not in Vercel mode
-  if (!vercelMode) {
+  // Still checking
+  if (vercelMode === null) {
     return null
   }
 
+  // Connected to SQLite backend
+  if (!vercelMode) {
+    return (
+      <div
+        className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-600/80 text-white rounded-lg text-xs cursor-help"
+        title="Connected to SQLite database. Changes are saved to the server."
+      >
+        <Database className="w-3.5 h-3.5" />
+        <span className="hidden sm:inline">SQLite</span>
+      </div>
+    )
+  }
+
+  // Vercel/offline mode
   return (
     <div
       className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-600/50 text-slate-300 rounded-lg text-xs cursor-help"
