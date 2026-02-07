@@ -355,10 +355,10 @@ treatment_line_aliases:
   later line: 2L+
   second line or later: 2L+
   2nd line+: 2L+
-  relapsed refractory: R/R (Relapsed/Refractory)
-  relapsed/refractory: R/R (Relapsed/Refractory)
-  R/R: R/R (Relapsed/Refractory)
-  RRMM: R/R (Relapsed/Refractory)
+  relapsed refractory: R/R
+  relapsed/refractory: R/R
+  R/R (Relapsed/Refractory): R/R
+  RRMM: R/R
   NDMM: Newly diagnosed
   newly diagnosed MM: Newly diagnosed
   new diagnosis: Newly diagnosed
@@ -382,12 +382,69 @@ performance_status_aliases:
   good PS: ECOG 0-1
   poor PS: ECOG 2+
 normalization_aliases:
+  # Symptom standardization
   Lytic lesions:
   - Lytic lesion
   Infections:
   - Infection
   Penta-refractory:
   - Pentarefractory
+
+  # ALL-CAPS drug name normalization
+  Acalabrutinib:
+  - ACALABRUTINIB
+  Ibrutinib:
+  - IBRUTINIB
+  Glofitamab:
+  - GLOFITAMAB
+  - glofitamab
+  Epcoritamab:
+  - EPCORITAMAB
+  - epcoritamab
+  Pirtobrutinib:
+  - PIRTOBRUTINIB
+  - pirtobrutinib
+  Tafasitamab:
+  - TAFASITAMAB
+  - tafasitamab
+  Polatuzumab vedotin:
+  - POLATUZUMAB VEDOTIN
+  - polatuzumab vedotin
+  Tisagenlecleucel:
+  - TISAGENLECLEUCEL
+  - tisagenlecleucel
+  - TISA-CEL
+  - Tisa-cel
+  - tisa-cel
+  Axicabtagene ciloleucel:
+  - AXICABTAGENE CILOLEUCEL
+  - AXI-CEL
+  - Axi-cel
+  - axi-cel
+  Lisocabtagene maraleucel:
+  - LISOCABTAGENE MARALEUCEL
+  - LISO-CEL
+  - Liso-cel
+  - liso-cel
+  Brexucabtagene autoleucel:
+  - BREXUCABTAGENE AUTOLEUCEL
+  - BREXU-CEL
+  - Brexu-cel
+  - brexu-cel
+
+  # Drug class normalization
+  IMiD:
+  - IMiD (Immunomodulatory drug)
+  Tyrosine kinase inhibitor:
+  - tyrosine kinase inhibitor
+  Non-covalent BTKi:
+  - Non-covalent BTK inhibitor
+
+  # Treatment line normalization
+  R/R:
+  - R/R (Relapsed/Refractory)
+  - 2L
+  - 3L+
 _metadata:
-  last_updated: '2026-01-29T14:19:14.226609'
-  total_aliases: 3
+  last_updated: '2026-02-07T08:08:24.174391'
+  total_aliases: 5

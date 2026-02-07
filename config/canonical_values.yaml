@@ -101,7 +101,7 @@ treatment_lines:
 - Perioperative
 - Maintenance
 - Consolidation
-- R/R (Relapsed/Refractory)
+- R/R
 - Newly diagnosed
 treatment_eligibility:
   multiple_myeloma:
@@ -119,10 +119,6 @@ age_groups:
 - Young
 - Transitional
 - Elderly
-# Normalization rules (applied during import/tagging):
-# - "Younger (<65)" → "Young"
-# - "Elderly (65-74)" → "Transitional"
-# - "Very elderly (>=75)" → "Elderly"
 fitness_status:
 - Fit
 - Frail
@@ -604,7 +600,6 @@ verified_values:
   - Weight gain
   - Lytic lesions
   treatment:
-  # All treatment names should be Title Case (first letter capitalized)
   - Idecabtagene vicleucel
   - Ciltacabtagene autoleucel
   - Elranatamab
@@ -621,6 +616,8 @@ verified_values:
   - Belantamab mafodotin
   - Mezigdomide
   - ASCT
+  - Acalabrutinib
+  - Ibrutinib
   biomarker:
   - del(17p)
   - MRD
@@ -630,6 +627,7 @@ verified_values:
   - Monoclonal antibody
   - Proteasome inhibitor
   - IMiD
+  - Covalent BTKi
   disease_type:
   - High-risk
   prior_therapy:
@@ -637,23 +635,20 @@ verified_values:
   - Prior PI
   - Prior IMiD
   - Prior stem cell transplant
+  - Prior CIT
   toxicity_type:
   - Infections
   - VTE
   - VOD/SOS
+  - Atrial fibrillation
   trial:
   - IsKia
   efficacy_endpoint:
   - MRD negativity rate
   toxicity_organ:
   - Hepatic
-
-# =============================================================================
-# NORMALIZATION RULES (Applied during import/post-processing)
-# Based on Phase 4 Accuracy Analysis: 168 reviewed questions, 556 field edits
-# =============================================================================
+  - Cardiac
 normalization_rules:
-  # Treatment names: lowercase → Title Case
   treatment:
     daratumumab: Daratumumab
     bortezomib: Bortezomib
@@ -667,39 +662,15 @@ normalization_rules:
     elranatamab: Elranatamab
     pomalidomide: Pomalidomide
     selinexor: Selinexor
-
-  # Age groups: verbose → simplified
   age_group:
-    "Younger (<65)": Young
-    "Elderly (65-74)": Transitional
-    "Very elderly (>=75)": Elderly
-
-  # Disease types: standardize MM subtypes
+    Younger (<65): Young
+    Elderly (65-74): Transitional
+    Very elderly (>=75): Elderly
   disease_type:
     Smoldering: Smoldering MM
-
-  # Answer patterns: default to Uniform (32 corrections Variable→Uniform)
   answer_length_pattern:
     Variable: Uniform
-    "Correct longest": Uniform  # Major test-wiseness flaw
-    "Correct shortest": Uniform  # Major test-wiseness flaw
-
-  # Topic: distinguish safety concepts (3 corrections)
+    Correct longest: Uniform
+    Correct shortest: Uniform
   topic:
-    "AE management": Safety profile  # When discussing general safety, not managing specific AE
-
-# =============================================================================
-# LEARNINGS FROM HUMAN REVIEW (Phase 4 Analysis)
-# =============================================================================
-# Top error patterns (count ≥ 10):
-# 1. answer_length_pattern: Variable→Uniform (32x) - Default to Uniform
-# 2. distractor_homogeneity: Homogeneous↔Heterogeneous (27x) - Requires judgment
-# 3. age_group: terminology normalization (24x) - Apply mapping above
-# 4. treatment capitalization (40+ corrections) - Title Case all drug names
-# 5. BCMA biomarker incorrectly tagged (8x) - Don't tag BCMA when it's drug target
-#
-# Key principles:
-# - BCMA: Tag as drug_target (Anti-BCMA CAR-T), NOT as biomarker
-# - Risk stratification: Tag in disease_type_2 (High-risk, Standard-risk)
-# - Lytic lesions: Tag in symptom fields, not metastatic_site
-# - CAR-T eligibility: Distinct from transplant eligibility
+    AE management: Safety profile

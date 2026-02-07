@@ -27,6 +27,7 @@ project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
 from dashboard.backend.services.database import DatabaseService
+from src.core.preprocessing.tag_normalizer import TagNormalizer
 
 logging.basicConfig(
     level=logging.INFO,
@@ -299,10 +300,25 @@ def import_stage2_upsert(db: DatabaseService, results: list, force_overwrite: bo
     """
     stats = {'inserted': 0, 'updated': 0, 'skipped_reviewed': 0, 'skipped_error': 0, 'skipped_excluded': 0, 'errors': 0}
 
+    # Initialize normalizer for tag normalization
+    try:
+        normalizer = TagNormalizer()
+        logger.info("TagNormalizer initialized for import normalization")
+    except Exception as e:
+        logger.warning(f"Failed to initialize TagNormalizer: {e}. Proceeding without normalization.")
+        normalizer = None
+
     # Load exclusion list
     excluded_source_ids = load_exclusion_list()
 
     for result in results:
+        # Normalize tags before import (belt-and-suspenders with tagging script normalization)
+        if normalizer:
+            try:
+                result = normalizer.normalize_result(result)
+            except Exception as e:
+                logger.warning(f"Normalization failed for result: {e}")
+
         try:
             # Handle error results — skip if no question data
             if 'error' in result:
