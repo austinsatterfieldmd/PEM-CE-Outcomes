@@ -551,6 +551,121 @@ def main():
             else:
                 logger.warning(f"Dashboard import failed: {result.stderr}")
 
+    # Auto-update remaining file (shrinking file approach)
+    if not args.dry_run and results:
+        update_remaining_file(results, args.input)
+
+
+def update_remaining_file(results: List[Dict[str, Any]], input_file: str):
+    """
+    Update the remaining file by removing tagged questions.
+
+    This implements the "shrinking file" approach:
+    1. Read the tagging manifest to find current remaining file
+    2. Remove newly tagged QGDs from remaining file
+    3. Save new timestamped remaining file
+    4. Update manifest with new entry
+    """
+    manifest_path = PROJECT_ROOT / "data" / "checkpoints" / "tagging_manifest.json"
+
+    if not manifest_path.exists():
+        logger.warning("No tagging_manifest.json found. Skipping remaining file update.")
+        logger.info("To enable this feature, create the manifest with the initial remaining file.")
+        return
+
+    try:
+        # Load manifest
+        with open(manifest_path, 'r', encoding='utf-8') as f:
+            manifest = json.load(f)
+
+        current_remaining_file = manifest.get('current_remaining')
+        if not current_remaining_file:
+            logger.warning("No current_remaining file in manifest. Skipping update.")
+            return
+
+        remaining_path = PROJECT_ROOT / "data" / "checkpoints" / current_remaining_file
+        if not remaining_path.exists():
+            logger.warning(f"Remaining file not found: {remaining_path}")
+            return
+
+        # Get QGDs that were just tagged
+        tagged_qgds = set()
+        for r in results:
+            if 'error' not in r:
+                qgd = r.get('qgd') or r.get('question_id')
+                if qgd:
+                    tagged_qgds.add(str(qgd))
+
+        if not tagged_qgds:
+            logger.info("No successful tags to remove from remaining file.")
+            return
+
+        # Load current remaining file
+        df_remaining = pd.read_excel(remaining_path)
+        original_count = len(df_remaining)
+
+        # Find QGD column (could be QGD or SOURCE_ID or similar)
+        qgd_col = None
+        for col in ['QGD', 'qgd', 'SOURCE_ID', 'source_id']:
+            if col in df_remaining.columns:
+                qgd_col = col
+                break
+
+        if not qgd_col:
+            logger.warning(f"Could not find QGD column in {remaining_path}")
+            return
+
+        # Remove tagged QGDs
+        df_remaining[qgd_col] = df_remaining[qgd_col].astype(str)
+        df_new_remaining = df_remaining[~df_remaining[qgd_col].isin(tagged_qgds)]
+        new_count = len(df_new_remaining)
+        removed_count = original_count - new_count
+
+        if removed_count == 0:
+            logger.info("No QGDs removed from remaining file (may have used different source).")
+            return
+
+        # Save new remaining file with timestamp
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        new_remaining_filename = f"stage2_remaining_{timestamp}.xlsx"
+        new_remaining_path = PROJECT_ROOT / "data" / "checkpoints" / new_remaining_filename
+
+        df_new_remaining.to_excel(new_remaining_path, index=False)
+
+        # Update manifest
+        manifest['current_remaining'] = new_remaining_filename
+        manifest['current_remaining_count'] = new_count
+        manifest['tagged_count'] = manifest.get('tagged_count', 0) + removed_count
+        manifest['last_updated'] = datetime.now().isoformat()
+
+        # Add to history
+        if 'history' not in manifest:
+            manifest['history'] = []
+
+        manifest['history'].append({
+            'file': new_remaining_filename,
+            'created': datetime.now().isoformat(),
+            'remaining_count': new_count,
+            'tagged_in_batch': removed_count,
+            'total_tagged': manifest['tagged_count'],
+            'note': f"Removed {removed_count} QGDs after tagging batch"
+        })
+
+        with open(manifest_path, 'w', encoding='utf-8') as f:
+            json.dump(manifest, f, indent=2)
+
+        print(f"\n📊 Remaining file updated:")
+        print(f"   Previous: {current_remaining_file} ({original_count} questions)")
+        print(f"   New:      {new_remaining_filename} ({new_count} questions)")
+        print(f"   Removed:  {removed_count} tagged QGDs")
+        print(f"   Total tagged so far: {manifest['tagged_count']}")
+
+        logger.info(f"Updated remaining file: {new_remaining_filename} ({new_count} remaining)")
+
+    except Exception as e:
+        logger.error(f"Failed to update remaining file: {e}")
+        # Don't fail the whole batch for this
+
 
 if __name__ == "__main__":
     main()
