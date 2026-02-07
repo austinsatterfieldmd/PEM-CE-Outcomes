@@ -129,23 +129,22 @@ You must assign values for all 70 tag fields (disease_state is already determine
 **OPTIONAL** - Can be null, but try to infer.
 
 **Valid values:**
-- `"1L"` - First-line, newly diagnosed, frontline
-- `"2L"` - Second-line (first relapse)
-- `"2L+"` - Second-line or later
-- `"3L+"` - Third-line or later
-- `"R/R"` - Relapsed/Refractory (general)
+- `"Newly diagnosed"` - First-line, newly diagnosed, frontline
+- `"R/R"` - Relapsed/Refractory, any line after initial therapy failure
 - `"Consolidation"` - Post-remission consolidation
 - `"Maintenance"` - Ongoing maintenance therapy
 
+**DO NOT USE:** 1L, 2L, 2L+, 3L+ - Use "Newly diagnosed" or "R/R" instead
+
 **Triggers:**
-- "newly diagnosed", "frontline", "first-line" → 1L
-- "relapsed", "refractory", "R/R DLBCL", "after R-CHOP failure" → R/R or 2L+
-- "third-line", "heavily pretreated", "after CAR-T" → 3L+
+- "newly diagnosed", "frontline", "first-line" → Newly diagnosed
+- "relapsed", "refractory", "R/R DLBCL", "after R-CHOP failure" → R/R
+- "second-line", "third-line", "heavily pretreated", "after CAR-T" → R/R
+- "Primary refractory" → R/R (never responded to initial therapy)
 
 **INFERENCE from context:**
-- R-CHOP, Pola-R-CHP → 1L
-- CAR-T, bispecifics → typically 2L+ or 3L+
-- "Primary refractory" → R/R (never responded to initial therapy)
+- R-CHOP, Pola-R-CHP → Newly diagnosed
+- CAR-T, bispecifics → typically R/R
 
 ### 6. treatment_1 through treatment_5 (up to 5 drugs)
 **OPTIONAL** - Can be null. Only tag fundable drugs when mentioned/inferable.
@@ -461,6 +460,8 @@ Trial/study context for efficacy data.
 Characterization of benefit.
 **Valid values:** `"Statistically significant"`, `"Superior"`, `"Clinically meaningful"`, `"Durable responses"`
 
+**CRITICAL**: Only tag clinical_benefit from the CORRECT answer. If a distractor says "Drug X showed superior PFS" but it's the WRONG answer, do NOT tag clinical_benefit. Exception: Compound questions where multiple options contribute to the answer.
+
 ---
 
 ## Group G: Evidence/Guidelines (3 fields)
@@ -471,7 +472,9 @@ Characterization of benefit.
 
 ### 29. evidence_type
 Type of evidence supporting the question/answer.
-**Valid values:** `"Phase 3 RCT"`, `"Phase 2 trial"`, `"Single-arm trial"`, `"Real-world evidence"`
+**Valid values:** `"Phase 1"`, `"Phase 1/2"`, `"Phase 2"`, `"Phase 2/3"`, `"Phase 3"`, `"Real-world evidence"`, `"Retrospective study"`, `"Meta-analysis"`, `"Guideline recommendation"`
+
+**DO NOT USE:** "Single-arm trial" - Use the phase instead (Phase 1, Phase 1/2, etc.)
 
 ---
 

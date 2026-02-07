@@ -101,21 +101,23 @@ While Rai and Binet staging systems exist, modern CLL treatment is driven by:
 - `"High-risk"` - When high-risk mentioned without specific score (e.g., del(17p), TP53 mutation)
 
 **Disease subtype (use disease_type_1 or disease_type_2):**
-- `"del(17p)/TP53-mutated"` - High-risk genetic subtype (drives treatment selection)
-- `"Unmutated IGHV"` - Poor prognosis subtype
-- `"Mutated IGHV"` - Favorable prognosis subtype
+- `"High-risk"` - When high-risk features are present (del(17p), TP53, unmutated IGHV)
+- `"Standard-risk"` - When standard-risk features mentioned
 - `"Richter transformation"` - Transformation to aggressive lymphoma (DLBCL or Hodgkin)
 
+**CRITICAL: Biomarkers go in biomarker_1-5, NOT disease_type:**
+- del(17p), TP53 mutation, IGHV status → Use biomarker_1-5 fields
+- disease_type is for risk CATEGORY, not specific genetic markers
+
 **When to tag:**
-- ALWAYS tag del(17p)/TP53 when mentioned (critical for treatment selection)
-- Tag IGHV status when explicitly discussed
+- Tag "High-risk" when del(17p)/TP53/unmutated IGHV is mentioned (put actual marker in biomarker field)
 - Tag Richter transformation when question addresses this scenario
 - Tag CLL-IPI risk when score/category is mentioned
 
 **Common patterns:**
-- "Patient with del(17p) CLL" → disease_type_1: "del(17p)/TP53-mutated"
+- "Patient with del(17p) CLL" → disease_type_1: "High-risk", biomarker_1: "del(17p)"
 - "High-risk CLL" without specifics → disease_type_1: "High-risk"
-- "Unmutated IGHV CLL progressing on..." → disease_type_1: "Unmutated IGHV"
+- "Unmutated IGHV CLL progressing on..." → disease_type_1: "High-risk", biomarker_1: "IGHV unmutated"
 - "CLL with Richter transformation" → disease_type_1: "Richter transformation"
 
 **INFERENCE from drug/context:**
@@ -127,19 +129,19 @@ While Rai and Binet staging systems exist, modern CLL treatment is driven by:
 **OPTIONAL** - Can be null, but try to infer. CLL uses specific terminology.
 
 **Valid values:**
-- `"Treatment-naive"` - First-line, frontline, previously untreated
-- `"1L"` - First-line (alternative notation)
-- `"2L+"` - Second-line or later, relapsed/refractory
-- `"R/R"` - Relapsed/Refractory
+- `"Treatment-naive"` - First-line, frontline, previously untreated (preferred for CLL)
+- `"R/R"` - Relapsed/Refractory, any line after initial therapy failure
 - `"Maintenance"` - Ongoing/continuous therapy (less common terminology in CLL)
 
+**DO NOT USE:** 1L, 2L, 2L+, 3L+ - Use "Treatment-naive" or "R/R" instead
+
 **Triggers:**
-- "treatment-naive", "frontline", "previously untreated", "first-line" → Treatment-naive or 1L
-- "relapsed", "refractory", "R/R CLL", "after progression on", "prior BTKi" → R/R or 2L+
-- "after ibrutinib failure", "BTKi-refractory" → R/R
+- "treatment-naive", "frontline", "previously untreated", "first-line" → Treatment-naive
+- "relapsed", "refractory", "R/R CLL", "after progression on", "prior BTKi" → R/R
+- "after ibrutinib failure", "BTKi-refractory", "second-line", "third-line" → R/R
 
 **INFERENCE from trial context:**
-- RESONATE-2, ELEVATE-TN, CLL14 → Treatment-naive/1L
+- RESONATE-2, ELEVATE-TN, CLL14 → Treatment-naive
 - RESONATE, ALPINE (R/R cohort), MURANO → R/R
 - BRUIN → R/R (pirtobrutinib after covalent BTKi)
 
@@ -460,6 +462,8 @@ Trial/study context for efficacy data.
 Characterization of benefit.
 **Valid values:** `"Statistically significant"`, `"Superior"`, `"Non-inferior"`, `"Clinically meaningful"`
 
+**CRITICAL**: Only tag clinical_benefit from the CORRECT answer. If a distractor says "Drug X showed superior PFS" but it's the WRONG answer, do NOT tag clinical_benefit. Exception: Compound questions where multiple options contribute to the answer.
+
 ---
 
 ## Group G: Evidence/Guidelines (3 fields)
@@ -470,7 +474,9 @@ Characterization of benefit.
 
 ### 29. evidence_type
 Type of evidence supporting the question/answer.
-**Valid values:** `"Phase 3 RCT"`, `"Phase 2 trial"`, `"Single-arm trial"`, `"Real-world evidence"`, `"Meta-analysis"`
+**Valid values:** `"Phase 1"`, `"Phase 1/2"`, `"Phase 2"`, `"Phase 2/3"`, `"Phase 3"`, `"Real-world evidence"`, `"Retrospective study"`, `"Meta-analysis"`, `"Guideline recommendation"`
+
+**DO NOT USE:** "Single-arm trial" - Use the phase instead (Phase 1, Phase 1/2, etc.)
 
 ---
 

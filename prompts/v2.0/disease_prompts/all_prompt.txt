@@ -478,6 +478,8 @@ Trial/study context for efficacy data.
 Characterization of benefit.
 **Valid values:** `"Statistically significant"`, `"Superior"`, `"Non-inferior"`, `"Clinically meaningful"`
 
+**CRITICAL**: Only tag clinical_benefit from the CORRECT answer. If a distractor says "Drug X showed superior PFS" but it's the WRONG answer, do NOT tag clinical_benefit. Exception: Compound questions where multiple options contribute to the answer.
+
 ---
 
 ## Group G: Evidence/Guidelines (3 fields)
@@ -488,7 +490,9 @@ Characterization of benefit.
 
 ### 29. evidence_type
 Type of evidence supporting the question/answer.
-**Valid values:** `"Phase 3 RCT"`, `"Phase 2 trial"`, `"Single-arm trial"`, `"Real-world evidence"`, etc.
+**Valid values:** `"Phase 1"`, `"Phase 1/2"`, `"Phase 2"`, `"Phase 2/3"`, `"Phase 3"`, `"Real-world evidence"`, `"Retrospective study"`, `"Meta-analysis"`, `"Guideline recommendation"`
+
+**DO NOT USE:** "Single-arm trial" - Use the phase instead (Phase 1, Phase 1/2, etc.)
 
 ---
 

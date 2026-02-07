@@ -113,17 +113,18 @@ You must assign values for all 70 tag fields (disease_state is already determine
 **OPTIONAL** - Can be null, but try to infer.
 
 **Valid values:**
-- `"1L"` - First-line, frontline, induction
-- `"2L"` - Second-line
-- `"2L+"` - Second-line or later
-- `"3L+"` - Third-line or later
-- `"R/R"` - Relapsed/Refractory
+- `"Newly diagnosed"` - First-line, frontline, induction
+- `"Induction"` - Initial intensive treatment phase
 - `"Consolidation"` - Consolidation (often ASCT)
 - `"Maintenance"` - Maintenance rituximab
+- `"R/R"` - Relapsed/Refractory, any line after initial therapy failure
+
+**DO NOT USE:** 1L, 2L, 2L+, 3L+ - Use "Newly diagnosed" or "R/R" instead
 
 **Triggers:**
-- "newly diagnosed", "frontline", "first-line", "induction" → 1L
-- "relapsed", "refractory", "R/R MCL", "after progression", "post-BTKi" → R/R or 2L+
+- "newly diagnosed", "frontline", "first-line", "induction" → Newly diagnosed
+- "relapsed", "refractory", "R/R MCL", "after progression", "post-BTKi" → R/R
+- "second-line", "third-line", "heavily pretreated" → R/R
 - "after ASCT", "consolidation" → Consolidation
 - "maintenance rituximab" → Maintenance
 
@@ -454,6 +455,8 @@ Trial/study context for efficacy data.
 Characterization of benefit.
 **Valid values:** `"Statistically significant"`, `"Superior"`, `"Clinically meaningful"`, `"Durable responses"`
 
+**CRITICAL**: Only tag clinical_benefit from the CORRECT answer. If a distractor says "Drug X showed superior PFS" but it's the WRONG answer, do NOT tag clinical_benefit. Exception: Compound questions where multiple options contribute to the answer.
+
 ---
 
 ## Group G: Evidence/Guidelines (3 fields)
@@ -464,7 +467,9 @@ Characterization of benefit.
 
 ### 29. evidence_type
 Type of evidence supporting the question/answer.
-**Valid values:** `"Phase 3 RCT"`, `"Phase 2 trial"`, `"Single-arm trial"`, `"Real-world evidence"`
+**Valid values:** `"Phase 1"`, `"Phase 1/2"`, `"Phase 2"`, `"Phase 2/3"`, `"Phase 3"`, `"Real-world evidence"`, `"Retrospective study"`, `"Meta-analysis"`, `"Guideline recommendation"`
+
+**DO NOT USE:** "Single-arm trial" - Use the phase instead (Phase 1, Phase 1/2, etc.)
 
 ---
 
