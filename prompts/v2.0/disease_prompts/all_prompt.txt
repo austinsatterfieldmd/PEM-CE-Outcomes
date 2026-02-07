@@ -130,13 +130,22 @@ Unlike solid tumors (TNM) or lymphomas (Ann Arbor), ALL is not staged. Disease c
 - `"Consolidation"` - Post-remission intensification
 - `"Maintenance"` - Prolonged lower-intensity therapy
 - `"R/R"` - Relapsed/Refractory, second-line or later, salvage
-- `"MRD+"` - Treatment for MRD-positive disease in remission
 
 **Triggers:**
 - "newly diagnosed", "frontline", "initial therapy", "induction" → Newly diagnosed or Induction
 - "relapsed", "refractory", "R/R ALL", "salvage" → R/R
-- "MRD-positive", "MRD eradication", "consolidation with blinatumomab" → MRD+
+- "after induction", "post-remission", "consolidation phase" → Consolidation
 - "maintenance", "POMP", "continuing therapy" → Maintenance
+
+### Consolidation Example (Q4936)
+
+EXAMPLE:
+Q: "45-year-old with Ph-negative B-ALL achieves CR after induction and first consolidation, with MRD-negative by flow but NGS detects 0.006% residual disease. What is the next step?"
+A: "Administer blinatumomab for deeper MRD clearance"
+✓ treatment_line: Consolidation (patient is in post-remission consolidation phase)
+✓ biomarker_1: MRD positive (NGS detects residual disease)
+
+WHY: The treatment_line describes the PHASE of therapy, not the MRD status. MRD status belongs in biomarker fields.
 
 **INFERENCE from trial context:**
 - TOWER → R/R B-ALL
