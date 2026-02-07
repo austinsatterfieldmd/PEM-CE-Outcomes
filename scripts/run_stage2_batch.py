@@ -346,8 +346,8 @@ def main():
     parser = argparse.ArgumentParser(description="Run Stage 2 batch tagging with 3-model voting")
     parser.add_argument(
         "--input",
-        default="data/checkpoints/stage2_ready_fixed_lookup_20260129_214737.xlsx",
-        help="Input Excel file with questions"
+        default="data/checkpoints/stage2_ready_MASTER.xlsx",
+        help="Input Excel file with questions (default: MASTER file with 3,486 questions)"
     )
     parser.add_argument(
         "--output",
