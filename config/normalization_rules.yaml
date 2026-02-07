@@ -382,15 +382,12 @@ performance_status_aliases:
   good PS: ECOG 0-1
   poor PS: ECOG 2+
 normalization_aliases:
-  # Symptom standardization
   Lytic lesions:
   - Lytic lesion
   Infections:
   - Infection
   Penta-refractory:
   - Pentarefractory
-
-  # ALL-CAPS drug name normalization
   Acalabrutinib:
   - ACALABRUTINIB
   Ibrutinib:
@@ -431,20 +428,76 @@ normalization_aliases:
   - BREXU-CEL
   - Brexu-cel
   - brexu-cel
-
-  # Drug class normalization
   IMiD:
   - IMiD (Immunomodulatory drug)
   Tyrosine kinase inhibitor:
   - tyrosine kinase inhibitor
   Non-covalent BTKi:
   - Non-covalent BTK inhibitor
-
-  # Treatment line normalization
   R/R:
   - R/R (Relapsed/Refractory)
   - 2L
   - 3L+
+  Mosunetuzumab:
+  - MOSUNETUZUMAB
+  Lenalidomide:
+  - LENALIDOMIDE
+  - lenalidomide
+  Venetoclax:
+  - VENETOCLAX
+  - venetoclax
+  Zanubrutinib:
+  - ZANUBRUTINIB
+  - zanubrutinib
+  Obinutuzumab:
+  - OBINUTUZUMAB
+  - obinutuzumab
+  Rituximab:
+  - RITUXIMAB
+  - rituximab
+  Dasatinib:
+  - DASATINIB
+  - dasatinib
+  Ponatinib:
+  - PONATINIB
+  - ponatinib
+  Imatinib:
+  - IMATINIB
+  - imatinib
+  Blinatumomab:
+  - BLINATUMOMAB
+  - blinatumomab
+  Inotuzumab ozogamicin:
+  - INOTUZUMAB OZOGAMICIN
+  - inotuzumab ozogamicin
+  Nelarabine:
+  - NELARABINE
+  - nelarabine
+  Tazemetostat:
+  - TAZEMETOSTAT
+  - tazemetostat
+  Copanlisib:
+  - COPANLISIB
+  - copanlisib
+  Idelalisib:
+  - IDELALISIB
+  - idelalisib
+  Duvelisib:
+  - DUVELISIB
+  - duvelisib
+  Selinexor:
+  - SELINEXOR
+  - selinexor
+  Loncastuximab tesirine:
+  - LONCASTUXIMAB TESIRINE
+  - loncastuximab tesirine
+  Bortezomib:
+  - BORTEZOMIB
+  - bortezomib
+  Newly diagnosed:
+  - Newly Diagnosed
+  - newly diagnosed
+  - NEWLY DIAGNOSED
 _metadata:
-  last_updated: '2026-02-07T08:08:24.174391'
-  total_aliases: 5
+  last_updated: '2026-02-07T16:00:00.000000'
+  total_aliases: 56

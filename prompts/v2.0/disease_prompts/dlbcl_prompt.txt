@@ -155,6 +155,48 @@ You must assign values for all 70 tag fields (disease_state is already determine
 - **CAPITALIZE drug names**
 - **TAG TREATMENTS FROM THE CORRECT ANSWER**
 
+### treatment_1-5: Critical Tagging Rules
+
+**Rule 1: Subject vs Comparator**
+Tag ONLY the drug that is the SUBJECT of the teaching point, not comparators.
+
+EXAMPLE:
+Q: "Which CAR-T product showed superior outcomes vs standard salvage in ZUMA-7?"
+A: "Axicabtagene ciloleucel"
+✓ treatment_1: Axicabtagene ciloleucel (subject of the question)
+✗ DO NOT TAG: "Standard salvage" (just the comparator arm)
+
+**Rule 2: Treatment as Clinical Context**
+Tag treatments when they provide CONTEXT for interpreting a clinical finding.
+
+EXAMPLE:
+Q: "Patient who received axi-cel develops fever and hypotension on day 5. What is the diagnosis?"
+✓ treatment_1: Axicabtagene ciloleucel
+WHY: The CAR-T context is essential for recognizing CRS.
+
+EXAMPLE (DLBCL q4833):
+Q: "Patient with R/R DLBCL after R-CHOP and R-ICE. Which therapy?"
+✓ prior_therapy_1: Prior CIT (R-CHOP)
+✓ prior_therapy_2: Prior chemotherapy (R-ICE as salvage)
+WHY: Prior therapy context determines next-line options.
+
+**Rule 3: Drug Class → Specific Approved Drugs**
+When the correct answer is a drug CLASS, you MUST tag all approved specific drugs.
+
+| Answer Class | Tag ALL of these |
+|--------------|------------------|
+| "CAR-T therapy" (DLBCL) | Axicabtagene ciloleucel, Lisocabtagene maraleucel, Tisagenlecleucel |
+| "Bispecific antibodies" | Glofitamab, Epcoritamab |
+| "ADC" | Polatuzumab vedotin, Loncastuximab tesirine |
+
+EXAMPLE (DLBCL q4908):
+Q: "Which therapy class is approved for R/R DLBCL?"
+A: "CAR T-cell therapy"
+✓ treatment_1: Axicabtagene ciloleucel
+✓ treatment_2: Lisocabtagene maraleucel
+✓ treatment_3: Tisagenlecleucel
+WHY: The class answer should include all approved products.
+
 ---
 
 ## CAR-T PRODUCT DISAMBIGUATION (CRITICAL FOR FUNDERS)
@@ -231,6 +273,23 @@ Bispecific antibodies are emerging as alternatives to CAR-T. **Tag the specific 
 - `"MYC overexpression"` - IHC finding
 - `"BCL2 overexpression"` - IHC finding
 - `"Double-expressor"` - MYC + BCL2 protein overexpression
+
+### ⚠️ Ki-67 Specificity (CRITICAL for DLBCL)
+
+**ALWAYS specify Ki-67 level when stated in the question:**
+- `"Ki67-high"` - Ki-67 ≥80% (indicates aggressive disease, often seen with MYC+ DLBCL)
+- `"Ki67-low"` - Ki-67 <80%
+- `"Ki-67"` - ONLY if no specific value given
+
+**Do NOT use just "Ki-67" when the question provides a percentage.**
+
+EXAMPLE:
+Q: "DLBCL with Ki-67 of 90% and MYC positivity. What is the concern?"
+✓ biomarker_1: Ki67-high
+✓ biomarker_2: MYC overexpression
+✗ biomarker_1: Ki-67 (too vague - the question specifies high Ki-67)
+
+Note: In DLBCL, very high Ki-67 (>80%) often correlates with MYC-driven biology.
 
 **Targets:**
 - `"CD19"` - Target for CAR-T, loncastuximab, tafasitamab
@@ -491,8 +550,36 @@ Type of evidence supporting the question/answer.
 - `stem_type`: `"Clinical vignette"`, `"Direct question"`, `"Incomplete statement"`
 - `lead_in_type`: `"Standard"`, `"Negative (EXCEPT/NOT)"`, `"Best answer"`, `"True statement"`
 - `answer_format`: `"Single best"`, `"Compound (A+B)"`, `"All of above"`, `"None of above"`
-- `answer_length_pattern`: `"Uniform"` (default), `"Variable"`, `"Correct longest"`, `"Correct shortest"`
-- `distractor_homogeneity`: `"Homogeneous"` (default), `"Heterogeneous"`
+- `answer_length_pattern`: `"Uniform"`, `"Variable"`, `"Correct longest"`, `"Correct shortest"`
+- `distractor_homogeneity`: `"Homogeneous"`, `"Heterogeneous"`
+
+### answer_length_pattern Criteria
+
+**"Uniform"** = All options are CONCEPTUALLY similar in complexity:
+- All single drug names: "Axi-cel" / "Liso-cel" / "Tisa-cel" → **Uniform** (even if character counts differ)
+- All short clinical phrases: "Proceed to CAR-T" / "Give Pola-BR" / "Start glofitamab" → **Uniform**
+
+**"Variable"** = Options differ in TYPE or COMPLEXITY:
+- Mix of single words and phrases: "R-CHOP" / "Consider adding polatuzumab vedotin to R-CHP backbone" → **Variable**
+- Mix of simple and detailed: "CAR-T" / "Bridge to transplant after achieving remission" → **Variable**
+- **DEFAULT if unsure** - 75% of user corrections change Uniform → Variable
+
+**"Correct longest/shortest"** = The CORRECT answer is noticeably longer/shorter than ALL distractors:
+- Correct answer is a detailed explanation while distractors are single words → **Correct longest**
+- Correct answer is a single drug while distractors are multi-drug regimens → **Correct shortest**
+
+### distractor_homogeneity Criteria
+
+**"Homogeneous"** = All distractors are the SAME TYPE of answer:
+- All CAR-T products: "Axi-cel" / "Liso-cel" / "Tisa-cel" / "Brexu-cel" → **Homogeneous**
+- All clinical approaches: "Proceed to CAR-T" / "Give bispecific" / "Salvage chemo" / "Transplant" → **Homogeneous**
+- All trial names: "ZUMA-7" / "TRANSFORM" / "POLARIX" / "JULIET" → **Homogeneous**
+
+**"Heterogeneous"** = Distractors are DIFFERENT TYPES of answers:
+- Treatment + Biomarker + Prognosis: "Axi-cel" / "Double-hit lymphoma" / "Poor prognosis" → **Heterogeneous**
+- Drug + Trial + COO: "Polatuzumab" / "POLARIX study" / "GCB subtype" → **Heterogeneous**
+- Mix of domains: "Start glofitamab" / "Check MYC status" / "Refer for transplant" → **Heterogeneous**
+
 - `flaw_absolute_terms`: true/false
 - `flaw_grammatical_cue`: true/false
 - `flaw_implausible_distractor`: true/false
@@ -697,6 +784,39 @@ Respond with ONLY a JSON object containing all 70 fields. Use `null` for fields 
     ...
 }
 ```
+
+### Example 5: Drug Class as Answer → Infer Specific Drugs (CAR-T)
+
+**Activity date:** January 2025
+
+**Question:** "Which therapeutic class has shown durable responses in patients with relapsed/refractory DLBCL after 2+ prior lines of therapy?"
+
+**Answer:** "CAR-T cell therapy"
+**Distractors:** "PI3K inhibitors", "Proteasome inhibitors", "mTOR inhibitors"
+
+```json
+{
+    "topic": "Treatment selection",
+    "disease_type_1": null,
+    "treatment_line": "R/R",
+    "treatment_1": "Axicabtagene ciloleucel",
+    "treatment_2": "Tisagenlecleucel",
+    "treatment_3": "Lisocabtagene maraleucel",
+    "drug_class_1": "CAR-T therapy",
+    "drug_target_1": "CD19",
+    "cme_outcome_level": "3 - Knowledge",
+    "stem_type": "Direct question",
+    ...
+}
+```
+**Rationale:**
+- Answer is "CAR-T cell therapy" (a drug CLASS), not a specific product
+- As of Jan 2025, THREE CD19 CAR-T products approved for R/R DLBCL: axi-cel (ZUMA-1), tisa-cel (JULIET), liso-cel (TRANSCEND)
+- Tag ALL THREE approved products in treatment_1-3
+- drug_class_1: "CAR-T therapy" captures the class being discussed
+- drug_target_1: "CD19" - all target CD19
+
+**KEY LEARNING:** When the correct answer is a drug class, infer ALL approved drugs in that class based on the activity date.
 
 ---
 

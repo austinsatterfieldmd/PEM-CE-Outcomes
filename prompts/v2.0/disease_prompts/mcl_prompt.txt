@@ -137,6 +137,40 @@ You must assign values for all 70 tag fields (disease_state is already determine
 - **CAPITALIZE drug names**
 - **TAG TREATMENTS FROM THE CORRECT ANSWER**
 
+### treatment_1-5: Critical Tagging Rules
+
+**Rule 1: Subject vs Comparator**
+Tag ONLY the drug that is the SUBJECT of the teaching point, not comparators.
+
+EXAMPLE:
+Q: "Which toxicity is more common with ibrutinib compared to acalabrutinib?"
+A: "Atrial fibrillation"
+✓ treatment_1: Ibrutinib (subject being compared)
+✗ DO NOT TAG: Acalabrutinib (just the comparator)
+
+**Rule 2: Treatment as Clinical Context**
+Tag treatments when they provide CONTEXT for interpreting a clinical finding.
+
+EXAMPLE:
+Q: "Patient on ibrutinib maintenance develops new atrial fibrillation. What is the next step?"
+✓ treatment_1: Ibrutinib
+WHY: The AE management depends on knowing the current treatment.
+
+**Rule 3: Drug Class → Specific Approved Drugs**
+When the correct answer is a drug CLASS, you MUST tag all approved specific drugs.
+
+| Answer Class | Tag ALL of these |
+|--------------|------------------|
+| "BTK inhibitor" (general) | Ibrutinib, Acalabrutinib, Zanubrutinib |
+| "CAR-T therapy" (MCL) | Brexucabtagene autoleucel |
+| "Non-covalent BTKi" | Pirtobrutinib |
+
+EXAMPLE:
+Q: "Which therapy class is standard after BTKi failure in MCL?"
+A: "CAR-T therapy"
+✓ treatment_1: Brexucabtagene autoleucel
+WHY: The class answer should include all approved products for MCL.
+
 ---
 
 ## BTK INHIBITOR (BTKi) CLASSIFICATION RULES (CRITICAL)
@@ -221,6 +255,26 @@ MCL has a specific CAR-T product approved:
 - `"TP53 mutation"` or `"del(17p)"` - Poor prognosis, aggressive disease
 - `"Ki-67"` - Proliferation index (high Ki-67 = worse prognosis)
 - `"Complex karyotype"` - Poor prognosis
+
+### ⚠️ Ki-67 Specificity (CRITICAL for MCL)
+
+**ALWAYS specify Ki-67 level when stated in the question:**
+- `"Ki67-high"` - Ki-67 ≥30% (indicates aggressive MCL, blastoid variant risk)
+- `"Ki67-low"` - Ki-67 <30%
+- `"Ki-67"` - ONLY if no specific value given
+
+**Do NOT use just "Ki-67" when the question provides a percentage.**
+
+EXAMPLE:
+Q: "Patient with MCL has Ki-67 of 45%. What does this indicate?"
+✓ biomarker_1: Ki67-high
+✗ biomarker_1: Ki-67 (too vague - the question specifies high Ki-67)
+
+EXAMPLE:
+Q: "MCL with blastoid morphology and Ki-67 >80%. What is the prognosis?"
+✓ biomarker_1: Ki67-high
+✓ biomarker_2: TP53 mutation (if mentioned)
+WHY: High Ki-67 in MCL correlates with aggressive disease.
 
 **Predictive:**
 - `"C481S mutation"` or `"BTK C481S"` - Resistance to covalent BTKi
@@ -486,8 +540,36 @@ Type of evidence supporting the question/answer.
 - `stem_type`: `"Clinical vignette"`, `"Direct question"`, `"Incomplete statement"`
 - `lead_in_type`: `"Standard"`, `"Negative (EXCEPT/NOT)"`, `"Best answer"`, `"True statement"`
 - `answer_format`: `"Single best"`, `"Compound (A+B)"`, `"All of above"`, `"None of above"`
-- `answer_length_pattern`: `"Uniform"` (default), `"Variable"`, `"Correct longest"`, `"Correct shortest"`
-- `distractor_homogeneity`: `"Homogeneous"` (default), `"Heterogeneous"`
+- `answer_length_pattern`: `"Uniform"`, `"Variable"`, `"Correct longest"`, `"Correct shortest"`
+- `distractor_homogeneity`: `"Homogeneous"`, `"Heterogeneous"`
+
+### answer_length_pattern Criteria
+
+**"Uniform"** = All options are CONCEPTUALLY similar in complexity:
+- All single drug names: "Ibrutinib" / "Acalabrutinib" / "Venetoclax" → **Uniform** (even if character counts differ)
+- All short clinical phrases: "Continue BTKi" / "Switch to CAR-T" / "Add venetoclax" → **Uniform**
+
+**"Variable"** = Options differ in TYPE or COMPLEXITY:
+- Mix of single words and phrases: "Ibrutinib" / "Continue current therapy and monitor for progression" → **Variable**
+- Mix of simple and detailed: "CAR-T" / "Add venetoclax after achieving partial response" → **Variable**
+- **DEFAULT if unsure** - 75% of user corrections change Uniform → Variable
+
+**"Correct longest/shortest"** = The CORRECT answer is noticeably longer/shorter than ALL distractors:
+- Correct answer is a detailed explanation while distractors are single words → **Correct longest**
+- Correct answer is a single drug while distractors are multi-drug regimens → **Correct shortest**
+
+### distractor_homogeneity Criteria
+
+**"Homogeneous"** = All distractors are the SAME TYPE of answer:
+- All drug names: "Ibrutinib" / "Acalabrutinib" / "Brexu-cel" / "Pirtobrutinib" → **Homogeneous**
+- All clinical actions: "Proceed to ASCT" / "Continue BTKi" / "Switch therapy" / "Observe" → **Homogeneous**
+- All trial names: "ZUMA-2" / "SHINE" / "SYMPATICO" / "BRUIN-MCL" → **Homogeneous**
+
+**"Heterogeneous"** = Distractors are DIFFERENT TYPES of answers:
+- Treatment + Prognosis + Testing: "Ibrutinib" / "Poor prognosis with TP53" / "Check Ki-67" → **Heterogeneous**
+- Drug + Trial + Biomarker: "Venetoclax" / "ZUMA-2 trial" / "C481S mutation" → **Heterogeneous**
+- Mix of domains: "Switch to pirtobrutinib" / "Check for C481S" / "Refer for ASCT" → **Heterogeneous**
+
 - `flaw_absolute_terms`: true/false
 - `flaw_grammatical_cue`: true/false
 - `flaw_implausible_distractor`: true/false
@@ -723,6 +805,41 @@ Respond with ONLY a JSON object containing all 70 fields. Use `null` for fields 
 - Young (48), ECOG 0 → ASCT-eligible, Fit
 - MIPI low → disease_type_1
 - First-line intensive approach for young, fit MCL
+
+### Example 6: Drug Class as Answer → Infer Specific Drug (Treatment Indication)
+
+**Activity date:** September 2024
+
+**Question:** "For which disease below is CAR T-cell therapy currently FDA approved after one line of therapy?"
+
+**Answer:** "MCL"
+**Distractors:** "FL", "DLBCL", "CLL"
+
+```json
+{
+    "topic": "Treatment indication",
+    "disease_stage": null,
+    "disease_type_1": null,
+    "treatment_line": "R/R",
+    "treatment_1": "Brexucabtagene autoleucel",
+    "treatment_2": null,
+    "trial_1": "ZUMA-2",
+    "drug_class_1": "CAR-T therapy",
+    "drug_target_1": "CD19",
+    "cme_outcome_level": "3 - Knowledge",
+    "stem_type": "Direct question",
+    "lead_in_type": "Standard",
+    ...
+}
+```
+**Rationale:**
+- Question asks which disease has CAR-T after 1 line → tests knowledge of CAR-T indications
+- MCL is correct because brexucabtagene autoleucel (brexu-cel) is approved for R/R MCL after 1+ prior therapy
+- Even though question doesn't name the drug, INFER brexucabtagene autoleucel as treatment_1
+- ZUMA-2 is the pivotal trial for brexu-cel in MCL
+- drug_class_1: "CAR-T therapy" captures the class being discussed
+
+**KEY LEARNING:** When a question tests drug INDICATION (which disease/setting) and the answer implies a specific drug is approved, tag that drug even if not explicitly named.
 
 ---
 

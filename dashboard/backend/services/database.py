@@ -244,6 +244,7 @@ class DatabaseService:
                 ("edited_by_user", "BOOLEAN DEFAULT FALSE"),
                 ("edited_at", "TIMESTAMP"),
                 ("edited_fields", "TEXT"),  # JSON array of edited field names
+                ("review_notes", "TEXT"),   # Reviewer comments for few-shot learning
 
                 # Tag agreement status (computed from 8 core tags' field_votes)
                 # Values: 'verified', 'unanimous', 'majority', 'conflict'
@@ -738,7 +739,7 @@ class DatabaseService:
             # Computed fields
             'answer_option_count', 'correct_answer_position',
             # Review metadata
-            'needs_review', 'review_flags', 'review_reason', 'flagged_at', 'agreement_level',
+            'needs_review', 'review_flags', 'review_reason', 'review_notes', 'flagged_at', 'agreement_level',
             'overall_confidence', 'llm_calls_made',
             # Tag status for filtering
             'tag_status', 'worst_case_agreement'
@@ -1342,7 +1343,8 @@ class DatabaseService:
 
             if needs_review is True:
                 # User-edited questions should never appear in review queue
-                where_clauses.append("t.needs_review = 1 AND (t.edited_by_user IS NULL OR t.edited_by_user = 0)")
+                # EXCEPT if they were explicitly flagged by a user (review_flags is set)
+                where_clauses.append("t.needs_review = 1 AND ((t.edited_by_user IS NULL OR t.edited_by_user = 0) OR (t.review_flags IS NOT NULL AND t.review_flags != '[]'))")
             elif needs_review is False:
                 where_clauses.append("(t.needs_review IS NULL OR t.needs_review = 0)")
 
@@ -1788,6 +1790,7 @@ class DatabaseService:
                     "needs_review": safe_get("needs_review", False),
                     "review_flags": json.loads(row["review_flags"]) if (safe_get("review_flags")) else None,
                     "review_reason": safe_get("review_reason"),
+                    "review_notes": safe_get("review_notes"),  # Reviewer comments for few-shot learning
                     "flagged_at": safe_get("flagged_at"),
                     "agreement_level": safe_get("agreement_level"),
                     "tag_status": safe_get("tag_status"),  # Computed from 8 core tags
@@ -2834,7 +2837,7 @@ class DatabaseService:
                 SELECT COUNT(*) FROM tags t
                 JOIN questions q ON t.question_id = q.id
                 WHERE t.needs_review = 1
-                AND (t.edited_by_user IS NULL OR t.edited_by_user = 0)
+                AND ((t.edited_by_user IS NULL OR t.edited_by_user = 0) OR (t.review_flags IS NOT NULL AND t.review_flags != '[]'))
                 AND (q.is_oncology IS NULL OR q.is_oncology = 1)
                 AND (q.canonical_source_id IS NULL OR q.canonical_source_id = CAST(q.source_id AS TEXT))
             """)
@@ -3380,7 +3383,8 @@ class DatabaseService:
 
             if needs_review is True:
                 # User-edited questions should never appear in review queue
-                where_clauses.append("t.needs_review = 1 AND (t.edited_by_user IS NULL OR t.edited_by_user = 0)")
+                # EXCEPT if they were explicitly flagged by a user (review_flags is set)
+                where_clauses.append("t.needs_review = 1 AND ((t.edited_by_user IS NULL OR t.edited_by_user = 0) OR (t.review_flags IS NOT NULL AND t.review_flags != '[]'))")
             elif needs_review is False:
                 where_clauses.append("(t.needs_review IS NULL OR t.needs_review = 0)")
 

@@ -66,6 +66,32 @@ cd "c:\Dev\CE-Outcomes-Dashboard\dashboard" && python -m uvicorn backend.main:ap
 
 Run with `run_in_background: true` to keep it running.
 
+### ⚠️ CRITICAL: Clear Port Before Restart
+
+**Before restarting the backend, ALWAYS verify port 8000 is clear:**
+
+```powershell
+# Check if port 8000 is in use
+netstat -ano | findstr ":8000" | findstr "LISTENING"
+
+# If a process is found, kill it (replace PID with actual number)
+powershell -Command "Stop-Process -Id <PID> -Force"
+
+# Verify port is clear (should return nothing)
+netstat -ano | findstr ":8000" | findstr "LISTENING"
+```
+
+**Why this matters:**
+- Old Python processes can persist after failed restarts
+- Multiple processes on same port causes "[WinError 10048]" binding errors
+- New server starts but old server may still be receiving requests
+- This can cause data inconsistency (writes go to wrong process)
+
+**Do NOT consider a backend restart complete until:**
+1. Port 8000 is confirmed clear (netstat shows nothing)
+2. New uvicorn process is started
+3. Health check returns expected data
+
 ### Verify Backend Health
 ```bash
 curl -s "http://127.0.0.1:8000/health"

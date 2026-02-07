@@ -154,6 +154,47 @@ Unlike solid tumors (TNM) or lymphomas (Ann Arbor), ALL is not staged. Disease c
 - **CAPITALIZE drug names**
 - **TAG TREATMENTS FROM THE CORRECT ANSWER**
 
+### treatment_1-5: Critical Tagging Rules
+
+**Rule 1: Subject vs Comparator**
+Tag ONLY the drug that is the SUBJECT of the teaching point, not comparators.
+
+EXAMPLE (Hypothetical ALL question):
+Q: "Which AE differentiates blinatumomab from inotuzumab and CAR-T?"
+A: "Cytokine release syndrome"
+✓ treatment_1: Blinatumomab (subject being differentiated)
+✗ DO NOT TAG: Inotuzumab, CAR-T (just comparators)
+
+**Rule 2: Treatment as Clinical Context**
+Tag treatments when they provide CONTEXT for interpreting a clinical finding.
+
+EXAMPLE:
+Q: "Patient on blinatumomab develops confusion and tremor. What is the most likely cause?"
+✓ treatment_1: Blinatumomab
+WHY: The neurologic toxicity interpretation depends on knowing the treatment regimen.
+
+EXAMPLE:
+Q: "Patient on dasatinib + chemotherapy for Ph+ ALL has persistent MRD. What is the next step?"
+✓ treatment_1: Dasatinib
+WHY: MRD interpretation depends on the current treatment regimen.
+
+**Rule 3: Drug Class → Specific Approved Drugs**
+When the correct answer is a drug CLASS, you MUST tag all approved specific drugs.
+
+| Answer Class | Tag ALL of these |
+|--------------|------------------|
+| "CAR-T therapy" (B-ALL) | Tisagenlecleucel, Brexucabtagene autoleucel |
+| "BiTE antibody" | Blinatumomab |
+| "TKI" (Ph+ ALL) | Dasatinib, Ponatinib, Imatinib |
+| "ADC" (B-ALL) | Inotuzumab ozogamicin |
+
+EXAMPLE:
+Q: "Which therapy class has shown benefit for R/R B-ALL?"
+A: "CAR-T therapy"
+✓ treatment_1: Tisagenlecleucel
+✓ treatment_2: Brexucabtagene autoleucel
+WHY: The class answer should include all approved products.
+
 ---
 
 ## ⚠️ ASPARAGINASE FORMULATION RULES (CRITICAL)
@@ -251,6 +292,25 @@ Asparaginase is a key therapy in ALL with multiple formulations from different m
 - Question about MRD as treatment decision point
 - Blinatumomab for MRD+ disease
 - MRD-guided therapy intensification
+
+### ⚠️ MRD Status Specificity (CRITICAL)
+
+**ALWAYS specify MRD status with direction when stated in the question:**
+- `"MRD positive"` - Detectable MRD, measurable residual disease
+- `"MRD negative"` - Undetectable MRD, no measurable residual disease
+- `"MRD"` - ONLY if direction is not stated (general MRD testing discussion)
+
+**Do NOT use just "MRD" when the question specifies positive or negative.**
+
+EXAMPLE:
+Q: "Patient achieves CR but has MRD positivity at 10^-4. What is the next step?"
+✓ biomarker_1: MRD positive
+✗ biomarker_1: MRD (too vague - the question specifies MRD positive)
+
+EXAMPLE:
+Q: "Patient achieves MRD negativity after blinatumomab. What does this predict?"
+✓ biomarker_1: MRD negative
+✗ biomarker_1: MRD (too vague)
 
 ### 8. trial_1 through trial_5 (up to 5 trials)
 **CONDITIONAL** — Tag when explicitly mentioned OR inferable for Clinical efficacy/Study design topics.
@@ -509,8 +569,36 @@ Type of evidence supporting the question/answer.
 - `stem_type`: `"Clinical vignette"`, `"Direct question"`, `"Incomplete statement"`
 - `lead_in_type`: `"Standard"`, `"Negative (EXCEPT/NOT)"`, `"Best answer"`, `"True statement"`
 - `answer_format`: `"Single best"`, `"Compound (A+B)"`, `"All of above"`, `"None of above"`
-- `answer_length_pattern`: `"Uniform"` (default), `"Variable"`, `"Correct longest"`, `"Correct shortest"`
-- `distractor_homogeneity`: `"Homogeneous"` (default), `"Heterogeneous"`
+- `answer_length_pattern`: `"Uniform"`, `"Variable"`, `"Correct longest"`, `"Correct shortest"`
+- `distractor_homogeneity`: `"Homogeneous"`, `"Heterogeneous"`
+
+### answer_length_pattern Criteria
+
+**"Uniform"** = All options are CONCEPTUALLY similar in complexity:
+- All single drug names: "Blinatumomab" / "Inotuzumab" / "CAR-T" → **Uniform** (even if character counts differ)
+- All short clinical phrases: "Continue therapy" / "Switch treatment" / "Monitor MRD" → **Uniform**
+
+**"Variable"** = Options differ in TYPE or COMPLEXITY:
+- Mix of single words and phrases: "Blinatumomab" / "Continue current chemotherapy and monitor" → **Variable**
+- Mix of simple and detailed: "TKI" / "Add blinatumomab after achieving remission" → **Variable**
+- **DEFAULT if unsure** - 75% of user corrections change Uniform → Variable
+
+**"Correct longest/shortest"** = The CORRECT answer is noticeably longer/shorter than ALL distractors:
+- Correct answer is a detailed explanation while distractors are single words → **Correct longest**
+- Correct answer is a single drug while distractors are multi-drug regimens → **Correct shortest**
+
+### distractor_homogeneity Criteria
+
+**"Homogeneous"** = All distractors are the SAME TYPE of answer:
+- All drug names: "Blinatumomab" / "Inotuzumab" / "CAR-T" / "Nelarabine" → **Homogeneous**
+- All clinical actions: "Hold therapy" / "Dose reduce" / "Discontinue" / "Continue" → **Homogeneous**
+- All trial names: "TOWER" / "ELIANA" / "ZUMA-3" / "INO-VATE" → **Homogeneous**
+
+**"Heterogeneous"** = Distractors are DIFFERENT TYPES of answers:
+- Treatment + Safety + Mechanism: "Blinatumomab" / "CRS occurs in 50%" / "CD19 targeting" → **Heterogeneous**
+- Drug + Trial + Endpoint: "Dasatinib" / "TOWER study" / "Overall survival" → **Heterogeneous**
+- Mix of domains: "Add TKI" / "Monitor for VOD" / "Transplant early" → **Heterogeneous**
+
 - `flaw_absolute_terms`: true/false
 - `flaw_grammatical_cue`: true/false
 - `flaw_implausible_distractor`: true/false
@@ -690,6 +778,38 @@ Respond with ONLY a JSON object containing all 70 fields. Use `null` for fields 
 - MRD-positive after CR → treatment_line: "MRD+"
 - Blinatumomab for MRD eradication is correct answer
 - MRD is the key biomarker driving treatment decision
+
+### Example 4: Drug Class as Answer → Infer Specific Drug (Immunotherapy in ALL)
+
+**Activity date:** March 2024
+
+**Question:** "Which targeted immunotherapy approach has changed the treatment paradigm for relapsed/refractory B-ALL?"
+
+**Answer:** "BiTE antibodies"
+**Distractors:** "CAR-T therapy", "Checkpoint inhibitors", "Monoclonal antibodies"
+
+```json
+{
+    "topic": "Treatment selection",
+    "disease_type_1": "B-ALL",
+    "treatment_line": "R/R",
+    "treatment_1": "Blinatumomab",
+    "treatment_2": null,
+    "drug_class_1": "Bispecific T-cell engager (BiTE)",
+    "drug_target_1": "CD19",
+    "cme_outcome_level": "3 - Knowledge",
+    "stem_type": "Direct question",
+    ...
+}
+```
+**Rationale:**
+- Answer is "BiTE antibodies" (a drug CLASS), not a specific drug
+- Blinatumomab is the only BiTE approved for ALL (CD19xCD3)
+- Tag blinatumomab in treatment_1
+- drug_class_1: "Bispecific T-cell engager (BiTE)"
+- Note: If answer was "CAR-T therapy", would tag tisagenlecleucel (only CAR-T for pediatric/young adult B-ALL)
+
+**KEY LEARNING:** When the correct answer is a drug class, infer the specific approved drug(s) in ALL. Unlike some diseases, ALL often has ONE drug per class.
 
 ---
 

@@ -154,6 +154,45 @@ While Rai and Binet staging systems exist, modern CLL treatment is driven by:
 - **CAPITALIZE drug names**
 - **TAG TREATMENTS FROM THE CORRECT ANSWER**
 
+### treatment_1-5: Critical Tagging Rules
+
+**Rule 1: Subject vs Comparator**
+Tag ONLY the drug that is the SUBJECT of the teaching point, not comparators.
+
+EXAMPLE (CLL q4922):
+Q: "Which AE differentiates acalabrutinib from ibrutinib and zanubrutinib?"
+A: "Hypertension"
+✓ treatment_1: Acalabrutinib (subject being differentiated)
+✗ DO NOT TAG: Ibrutinib, Zanubrutinib (just comparators)
+
+**Rule 2: Treatment as Clinical Context**
+Tag treatments when they provide CONTEXT for interpreting a clinical finding.
+
+EXAMPLE (CLL q4920):
+Q: "Patient on venetoclax + obinutuzumab has MRD positivity at end of treatment. What is the significance?"
+✓ treatment_1: Venetoclax
+✓ treatment_2: Obinutuzumab
+WHY: MRD interpretation depends on the treatment regimen.
+
+**Rule 3: Drug Class → Specific Approved Drugs**
+When the correct answer is a drug CLASS, you MUST tag all approved specific drugs.
+
+| Answer Class | Tag ALL of these |
+|--------------|------------------|
+| "BTK inhibitor" (general) | Ibrutinib, Acalabrutinib, Zanubrutinib |
+| "Covalent BTKi" | Ibrutinib, Acalabrutinib, Zanubrutinib |
+| "Non-covalent BTKi" | Pirtobrutinib |
+| "BCL-2 inhibitor" | Venetoclax |
+| "Anti-CD20" | Obinutuzumab, Rituximab |
+
+EXAMPLE:
+Q: "Which therapy class is preferred for del(17p) CLL?"
+A: "BTK inhibitor"
+✓ treatment_1: Ibrutinib
+✓ treatment_2: Acalabrutinib
+✓ treatment_3: Zanubrutinib
+WHY: The class answer should include all approved products.
+
 ---
 
 ## BTK INHIBITOR (BTKi) CLASSIFICATION RULES (CRITICAL)
@@ -244,6 +283,25 @@ Look for **C481S mutation** (also written as Cys481Ser or BTK C481S) in the ques
 - Explicitly mentioned in question or answer
 - "Acquired resistance to ibrutinib" with mechanism discussion
 - Question about switching from covalent to non-covalent BTKi
+
+### ⚠️ MRD Status Specificity (CRITICAL)
+
+**ALWAYS specify MRD status with direction when stated in the question:**
+- `"MRD positive"` - Detectable MRD (e.g., at end of fixed-duration venetoclax)
+- `"MRD negative"` - Undetectable MRD (goal of venetoclax-based therapy)
+- `"MRD"` - ONLY if direction is not stated (general MRD testing discussion)
+
+**Do NOT use just "MRD" when the question specifies positive or negative.**
+
+EXAMPLE:
+Q: "Patient on venetoclax + obinutuzumab achieves MRD negativity. What does this predict?"
+✓ biomarker_1: MRD negative
+✗ biomarker_1: MRD (too vague - the question specifies MRD negative)
+
+EXAMPLE:
+Q: "Patient completes CLL14 regimen but has MRD positivity at 10^-4. What is the next step?"
+✓ biomarker_1: MRD positive
+✗ biomarker_1: MRD (too vague)
 
 ### 8. trial_1 through trial_5 (up to 5 trials)
 **CONDITIONAL** — Tag when explicitly mentioned OR inferable for Clinical efficacy/Study design topics.
@@ -493,8 +551,36 @@ Type of evidence supporting the question/answer.
 - `stem_type`: `"Clinical vignette"`, `"Direct question"`, `"Incomplete statement"`
 - `lead_in_type`: `"Standard"`, `"Negative (EXCEPT/NOT)"`, `"Best answer"`, `"True statement"`
 - `answer_format`: `"Single best"`, `"Compound (A+B)"`, `"All of above"`, `"None of above"`
-- `answer_length_pattern`: `"Uniform"` (default), `"Variable"`, `"Correct longest"`, `"Correct shortest"`
-- `distractor_homogeneity`: `"Homogeneous"` (default), `"Heterogeneous"`
+- `answer_length_pattern`: `"Uniform"`, `"Variable"`, `"Correct longest"`, `"Correct shortest"`
+- `distractor_homogeneity`: `"Homogeneous"`, `"Heterogeneous"`
+
+### answer_length_pattern Criteria
+
+**"Uniform"** = All options are CONCEPTUALLY similar in complexity:
+- All single drug names: "Ibrutinib" / "Acalabrutinib" / "Venetoclax" → **Uniform** (even if character counts differ)
+- All short clinical phrases: "Continue therapy" / "Switch BTKi" / "Add venetoclax" → **Uniform**
+
+**"Variable"** = Options differ in TYPE or COMPLEXITY:
+- Mix of single words and phrases: "Ibrutinib" / "Continue current venetoclax and monitor response" → **Variable**
+- Mix of simple and detailed: "BTKi" / "Add venetoclax after achieving remission" → **Variable**
+- **DEFAULT if unsure** - 75% of user corrections change Uniform → Variable
+
+**"Correct longest/shortest"** = The CORRECT answer is noticeably longer/shorter than ALL distractors:
+- Correct answer is a detailed explanation while distractors are single words → **Correct longest**
+- Correct answer is a single drug while distractors are multi-drug regimens → **Correct shortest**
+
+### distractor_homogeneity Criteria
+
+**"Homogeneous"** = All distractors are the SAME TYPE of answer:
+- All drug names: "Ibrutinib" / "Acalabrutinib" / "Venetoclax" / "Zanubrutinib" → **Homogeneous**
+- All clinical actions: "Hold therapy" / "Dose reduce" / "Discontinue" / "Continue" → **Homogeneous**
+- All trial names: "RESONATE" / "ALPINE" / "CLL14" / "MURANO" → **Homogeneous**
+
+**"Heterogeneous"** = Distractors are DIFFERENT TYPES of answers:
+- Treatment + Safety + Mechanism: "Ibrutinib" / "Atrial fibrillation occurs in 10%" / "BTK inhibition" → **Heterogeneous**
+- Drug + Trial + Endpoint: "Venetoclax" / "CLL14 study" / "MRD negativity" → **Heterogeneous**
+- Mix of domains: "Switch to zanubrutinib" / "Check for C481S" / "Refer for transplant" → **Heterogeneous**
+
 - `flaw_absolute_terms`: true/false
 - `flaw_grammatical_cue`: true/false
 - `flaw_implausible_distractor`: true/false
@@ -703,6 +789,39 @@ Respond with ONLY a JSON object containing all 70 fields. Use `null` for fields 
     ...
 }
 ```
+
+### Example 5: Drug Class as Answer → Infer Specific Drugs (BTK inhibitors)
+
+**Activity date:** October 2024
+
+**Question:** "Which class of targeted therapies has demonstrated efficacy in treatment-naive CLL regardless of IGHV mutation status?"
+
+**Answer:** "BTK inhibitors"
+**Distractors:** "PI3K inhibitors", "mTOR inhibitors", "JAK inhibitors"
+
+```json
+{
+    "topic": "Treatment selection",
+    "disease_type_1": null,
+    "treatment_line": "Treatment-naive",
+    "treatment_1": "Ibrutinib",
+    "treatment_2": "Acalabrutinib",
+    "treatment_3": "Zanubrutinib",
+    "drug_class_1": "Covalent BTKi",
+    "drug_target_1": "BTK",
+    "cme_outcome_level": "3 - Knowledge",
+    "stem_type": "Direct question",
+    ...
+}
+```
+**Rationale:**
+- Answer is "BTK inhibitors" (a drug CLASS), not a specific drug
+- As of Oct 2024, THREE covalent BTKis approved for CLL: ibrutinib, acalabrutinib, zanubrutinib
+- Tag ALL THREE in treatment_1-3
+- drug_class_1: "Covalent BTKi" - all three are covalent inhibitors
+- Use "Treatment-naive" not "1L" for CLL treatment line
+
+**KEY LEARNING:** When the correct answer is a drug class, infer ALL approved drugs in that class based on the activity date. For BTKis, distinguish covalent vs non-covalent.
 
 ---
 

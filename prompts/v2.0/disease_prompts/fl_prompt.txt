@@ -101,20 +101,18 @@ You must assign values for all 70 tag fields (disease_state is already determine
 
 **Special subtypes:**
 - `"Transformed"` - Transformed to DLBCL (high-risk, treat as DLBCL)
-- `"POD24"` - Progression of disease within 24 months (high-risk)
 
 **When to tag:**
 - Always tag FLIPI when score or category mentioned
 - Tag grade when histology discussed
 - Tag Transformed when question addresses transformation
-- Tag POD24 when early progression is the focus
 
 **Common patterns:**
 - "Low-grade follicular lymphoma" → disease_type_1: "Low-grade"
 - "FL grade 3B" → disease_type_1: "Grade 3B" (treat as DLBCL)
 - "FLIPI high-risk FL" → disease_type_1: "FLIPI high"
 - "Transformed FL" → disease_type_1: "Transformed"
-- "FL with POD24" → disease_type_1: "POD24"
+- "FL with POD24" → biomarker_1: "POD24"
 
 **CRITICAL:** Grade 3B FL should be treated like DLBCL. If question focuses on Grade 3B, consider whether it should be tagged as FL or DLBCL.
 
@@ -148,6 +146,44 @@ You must assign values for all 70 tag fields (disease_state is already determine
 - **CAPITALIZE drug names**
 - **TAG TREATMENTS FROM THE CORRECT ANSWER**
 
+### treatment_1-5: Critical Tagging Rules
+
+**Rule 1: Subject vs Comparator**
+Tag ONLY the drug that is the SUBJECT of the teaching point, not comparators.
+
+EXAMPLE:
+Q: "Which toxicity differentiates obinutuzumab from rituximab?"
+A: "Infusion reactions"
+✓ treatment_1: Obinutuzumab (subject being differentiated)
+✗ DO NOT TAG: Rituximab (just the comparator)
+
+**Rule 2: Treatment as Clinical Context**
+Tag treatments when they provide CONTEXT for interpreting a clinical finding.
+
+EXAMPLE:
+Q: "Patient on R-CHOP develops new lymphadenopathy at 18 months. What does this indicate?"
+✓ treatment_1: R-CHOP (prior therapy context)
+✓ Tag POD24 if progression within 24 months of first-line therapy
+WHY: The timing relative to prior therapy is critical for interpretation.
+
+**Rule 3: Drug Class → Specific Approved Drugs**
+When the correct answer is a drug CLASS, you MUST tag all approved specific drugs.
+
+| Answer Class | Tag ALL of these |
+|--------------|------------------|
+| "Bispecific antibodies" (before Apr 2024) | Mosunetuzumab |
+| "Bispecific antibodies" (Apr 2024+) | Mosunetuzumab, Epcoritamab |
+| "CAR-T therapy" (FL) | Axicabtagene ciloleucel |
+| "PI3K inhibitor" | Idelalisib, Duvelisib, Copanlisib |
+| "Anti-CD20" | Rituximab, Obinutuzumab |
+
+EXAMPLE (FL q4883):
+Q: "Which therapy class has shown benefit for R/R FL?"
+A: "Bispecific antibodies"
+✓ treatment_1: Mosunetuzumab
+✓ treatment_2: Epcoritamab (if activity date ≥ April 2024)
+WHY: The class answer should include all approved products.
+
 ---
 
 ## KEY FL TREATMENTS
@@ -170,9 +206,13 @@ You must assign values for all 70 tag fields (disease_state is already determine
 **Note:** PI3K inhibitors have significant toxicities (colitis, pneumonitis, infections) and are used less frequently now.
 
 ### Bispecific Antibodies
-- `"Mosunetuzumab"` - CD20xCD3 bispecific (approved in R/R FL)
+- `"Mosunetuzumab"` - CD20xCD3 bispecific (FDA approved Dec 2022 for R/R FL after 2+ prior lines)
+- `"Epcoritamab"` - CD20xCD3 bispecific (FDA approved April 2024 for R/R FL after 2+ prior lines)
 
-**Future-proofing:** For any bispecific encountered, identify the specific product.
+**CRITICAL - Drug Class as Answer:** When the correct answer is a drug CLASS (e.g., "Bispecific antibodies") rather than a specific drug, INFER the individual drugs approved at the activity date:
+- Activity date before April 2024 → tag only Mosunetuzumab
+- Activity date April 2024 or later → tag both Mosunetuzumab and Epcoritamab
+- Always also tag `drug_class_1: "Bispecific antibody"`
 
 ### CAR-T Therapy
 - `"Axicabtagene ciloleucel"` (axi-cel) - ZUMA-5 trial in R/R FL
@@ -196,6 +236,27 @@ You must assign values for all 70 tag fields (disease_state is already determine
 **Prognostic/Diagnostic:**
 - `"BCL2 rearrangement"` or `"t(14;18)"` - Hallmark of FL
 - `"Ki-67"` - Proliferation marker (high Ki-67 may indicate higher grade)
+- `"POD24"` - Progression of disease within 24 months (clinical prognostic biomarker, poor prognosis)
+
+### ⚠️ Ki-67 Specificity (CRITICAL for FL)
+
+**ALWAYS specify Ki-67 level when stated in the question:**
+- `"Ki67-high"` - Ki-67 ≥30% (indicates aggressive histology, potential Grade 3 FL)
+- `"Ki67-low"` - Ki-67 <30%
+- `"Ki-67"` - ONLY if no specific value given
+
+**Do NOT use just "Ki-67" when the question provides a percentage.**
+
+EXAMPLE:
+Q: "FL patient has Ki-67 of 40% on biopsy. What does this suggest?"
+✓ biomarker_1: Ki67-high
+✗ biomarker_1: Ki-67 (too vague - the question specifies high Ki-67)
+
+EXAMPLE:
+Q: "FL with Ki-67 >50% and focal large cell areas. What is the concern?"
+✓ biomarker_1: Ki67-high
+✓ Consider: Transformation to DLBCL or Grade 3B FL
+WHY: High Ki-67 in FL suggests aggressive biology.
 
 **CRITICAL - EZH2 Mutation:**
 EZH2 mutation status is important for tazemetostat selection. Tag when:
@@ -266,7 +327,6 @@ EZH2 mutation status is important for tazemetostat selection. Tag when:
 
 **Valid values:**
 - `"Transformation"` - Histologic transformation to DLBCL (critical, changes management)
-- `"POD24"` - Progression within 24 months of frontline therapy (poor prognosis)
 - `"Bulky disease"` - Large tumor mass
 - `"High tumor burden"` - GELF/GELF-like criteria met
 - `"Low tumor burden"` - May be watch-and-wait candidate
@@ -333,7 +393,6 @@ If resistance is discussed.
 
 **FL examples:**
 - `"Rituximab-refractory"` - No response to or rapid relapse after rituximab
-- `"POD24"` - Early progression (also disease_specific_factor)
 - `"Transformation"` - Clonal evolution to DLBCL
 
 ---
@@ -438,8 +497,36 @@ Type of evidence supporting the question/answer.
 - `stem_type`: `"Clinical vignette"`, `"Direct question"`, `"Incomplete statement"`
 - `lead_in_type`: `"Standard"`, `"Negative (EXCEPT/NOT)"`, `"Best answer"`, `"True statement"`
 - `answer_format`: `"Single best"`, `"Compound (A+B)"`, `"All of above"`, `"None of above"`
-- `answer_length_pattern`: `"Uniform"` (default), `"Variable"`, `"Correct longest"`, `"Correct shortest"`
-- `distractor_homogeneity`: `"Homogeneous"` (default), `"Heterogeneous"`
+- `answer_length_pattern`: `"Uniform"`, `"Variable"`, `"Correct longest"`, `"Correct shortest"`
+- `distractor_homogeneity`: `"Homogeneous"`, `"Heterogeneous"`
+
+### answer_length_pattern Criteria
+
+**"Uniform"** = All options are CONCEPTUALLY similar in complexity:
+- All single drug names: "Rituximab" / "Obinutuzumab" / "Lenalidomide" → **Uniform** (even if character counts differ)
+- All short clinical phrases: "Watch and wait" / "Start BR" / "Give rituximab" → **Uniform**
+
+**"Variable"** = Options differ in TYPE or COMPLEXITY:
+- Mix of single words and phrases: "Rituximab" / "Start bendamustine-rituximab and monitor for transformation" → **Variable**
+- Mix of simple and detailed: "Tazemetostat" / "Check EZH2 status before selecting therapy" → **Variable**
+- **DEFAULT if unsure** - 75% of user corrections change Uniform → Variable
+
+**"Correct longest/shortest"** = The CORRECT answer is noticeably longer/shorter than ALL distractors:
+- Correct answer is a detailed explanation while distractors are single words → **Correct longest**
+- Correct answer is a single drug while distractors are multi-drug regimens → **Correct shortest**
+
+### distractor_homogeneity Criteria
+
+**"Homogeneous"** = All distractors are the SAME TYPE of answer:
+- All drug names: "Rituximab" / "Lenalidomide" / "Tazemetostat" / "Mosunetuzumab" → **Homogeneous**
+- All clinical approaches: "Watch and wait" / "Start chemo" / "Start immunotherapy" / "Radiation" → **Homogeneous**
+- All trial names: "GALLIUM" / "AUGMENT" / "ZUMA-5" → **Homogeneous**
+
+**"Heterogeneous"** = Distractors are DIFFERENT TYPES of answers:
+- Treatment + Biomarker + Prognosis: "Rituximab" / "Check EZH2 mutation" / "POD24 risk" → **Heterogeneous**
+- Drug + Trial + Grade: "Lenalidomide" / "AUGMENT study" / "Grade 3A transformation" → **Heterogeneous**
+- Mix of domains: "Start bispecific" / "Test for transformation" / "Refer for CAR-T" → **Heterogeneous**
+
 - `flaw_absolute_terms`: true/false
 - `flaw_grammatical_cue`: true/false
 - `flaw_implausible_distractor`: true/false
@@ -656,6 +743,49 @@ Respond with ONLY a JSON object containing all 70 fields. Use `null` for fields 
     ...
 }
 ```
+
+### Example 6: Drug Class as Answer → Infer Specific Drugs
+
+**Activity date:** December 2024
+
+**Question:** "A 45-year-old man with low grade FL, Ki-67 20%, stage 3A disease was treated with BR, and relapsed 20 months later with diffuse LAN. He is then treated with R-squared and relapses 6 months later, and meets GELF criteria to warrant therapy. PET shows SUVs up to 16, biopsy is low grade FL, Ki-67 is 50%. Which of the following is an NCCN preferred regimen for this patient?"
+
+**Answer:** "Bispecific antibodies"
+**Distractors:** "Tazemetostat", "Zanubrutinib + obinutuzumab"
+
+```json
+{
+    "topic": "Treatment selection",
+    "disease_stage": "Stage III",
+    "disease_type_1": "Low-grade",
+    "treatment_line": "R/R",
+    "treatment_1": "Mosunetuzumab",
+    "treatment_2": "Epcoritamab",
+    "treatment_3": null,
+    "biomarker_1": null,
+    "trial_1": null,
+    "drug_class_1": "Bispecific antibody",
+    "drug_target_1": "CD20",
+    "prior_therapy_1": "Prior BR",
+    "prior_therapy_2": "Prior R2",
+    "disease_specific_factor": "High tumor burden",
+    "guideline_source_1": "NCCN",
+    "cme_outcome_level": "4 - Competence",
+    "stem_type": "Clinical vignette",
+    "lead_in_type": "Standard",
+    ...
+}
+```
+**Rationale:**
+- Answer is "Bispecific antibodies" (a drug CLASS), not a specific drug
+- Activity date is Dec 2024 → BOTH mosunetuzumab (approved Dec 2022) AND epcoritamab (approved April 2024) were available
+- Tag BOTH specific drugs in treatment_1 and treatment_2
+- Also tag drug_class_1: "Bispecific antibody" for the class
+- Prior therapies: BR (first), R2/R-squared (second) → R/R after 2+ lines
+- GELF criteria met → High tumor burden
+- NCCN mentioned → guideline_source_1
+
+**KEY LEARNING:** When the correct answer is a drug class, infer the specific approved drugs based on the activity date. This ensures accurate treatment tagging for CME analysis.
 
 ---
 
