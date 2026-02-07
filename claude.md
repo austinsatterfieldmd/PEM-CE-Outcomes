@@ -70,6 +70,65 @@ Detailed session logs are saved in `docs/SESSION_LOG_YYYY-MM-DD.md` for audit tr
 
 ---
 
+## ⚠️ CRITICAL: Performance Score Calculations
+
+**The raw data columns are NOT percentages - they are counts!**
+
+### Column Definitions
+
+| Column | Meaning |
+|--------|---------|
+| `PRESCORECALC` | Number of **correct** responses on pre-test |
+| `PRESCOREN` | **Total** number of responses on pre-test |
+| `POSTSCORECALC` | Number of **correct** responses on post-test |
+| `POSTSCOREN` | **Total** number of responses on post-test |
+
+### How to Calculate Percentages
+
+```python
+# CORRECT formula
+pre_pct = (PRESCORECALC / PRESCOREN) * 100
+post_pct = (POSTSCORECALC / POSTSCOREN) * 100
+change = post_pct - pre_pct  # in percentage points (pp)
+
+# For aggregated data (multiple rows):
+pre_pct = (sum(PRESCORECALC) / sum(PRESCOREN)) * 100
+post_pct = (sum(POSTSCORECALC) / sum(POSTSCOREN)) * 100
+```
+
+### Common Mistakes to Avoid
+
+❌ **WRONG**: Treating `PRESCORECALC` as a percentage directly
+❌ **WRONG**: Using weighted average of percentages (pre_pct * n / sum(n))
+❌ **WRONG**: Dividing by count of rows instead of sum of N
+
+✅ **CORRECT**: Sum all correct responses, divide by sum of all responses
+
+### Example
+
+```
+Row 1: PRESCORECALC=7, PRESCOREN=10 (70% correct)
+Row 2: PRESCORECALC=3, PRESCOREN=10 (30% correct)
+
+WRONG: Average of 70% and 30% = 50%
+CORRECT: (7+3)/(10+10) = 10/20 = 50% ✓ (same here, but not always!)
+
+Row 1: PRESCORECALC=7, PRESCOREN=10 (70% correct)
+Row 2: PRESCORECALC=30, PRESCOREN=100 (30% correct)
+
+WRONG: Average of 70% and 30% = 50%
+CORRECT: (7+30)/(10+100) = 37/110 = 33.6% ✓ (weighted by sample size!)
+```
+
+### Data Source Files
+
+- **Raw Excel**: `data/raw/MyelomaDataTable_*.xlsx` - Contains per-row performance data
+- **SCORINGGROUP column**: Identifies audience (Overall, MedicalOncology, NP/PA, NursingOncology, etc.)
+- **TREATMENT_LINE column**: Newly diagnosed, R/R, Maintenance
+- **DRUG_CLASS_1/2/3 columns**: Drug class tags (may need to check all 3)
+
+---
+
 ## ⚠️ CRITICAL: Tagging Workflow Rules
 
 **NEVER re-tag questions that already have tags in the database.**
