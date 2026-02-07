@@ -27,6 +27,28 @@ Instead:
 
 When in doubt, ASK before editing.
 
+### ⚠️ CRITICAL: Commit After Every Change
+
+**After editing prompts, config files, or any file that affects tagging behavior:**
+
+1. **Git add and commit IMMEDIATELY** - Don't wait until the end
+2. **Verify with `git diff`** before moving to next task
+3. **Never mark a task "complete" without a commit**
+
+```bash
+# After EVERY prompt/config change
+git add <file>
+git commit -m "fix: <description>"
+git log --oneline -1  # Verify commit exists
+```
+
+**Why this matters:**
+- Session context can be lost at any time
+- Uncommitted changes are invisible to future sessions
+- A commit is the ONLY durable record of work done
+
+**See also:** [docs/runbooks/tagging-workflow.md](docs/runbooks/tagging-workflow.md)
+
 ---
 
 ## Service Management
