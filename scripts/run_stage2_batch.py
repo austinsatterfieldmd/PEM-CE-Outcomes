@@ -154,6 +154,7 @@ def load_questions_from_excel(
             'incorrect_answers': incorrect,
             'disease_state': str(row['STAGE1_disease_state']),
             'activities': str(row.get('ACTIVITY_NAMES', '')) if pd.notna(row.get('ACTIVITY_NAMES')) else '',
+            'startdate': str(row.get('START_DATES', row.get('STARTDATE', ''))) if pd.notna(row.get('START_DATES', row.get('STARTDATE'))) else '',
         })
 
     return questions
@@ -174,6 +175,7 @@ def aggregated_vote_to_dict(result: AggregatedVote, question: Dict) -> Dict[str,
         'incorrect_answers': question['incorrect_answers'],
         'disease_state': question['disease_state'],
         'activities': question['activities'],
+        'startdate': question.get('startdate', ''),
 
         # Aggregation results
         'final_tags': result.final_tags,
@@ -276,11 +278,19 @@ async def process_batch(
             try:
                 logger.info(f"Tagging question {question['id']} ({question['source_id'][:20]}...)")
 
+                # Build temporal context for LLM
+                kb_context = {}
+                if question.get('startdate'):
+                    kb_context['activity_start_date'] = question['startdate']
+                if question.get('activities'):
+                    kb_context['activity_names'] = question['activities']
+
                 result = await tagger.tag_question(
                     question_id=question['id'],
                     question_text=question['question_stem'],
                     correct_answer=question.get('correct_answer'),
-                    incorrect_answers=question.get('incorrect_answers')
+                    incorrect_answers=question.get('incorrect_answers'),
+                    kb_context=kb_context if kb_context else None
                 )
 
                 result_dict = aggregated_vote_to_dict(result, question)

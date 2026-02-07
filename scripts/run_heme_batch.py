@@ -342,11 +342,20 @@ async def process_batch(
 
             # Note: Stage 1 (disease classification) runs internally even though we already have it
             # This is by design - Stage 1 is cheap (~$0.01) and validates our classification
+
+            # Build temporal context for LLM
+            kb_context = {}
+            if question.get('startdate'):
+                kb_context['activity_start_date'] = question['startdate']
+            if question.get('activities'):
+                kb_context['activity_names'] = question['activities']
+
             result = await tagger.tag_question(
                 question_id=question['id'],
                 question_text=question['question_stem'],
                 correct_answer=question.get('correct_answer'),
-                incorrect_answers=question.get('incorrect_answers')
+                incorrect_answers=question.get('incorrect_answers'),
+                kb_context=kb_context if kb_context else None
             )
 
             result_dict = aggregated_vote_to_dict(result, question)
