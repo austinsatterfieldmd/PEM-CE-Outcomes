@@ -271,6 +271,25 @@ When the correct answer is a drug CLASS, you MUST tag all approved specific drug
 - MRD-guided transplant decisions
 - MRD status after induction/consolidation
 
+### MRD Status Specificity (CRITICAL)
+
+**ALWAYS specify MRD status with direction when stated in the question:**
+- `"MRD positive"` - Detectable MRD, measurable residual disease
+- `"MRD negative"` - Undetectable MRD, no measurable residual disease
+- `"MRD"` - ONLY if direction is not stated (general MRD testing discussion)
+
+**Do NOT use just "MRD" when the question specifies positive or negative.**
+
+EXAMPLE:
+Q: "Patient achieves CR but has MRD positivity at 10^-3. What is the next step?"
+- biomarker_1: MRD positive
+- DO NOT use: biomarker_1: MRD (too vague)
+
+EXAMPLE:
+Q: "Patient achieves MRD negativity after consolidation. What does this predict?"
+- biomarker_1: MRD negative
+- DO NOT use: biomarker_1: MRD (too vague)
+
 ### 8. trial_1 through trial_5 (up to 5 trials)
 **CONDITIONAL** - Tag when explicitly mentioned OR inferable for Clinical efficacy/Study design topics.
 
