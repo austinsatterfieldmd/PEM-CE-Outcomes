@@ -17,6 +17,7 @@ export interface LocalEdit {
   previousValues?: Record<string, string | null>  // field -> old value (for review)
   markAsReviewed?: boolean
   questionStem?: string  // if question stem was edited
+  reviewNotes?: string  // reviewer comments for few-shot learning
 }
 
 export interface PendingEdits {

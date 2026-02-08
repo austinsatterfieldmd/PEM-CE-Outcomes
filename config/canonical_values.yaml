@@ -599,6 +599,17 @@ verified_values:
   - Jaundice
   - Weight gain
   - Lytic lesions
+  - Lymphadenopathy
+  - Splenomegaly
+  - Dyspnea
+  - B symptoms
+  - Cognitive changes
+  - Somnolence
+  - Fever
+  - Fatigue
+  - Bleeding
+  - Pancytopenias
+  - Bruising
   treatment:
   - Idecabtagene vicleucel
   - Ciltacabtagene autoleucel
@@ -618,15 +629,57 @@ verified_values:
   - ASCT
   - Acalabrutinib
   - Ibrutinib
+  - Brexucabtagene autoleucel
+  - Pirtobrutinib
   - Mosunetuzumab
+  - Epcoritamab
+  - Obinutuzumab
   - Axicabtagene ciloleucel
+  - Rituximab
+  - R-CHOP
   - Tisagenlecleucel
-  - Umbralisib
+  - Zandelisib
+  - Lisocabtagene maraleucel
+  - Glofitamab
+  - Glucarpidase
   - Tafasitamab
+  - Polatuzumab vedotin
+  - Venetoclax
+  - Blinatumomab
+  - Dasatinib
+  - Ponatinib
+  - Asparaginase Erwinia chrysanthemi
+  - Pegaspargase
+  - Obecabtagene autoleucel
+  - Umbralisib
   biomarker:
   - del(17p)
   - MRD
   - t(14;18)
+  - Ki67-high
+  - TP53 mutation
+  - t(11;14)
+  - Ki-67
+  - Ki67-low
+  - POD24
+  - BCL6 rearrangement
+  - LDH
+  - CAR-HEMATOTOX
+  - CD20
+  - MYC rearrangement
+  - del(11q)
+  - IGHV unmutated
+  - Trisomy 12
+  - IGHV mutated
+  - TP53 wildtype
+  - MRD negative
+  - BCR-ABL
+  - t(9;22)
+  - MRD positive
+  - Diploid
+  - CRLF2 rearrangement
+  - JAK2 mutation
+  - TCF3::PBX1 fusion
   drug_class:
   - CAR-T therapy
   - Bispecific antibody
@@ -634,35 +687,109 @@ verified_values:
   - Proteasome inhibitor
   - IMiD
   - Covalent BTKi
+  - Non-covalent BTKi
   - PI3K inhibitor
+  - IMiD (Immunomodulatory drug)
+  - Antibody-drug conjugate (ADC)
+  - BCL-2 inhibitor
+  - tyrosine kinase inhibitor
+  - Asparaginase
   disease_type:
   - High-risk
-  - B-ALL
-  - Grade 3B
+  - Blastoid
+  - MIPI high
+  - POD24
   - Low-grade
+  - Grade 3A
+  - Grade 3B
+  - FLIPI intermediate
+  - Non-GCB
+  - GCB
+  - Double-hit
+  - IPI high-intermediate
+  - IPI high
+  - ABC
+  - B-ALL
+  - Ph-
+  - Ph+
+  - Ph-like
+  - Pleomorphic
   prior_therapy:
   - Prior anti-CD38
   - Prior PI
   - Prior IMiD
   - Prior stem cell transplant
   - Prior CIT
+  - Prior BTK inhibitor
+  - Prior BR
+  - Prior covalent BTKi
+  - Prior R2
+  - Prior rituximab
+  - Prior lenalidomide
+  - Prior obinutuzumab
+  - Prior R-CHOP
+  - Prior CAR-T
+  - Prior Pola-R-CHP
+  - Prior RT
+  - Prior chemoimmunotherapy
+  - Prior venetoclax
+  - Prior anti-CD20
+  - Prior asparaginase
+  - Prior bispecific
+  - Prior chemotherapy
+  - Pegaspargase
+  - Prior ADC
   toxicity_type:
   - Infections
   - VTE
   - VOD/SOS
   - Atrial fibrillation
   - Cytopenias
+  - ICANS
+  - Constipation
+  - Deep vein thrombosis
+  - Neutropenia
+  - Rash
+  - Fever
+  - CRS
+  - Acute kidney injury (AKI)
+  - Prolonged cytopenias
+  - Hypertension
+  - Silent inactivation
+  - Hypersensitivity
   trial:
   - IsKia
   - UNITY-NHL
+  - ZUMA-2
+  - TRIANGLE
+  - BRUIN-MCL
+  - ZUMA-5
+  - ELARA
+  - ZUMA-7
+  - BRUIN
+  - CLL14
+  - E1910
+  - FELIX
   efficacy_endpoint:
   - MRD negativity rate
   - Overall response rate (ORR)
   - Stable disease
+  - Complete response rate (CR)
+  - Overall survival (OS)
+  - Progression-free survival (PFS)
+  - Duration of remission (DoR)
+  - MRD-negative CR
   toxicity_organ:
   - Hepatic
   - Cardiac
+  - Neurologic
+  - Renal
   - Hematologic
+  metastatic_site:
+  - Mediastinum
+  - Bone
+  - Liver
+  - GI tract
 normalization_rules:
   treatment:
     daratumumab: Daratumumab

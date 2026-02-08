@@ -1430,4 +1430,40 @@ A: "Progression-free survival"
 ```
 Note: "Squamous NSCLC" explicitly stated → disease_type is "Squamous"; both fundable drugs tagged; ivonescimab is a PD-1/VEGF bispecific; PFS captured as endpoint
 
+**Example 12: Drug Class as Answer → Infer Specific Drugs (EGFR TKIs)**
+
+**Activity date:** October 2024
+
+Q: "Which class of targeted therapies is first-line for EGFR-mutated metastatic NSCLC?"
+A: "EGFR tyrosine kinase inhibitors"
+Distractors: "ALK inhibitors", "KRAS G12C inhibitors", "MET inhibitors"
+
+```json
+{
+    "topic": "Treatment selection",
+    "disease_stage": "Metastatic",
+    "disease_type": "EGFR-mutated",
+    "treatment_line": "1L",
+    "treatment_1": "osimertinib",
+    "treatment_2": "erlotinib",
+    "treatment_3": "gefitinib",
+    "treatment_4": "afatinib",
+    "treatment_5": "dacomitinib",
+    "biomarker_1": "EGFR",
+    "drug_class_1": "EGFR TKI",
+    "drug_target_1": "EGFR",
+    "cme_outcome_level": "3 - Knowledge",
+    "stem_type": "Direct question",
+    ...
+}
+```
+**Rationale:**
+- Answer is "EGFR tyrosine kinase inhibitors" (a drug CLASS), not a specific drug
+- As of Oct 2024, FIVE EGFR TKIs approved for first-line EGFR-mutated NSCLC
+- However, osimertinib is the preferred first-line per NCCN guidelines
+- When tagging, consider: if question implies "preferred" → tag osimertinib first; if "all approved" → tag all
+- drug_class_1: "EGFR TKI" captures the class
+
+**KEY LEARNING:** When the correct answer is a drug class, infer approved drugs in that class. Consider context: "preferred" vs "approved" may affect which drugs to tag.
+
 Now analyze the following NSCLC question:

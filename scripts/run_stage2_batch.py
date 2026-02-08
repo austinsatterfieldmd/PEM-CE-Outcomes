@@ -154,7 +154,8 @@ def load_questions_from_excel(
             'incorrect_answers': incorrect,
             'disease_state': str(row['STAGE1_disease_state']),
             'activities': str(row.get('ACTIVITY_NAMES', '')) if pd.notna(row.get('ACTIVITY_NAMES')) else '',
-            'startdate': str(row.get('START_DATES', row.get('STARTDATE', ''))) if pd.notna(row.get('START_DATES', row.get('STARTDATE'))) else '',
+            # Activity dates (parallel to activity names, semicolon-separated)
+            'activity_dates': str(row.get('START_DATES', row.get('STARTDATE', ''))) if pd.notna(row.get('START_DATES', row.get('STARTDATE'))) else '',
         })
 
     return questions
@@ -175,7 +176,7 @@ def aggregated_vote_to_dict(result: AggregatedVote, question: Dict) -> Dict[str,
         'incorrect_answers': question['incorrect_answers'],
         'disease_state': question['disease_state'],
         'activities': question['activities'],
-        'startdate': question.get('startdate', ''),
+        'activity_dates': question.get('activity_dates', ''),  # Parallel dates for each activity
 
         # Aggregation results
         'final_tags': result.final_tags,

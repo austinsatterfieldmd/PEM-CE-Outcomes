@@ -270,6 +270,8 @@ export function QuestionDetail({ questionId, onClose, onTagsUpdated }: QuestionD
   })
   // Track which field groups are expanded (core is expanded by default for both view and edit modes)
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set(['core', 'edit-core']))
+  // Reviewer notes for few-shot learning
+  const [reviewNotes, setReviewNotes] = useState('')
 
   useEffect(() => {
     setLoading(true)
@@ -279,6 +281,8 @@ export function QuestionDetail({ questionId, onClose, onTagsUpdated }: QuestionD
         // Initialize editable tags and question stem from data
         setEditedTags(initEditableTagsFromData(result.tags))
         setEditedQuestionStem(result.question_stem)
+        // Initialize review notes
+        setReviewNotes(result.tags?.review_notes || '')
       })
       .catch(console.error)
       .finally(() => setLoading(false))
@@ -470,8 +474,9 @@ export function QuestionDetail({ questionId, onClose, onTagsUpdated }: QuestionD
         answer_format: editedTags.answer_format || null,
         answer_length_pattern: editedTags.answer_length_pattern || null,
         distractor_homogeneity: editedTags.distractor_homogeneity || null,
-        // Review flag
-        mark_as_reviewed: markAsReviewed
+        // Review flag and notes
+        mark_as_reviewed: markAsReviewed,
+        review_notes: reviewNotes || null
       }
 
       // Include question stem if it was edited (admin only)
@@ -1652,6 +1657,25 @@ export function QuestionDetail({ questionId, onClose, onTagsUpdated }: QuestionD
                           </div>
                         )}
                       </div>
+
+                      {/* Review Notes - for few-shot learning */}
+                      <div className="bg-amber-50 rounded-xl overflow-hidden border border-amber-200">
+                        <div className="px-4 py-3">
+                          <label className="block text-sm font-semibold text-amber-800 mb-2">
+                            Review Notes (for few-shot learning)
+                          </label>
+                          <textarea
+                            value={reviewNotes}
+                            onChange={(e) => setReviewNotes(e.target.value)}
+                            placeholder="Add notes about tag corrections, reasoning, or patterns to help improve future LLM tagging..."
+                            rows={3}
+                            className="w-full px-3 py-2 text-sm border border-amber-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-white placeholder-amber-400"
+                          />
+                          <p className="text-xs text-amber-600 mt-1">
+                            These notes will be saved with the question and can be used when creating few-shot examples.
+                          </p>
+                        </div>
+                      </div>
                     </>
                   ) : (
                     // Read-Only Mode - Collapsible field groups
@@ -1880,6 +1904,14 @@ export function QuestionDetail({ questionId, onClose, onTagsUpdated }: QuestionD
                         {data.tags.answer_option_count && <TagBadge label="Answer Options" value={String(data.tags.answer_option_count)} tagField="computed" fieldKey="answer_option_count" color="bg-gray-100 text-gray-800" />}
                         {data.tags.correct_answer_position && <TagBadge label="Correct Answer Position" value={data.tags.correct_answer_position} tagField="computed" fieldKey="correct_answer_position" color="bg-gray-100 text-gray-800" />}
                       </FieldGroupSection>
+
+                      {/* Review Notes (if present) */}
+                      {data.tags.review_notes && (
+                        <div className="bg-amber-50 rounded-xl p-4 border border-amber-200">
+                          <h4 className="text-sm font-semibold text-amber-800 mb-2">Review Notes</h4>
+                          <p className="text-sm text-amber-700 whitespace-pre-wrap">{data.tags.review_notes}</p>
+                        </div>
+                      )}
 
                       {/* Show message if no tags */}
                       {!data.tags.disease_state && !data.tags.topic && !data.tags.treatment_1 && (

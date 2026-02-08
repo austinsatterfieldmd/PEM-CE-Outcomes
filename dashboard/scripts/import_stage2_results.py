@@ -383,6 +383,12 @@ def import_stage2_upsert(db: DatabaseService, results: list, force_overwrite: bo
                 tag_update = build_tag_update(result)
                 db.update_tags(existing['id'], tag_update)
 
+                # Calculate QCore score for the updated question
+                try:
+                    db.calculate_qcore_for_question(existing['id'])
+                except Exception as e:
+                    logger.warning(f"QCore scoring failed for QGD={source_id_str}: {e}")
+
                 stats['updated'] += 1
             else:
                 # Insert new question
@@ -407,12 +413,33 @@ def import_stage2_upsert(db: DatabaseService, results: list, force_overwrite: bo
                 tag_update = build_tag_update(result)
                 db.update_tags(db_question_id, tag_update)
 
-                # Insert activities if present
+                # Calculate QCore score for the new question
+                try:
+                    db.calculate_qcore_for_question(db_question_id)
+                except Exception as e:
+                    logger.warning(f"QCore scoring failed for new question (QGD={source_id}): {e}")
+
+                # Insert activities if present (with dates when available)
                 activities = result.get('activities', '')
+                activity_dates = result.get('activity_dates', '')
                 if activities:
-                    for activity_name in activities.split('; '):
-                        if activity_name.strip():
-                            db.insert_activity(db_question_id, activity_name.strip())
+                    activity_list = [a.strip() for a in activities.split('; ') if a.strip()]
+                    date_list = [d.strip() for d in activity_dates.split('; ')] if activity_dates else []
+
+                    for i, activity_name in enumerate(activity_list):
+                        # Get corresponding date if available (parallel lists)
+                        activity_date = None
+                        if i < len(date_list) and date_list[i]:
+                            try:
+                                from datetime import datetime
+                                activity_date = datetime.strptime(date_list[i], '%Y-%m-%d').date()
+                            except (ValueError, TypeError):
+                                pass  # Skip invalid dates
+
+                        if activity_date:
+                            db.insert_activity_with_date(db_question_id, activity_name, activity_date)
+                        else:
+                            db.insert_activity(db_question_id, activity_name)
 
                 stats['inserted'] += 1
 
@@ -474,6 +501,12 @@ def import_stage2_clear(db: DatabaseService, results: list) -> dict:
 
             tag_update = build_tag_update(result)
             db.update_tags(db_question_id, tag_update)
+
+            # Calculate QCore score for the new question
+            try:
+                db.calculate_qcore_for_question(db_question_id)
+            except Exception as e:
+                logger.warning(f"QCore scoring failed for question (QGD={source_id}): {e}")
 
             activities = result.get('activities', '')
             if activities:

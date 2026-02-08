@@ -545,4 +545,37 @@ A: "Patients with HER2-low (IHC 1+ or IHC 2+/ISH-) metastatic breast cancer with
 ```
 Note: Trial inferred for Study design topic
 
+**Example 9: Drug Class as Answer → Infer Specific Drugs (CDK4/6 inhibitors)**
+
+**Activity date:** November 2024
+
+Q: "Which class of targeted therapies has become standard of care for HR+/HER2- metastatic breast cancer in combination with endocrine therapy?"
+A: "CDK4/6 inhibitors"
+Distractors: "mTOR inhibitors", "PI3K inhibitors", "AKT inhibitors"
+
+```json
+{
+    "topic": "Treatment selection",
+    "disease_stage": "Metastatic",
+    "disease_type": "HR+/HER2-",
+    "treatment_line": "1L",
+    "treatment_1": "palbociclib",
+    "treatment_2": "ribociclib",
+    "treatment_3": "abemaciclib",
+    "drug_class_1": "CDK4/6 inhibitor",
+    "drug_target_1": "CDK4/6",
+    "cme_outcome_level": "3 - Knowledge",
+    "stem_type": "Direct question",
+    ...
+}
+```
+**Rationale:**
+- Answer is "CDK4/6 inhibitors" (a drug CLASS), not a specific drug
+- As of Nov 2024, THREE CDK4/6 inhibitors approved for HR+/HER2- mBC: palbociclib, ribociclib, abemaciclib
+- Tag ALL THREE in treatment_1-3
+- drug_class_1: "CDK4/6 inhibitor" captures the class
+- Note: If question specified "with ribociclib showing OS benefit in premenopausal women" → could infer MONALEESA trials
+
+**KEY LEARNING:** When the correct answer is a drug class, infer ALL approved drugs in that class based on the activity date.
+
 Now analyze the following breast cancer question:

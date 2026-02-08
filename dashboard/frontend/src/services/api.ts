@@ -168,6 +168,7 @@ async function loadStaticPerformance(): Promise<Record<number, any[]>> {
 
 /**
  * Filter and paginate static questions (client-side search)
+ * Supports full SearchFilters for filtering in Vercel static mode
  */
 function searchStaticQuestions(
   questions: any[],
@@ -177,10 +178,25 @@ function searchStaticQuestions(
     page_size?: number
     sort_by?: string
     sort_desc?: boolean
+    // Core filters
     disease_states?: string[]
     topics?: string[]
     source_files?: string[]
     needs_review?: boolean
+    // Extended filters for static mode
+    treatments?: string[]
+    biomarkers?: string[]
+    treatment_lines?: string[]
+    disease_types?: string[]
+    disease_stages?: string[]
+    trials?: string[]
+    // Tag status filters
+    tag_status_filter?: string
+    worst_case_agreement?: string
+    // Performance/data filters
+    has_performance_data?: boolean
+    min_sample_size?: number
+    exclude_numeric?: boolean
   }
 ): { questions: any[]; total: number; total_pages: number } {
   const { query, page = 1, page_size = 20, sort_by = 'id', sort_desc = false } = params
@@ -210,6 +226,73 @@ function searchStaticQuestions(
 
   if (params.needs_review !== undefined) {
     filtered = filtered.filter(q => q.needs_review === (params.needs_review ? 1 : 0))
+  }
+
+  // Extended filters - check multi-value fields (treatment_1-5, biomarker_1-5, etc.)
+  if (params.treatments?.length) {
+    filtered = filtered.filter(q => {
+      const qTreatments = [q.treatment_1, q.treatment_2, q.treatment_3, q.treatment_4, q.treatment_5].filter(Boolean)
+      return params.treatments!.some(t => qTreatments.includes(t))
+    })
+  }
+
+  if (params.biomarkers?.length) {
+    filtered = filtered.filter(q => {
+      const qBiomarkers = [q.biomarker_1, q.biomarker_2, q.biomarker_3, q.biomarker_4, q.biomarker_5].filter(Boolean)
+      return params.biomarkers!.some(b => qBiomarkers.includes(b))
+    })
+  }
+
+  if (params.treatment_lines?.length) {
+    filtered = filtered.filter(q => params.treatment_lines?.includes(q.treatment_line))
+  }
+
+  if (params.disease_types?.length) {
+    filtered = filtered.filter(q => {
+      const qTypes = [q.disease_type_1, q.disease_type_2].filter(Boolean)
+      return params.disease_types!.some(t => qTypes.includes(t))
+    })
+  }
+
+  if (params.disease_stages?.length) {
+    filtered = filtered.filter(q => params.disease_stages?.includes(q.disease_stage))
+  }
+
+  if (params.trials?.length) {
+    filtered = filtered.filter(q => {
+      const qTrials = [q.trial_1, q.trial_2, q.trial_3, q.trial_4, q.trial_5].filter(Boolean)
+      return params.trials!.some(t => qTrials.includes(t))
+    })
+  }
+
+  // Tag status filters
+  if (params.tag_status_filter) {
+    if (params.tag_status_filter === 'verified_only') {
+      filtered = filtered.filter(q => q.tag_status === 'verified')
+    } else if (params.tag_status_filter === 'verified_or_unanimous') {
+      filtered = filtered.filter(q => ['verified', 'unanimous'].includes(q.tag_status))
+    } else if (params.tag_status_filter === 'verified_unanimous_majority') {
+      filtered = filtered.filter(q => ['verified', 'unanimous', 'majority'].includes(q.tag_status))
+    }
+  }
+
+  if (params.worst_case_agreement) {
+    filtered = filtered.filter(q => q.worst_case_agreement === params.worst_case_agreement)
+  }
+
+  // Performance/data filters
+  if (params.has_performance_data) {
+    // Only questions with both pre AND post test scores
+    filtered = filtered.filter(q => q.pre_score != null && q.post_score != null)
+  }
+
+  if (params.min_sample_size && params.min_sample_size > 0) {
+    filtered = filtered.filter(q => (q.sample_size ?? 0) >= params.min_sample_size!)
+  }
+
+  if (params.exclude_numeric) {
+    // Hide questions with data_response_type = 'Numeric'
+    filtered = filtered.filter(q => q.data_response_type !== 'Numeric')
   }
 
   // Sort
@@ -323,10 +406,24 @@ export async function searchQuestions(params: SearchFilters & {
     page_size,
     sort_by,
     sort_desc,
+    // Core filters
     disease_states: filters.disease_states,
     topics: filters.topics,
     source_files: filters.source_files,
-    needs_review: filters.needs_review
+    needs_review: filters.needs_review,
+    // Extended filters for full static mode support
+    treatments: filters.treatments,
+    biomarkers: filters.biomarkers,
+    treatment_lines: filters.treatment_lines,
+    disease_types: filters.disease_types,
+    disease_stages: filters.disease_stages,
+    trials: filters.trials,
+    tag_status_filter: filters.tag_status_filter,
+    worst_case_agreement: filters.worst_case_agreement,
+    // Performance/data filters
+    has_performance_data: filters.has_performance_data,
+    min_sample_size: filters.min_sample_size,
+    exclude_numeric: filters.exclude_numeric
   })
 
   return {
@@ -610,6 +707,7 @@ export type TagUpdatePayload = {
   // Admin fields
   question_stem?: string | null
   mark_as_reviewed?: boolean
+  review_notes?: string | null  // Reviewer comments for few-shot learning
   // User-defined values to persist (custom values not in static dropdown lists)
   custom_values?: Array<{ field_name: string; value: string }>
 }
@@ -628,7 +726,7 @@ export async function updateQuestionTags(
 
     // Extract the changes (non-meta fields)
     const changes: Record<string, string | null> = {}
-    const metaFields = ['mark_as_reviewed', 'custom_values', 'question_stem']
+    const metaFields = ['mark_as_reviewed', 'custom_values', 'question_stem', 'review_notes']
 
     for (const [key, value] of Object.entries(tags)) {
       if (!metaFields.includes(key)) {
@@ -650,7 +748,8 @@ export async function updateQuestionTags(
       changes,
       previousValues,
       markAsReviewed: tags.mark_as_reviewed,
-      questionStem: tags.question_stem || undefined
+      questionStem: tags.question_stem || undefined,
+      reviewNotes: tags.review_notes || undefined
     })
 
     return { savedLocally: true }

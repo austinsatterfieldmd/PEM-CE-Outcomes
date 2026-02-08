@@ -403,11 +403,21 @@ async def update_question_tags(question_id: int, tags: TagUpdate):
     if tags.flaw_double_negative is not None:
         tags_dict['flaw_double_negative'] = tags.flaw_double_negative
 
+    # Review notes (reviewer comments for few-shot learning)
+    if tags.review_notes is not None:
+        tags_dict['review_notes'] = tags.review_notes
+
     # Capture original tags BEFORE update for correction tracking
     original_tags = question["tags"].copy()
 
     # Update using the new 70-field method
     db.update_tags(question_id, tags_dict, mark_as_reviewed=tags.mark_as_reviewed)
+
+    # Recalculate QCore score after tag update (relevant fields may have changed)
+    try:
+        db.calculate_qcore_for_question(question_id)
+    except Exception as e:
+        logger.warning(f"QCore recalculation failed for question {question_id}: {e}")
 
     # Get updated question data
     updated = db.get_question_detail(question_id)

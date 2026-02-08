@@ -1759,4 +1759,44 @@ A: "Carfilzomib-based regimens due to cardiac toxicity risk"
 ```
 Note: All patient characteristic fields utilized - treatment_eligibility (inferred from frail + age), age_group from age 82, organ_dysfunction from cardiac history, fitness_status from "frail" (Fit/Unfit/Frail go in fitness_status, NOT performance_status)
 
+**Example 12: Drug Class as Answer → Infer Specific Drugs (BCMA-directed therapy)**
+
+**Activity date:** December 2024
+
+Q: "Which targeted therapy approach has revolutionized treatment for relapsed/refractory multiple myeloma after multiple prior lines?"
+A: "BCMA-directed therapies"
+Distractors: "GPRC5D-directed therapies", "FcRH5-directed therapies", "CD38-directed therapies"
+
+```json
+{
+    "topic": "Treatment selection",
+    "disease_stage": null,
+    "disease_type_1": null,
+    "treatment_line": "R/R",
+    "treatment_1": "Idecabtagene vicleucel",
+    "treatment_2": "Ciltacabtagene autoleucel",
+    "treatment_3": "Teclistamab",
+    "treatment_4": "Elranatamab",
+    "treatment_5": "Belantamab mafodotin",
+    "drug_class_1": "CAR-T therapy",
+    "drug_class_2": "Bispecific antibody",
+    "drug_class_3": "Antibody-drug conjugate (ADC)",
+    "drug_target_1": "BCMA",
+    "cme_outcome_level": "3 - Knowledge",
+    "stem_type": "Direct question",
+    ...
+}
+```
+**Rationale:**
+- Answer is "BCMA-directed therapies" (a target CLASS), not a specific drug
+- As of Dec 2024, FIVE BCMA-directed therapies approved for R/R MM:
+  - CAR-T: ide-cel (Abecma), cilta-cel (Carvykti)
+  - Bispecifics: teclistamab (Tecvayli), elranatamab (Elrexfio)
+  - ADC: belantamab mafodotin (Blenrep - note: had voluntary withdrawal but was reapproved)
+- Tag ALL approved products
+- drug_class_1-3 captures the THREE different mechanisms targeting BCMA
+- drug_target_1: "BCMA" - all target BCMA
+
+**KEY LEARNING:** When the correct answer is a target-based class (like "BCMA-directed"), infer ALL approved drugs targeting that antigen and note the different drug classes within that target.
+
 Now analyze the following multiple myeloma question:

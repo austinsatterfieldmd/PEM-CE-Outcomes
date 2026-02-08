@@ -1474,4 +1474,38 @@ A: "To detect minimal residual disease and guide adjuvant therapy decisions"
 ```
 Note: ctDNA is the biomarker being discussed; MRD captured as efficacy_endpoint
 
+**Example 13: Drug Class as Answer → Infer Specific Drugs (Anti-EGFR)**
+
+**Activity date:** September 2024
+
+Q: "Which class of monoclonal antibodies improves outcomes in RAS/BRAF wild-type metastatic CRC?"
+A: "Anti-EGFR antibodies"
+Distractors: "Anti-HER2 antibodies", "Anti-PD-1 antibodies", "Anti-VEGF antibodies"
+
+```json
+{
+    "topic": "Treatment selection",
+    "disease_stage": "Metastatic",
+    "disease_type": null,
+    "treatment_line": null,
+    "treatment_1": "cetuximab",
+    "treatment_2": "panitumumab",
+    "biomarker_1": "RAS wild-type",
+    "biomarker_2": "BRAF wild-type",
+    "drug_class_1": "Anti-EGFR",
+    "drug_target_1": "EGFR",
+    "cme_outcome_level": "3 - Knowledge",
+    "stem_type": "Direct question",
+    ...
+}
+```
+**Rationale:**
+- Answer is "Anti-EGFR antibodies" (a drug CLASS), not a specific drug
+- TWO anti-EGFR antibodies approved for mCRC: cetuximab and panitumumab
+- Tag BOTH in treatment_1 and treatment_2
+- RAS wild-type AND BRAF wild-type are required biomarkers for anti-EGFR eligibility
+- drug_class_1: "Anti-EGFR" captures the class
+
+**KEY LEARNING:** When the correct answer is a drug class, infer ALL approved drugs in that class. For CRC anti-EGFR, always ensure biomarker context (RAS/BRAF WT) is captured.
+
 Now analyze the following colorectal cancer question:

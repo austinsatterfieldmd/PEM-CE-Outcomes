@@ -360,6 +360,8 @@ export function QuestionReviewDetail({ questionId, onClose, onReviewComplete }: 
     'core', 'multiValue', 'treatmentDetails', 'patientCharacteristics',
     'clinicalContext', 'safetyToxicity', 'efficacyOutcomes', 'evidenceGuidelines', 'questionQuality'
   ]))
+  // Review notes for capturing reviewer comments (for few-shot learning)
+  const [reviewNotes, setReviewNotes] = useState('')
 
   // Load user-defined values on mount (for dropdown options)
   useEffect(() => {
@@ -461,6 +463,7 @@ export function QuestionReviewDetail({ questionId, onClose, onReviewComplete }: 
           distractor_homogeneity: result.tags.distractor_homogeneity || '',
         })
         setEditedQuestionStem(result.question_stem)
+        setReviewNotes(result.tags?.review_notes || '')
       })
       .catch(err => {
         console.error('Failed to load question details:', err)
@@ -482,7 +485,9 @@ export function QuestionReviewDetail({ questionId, onClose, onReviewComplete }: 
         ...editedTags,
         mark_as_reviewed: markAsReviewed,
         // Send custom values to be persisted in the database
-        custom_values: customValues.length > 0 ? customValues : undefined
+        custom_values: customValues.length > 0 ? customValues : undefined,
+        // Review notes (reviewer comments for few-shot learning)
+        review_notes: reviewNotes || null
       }
       if (editedQuestionStem !== data.question_stem) {
         payload.question_stem = editedQuestionStem
@@ -1208,6 +1213,30 @@ export function QuestionReviewDetail({ questionId, onClose, onReviewComplete }: 
                 {data.tags.answer_option_count && <TagRow label="Answer Options" value={String(data.tags.answer_option_count)} isEditing={false} tagKey="answer_option_count" conflictFields={conflictFields} majorityFields={majorityFields} />}
                 {data.tags.correct_answer_position && <TagRow label="Correct Answer Position" value={data.tags.correct_answer_position} isEditing={false} tagKey="correct_answer_position" conflictFields={conflictFields} majorityFields={majorityFields} />}
               </FieldGroupSection>
+
+              {/* Review Notes Section */}
+              {isEditing ? (
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mt-4">
+                  <label className="block text-sm font-semibold text-amber-800 mb-2">
+                    Review Notes (for few-shot learning)
+                  </label>
+                  <textarea
+                    value={reviewNotes}
+                    onChange={(e) => setReviewNotes(e.target.value)}
+                    placeholder="Add notes about your corrections (e.g., 'LLM over-tagged clinical_benefit', 'Should be R/R not 2L')..."
+                    className="w-full px-3 py-2 border border-amber-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent resize-none bg-white"
+                    rows={3}
+                  />
+                  <p className="text-xs text-amber-600 mt-1">
+                    These notes help improve future tagging accuracy
+                  </p>
+                </div>
+              ) : reviewNotes ? (
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mt-4">
+                  <h4 className="text-sm font-semibold text-amber-800 mb-2">Review Notes</h4>
+                  <p className="text-sm text-amber-900 whitespace-pre-wrap">{reviewNotes}</p>
+                </div>
+              ) : null}
             </div>
           </div>
 

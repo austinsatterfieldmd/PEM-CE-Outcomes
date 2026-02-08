@@ -160,6 +160,7 @@ export interface TagInfo {
   needs_review: boolean | null
   review_flags: string[] | string | null
   review_reason: string | null
+  review_notes: string | null  // Reviewer comments for few-shot learning
   flagged_at: string | null
   agreement_level: string | null  // unanimous, majority, conflict
   tag_status: TagStatus | null  // Computed from 8 core tags: verified, unanimous, majority, conflict

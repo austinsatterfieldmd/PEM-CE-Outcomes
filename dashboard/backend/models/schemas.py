@@ -139,6 +139,7 @@ class TagInfo(BaseModel):
     needs_review: Optional[bool] = None
     review_flags: Optional[List[str]] = None
     review_reason: Optional[str] = None
+    review_notes: Optional[str] = None  # Reviewer comments for few-shot learning
     flagged_at: Optional[datetime] = None
 
     # === Model voting data (for review interface) ===
@@ -244,6 +245,7 @@ class TagUpdate(BaseModel):
     # === Admin fields ===
     question_stem: Optional[str] = Field(None, description="Updated question stem (admin only)")
     mark_as_reviewed: Optional[bool] = False
+    review_notes: Optional[str] = Field(None, description="Reviewer comments for few-shot learning")
 
     # === User-defined values ===
     # When the frontend detects a custom value (not in static allowed values),

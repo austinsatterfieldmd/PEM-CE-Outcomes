@@ -57,6 +57,12 @@ ls -la data/checkpoints/ | grep MCL | tail -5
 python dashboard/scripts/import_stage2_results.py --checkpoint data/checkpoints/stage2_tagged_MCL_*.json --upsert
 ```
 
+**Note**: The import script automatically:
+1. Normalizes tags via `TagNormalizer`
+2. Calculates QCore scores for each imported question
+
+**Dashboard edits**: When tags are edited via the dashboard UI (Save & Mark Reviewed), QCore scores are automatically recalculated. No manual action needed.
+
 ### Step 5: Verify Import
 ```bash
 python -c "import sqlite3; print(sqlite3.connect('dashboard/data/questions.db').execute(\"SELECT COUNT(*) FROM questions WHERE disease_state='MCL'\").fetchone()[0])"
