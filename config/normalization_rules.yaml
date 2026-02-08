@@ -498,6 +498,18 @@ normalization_aliases:
   - Newly Diagnosed
   - newly diagnosed
   - NEWLY DIAGNOSED
+  Transplant-eligible:
+  - HSCT-eligible
+  - HSCT eligible
+  - ASCT-eligible
+  - ASCT eligible
+  - transplant eligible
+  Transplant-ineligible:
+  - HSCT-ineligible
+  - HSCT ineligible
+  - ASCT-ineligible
+  - ASCT ineligible
+  - transplant ineligible
 _metadata:
   last_updated: '2026-02-07T16:00:00.000000'
   total_aliases: 56
