@@ -34,6 +34,29 @@ Patients with ALL often develop secondary immunodeficiency. Questions about **ma
 
 ---
 
+## CRITICAL: Compound Answer Handling
+
+When the correct answer references options by letter/number (e.g., "B or C", "A and C", "Options 1 and 3"):
+
+1. **DO NOT assume option order matches the original question** - The options you receive may be in a different order than the actual test question.
+
+2. **Deduce the correct answer from clinical reasoning** - Read the substance of each option and determine which ones make sense as the correct answer based on the clinical scenario.
+
+3. **Tag based on the deduced correct content** - Once you identify what the compound answer actually refers to, tag those treatments/concepts.
+
+**Example (CLL):**
+- **Stem:** 71-year-old man with treatment-naive CLL, unmutated IGHV, del(13q), no TP53 abnormality. On DOAC for atrial fibrillation, prefers minimal cardiac toxicity. What is the most appropriate frontline treatment?
+- **Correct answer:** "B or C"
+- **Options presented to you:** Acalabrutinib plus venetoclax ± obinutuzumab | Continuous ibrutinib monotherapy | Venetoclax plus obinutuzumab
+
+**How to deduce:** The patient wants to avoid cardiac toxicity and has AFib. Ibrutinib has higher AFib risk than other BTKis. Therefore "B or C" most likely refers to:
+- Acalabrutinib-based regimen (2nd-gen BTKi, lower cardiac risk)
+- Venetoclax-obinutuzumab (no BTKi cardiac risk)
+
+**Tag accordingly:** treatment_1: Acalabrutinib, treatment_2: Venetoclax, treatment_3: Obinutuzumab
+
+---
+
 ## Tag Fields
 
 You must assign values for all 70 tag fields (disease_state is already determined in Stage 1):
