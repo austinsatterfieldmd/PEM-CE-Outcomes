@@ -401,7 +401,7 @@ Use this value ONLY when the question involves patient eligibility context, NOT 
 - **Drug comparison questions** - Comparing drugs without patient eligibility context → null
 
 ### 10. age_group
-**OPTIONAL** - Patient age category when explicitly mentioned or strongly implied.
+**REQUIRED when patient age is stated** - Tag the age category whenever a specific age (e.g., "72-year-old") appears in the question stem.
 
 **Valid values:**
 - `"Pediatric"` - Under 18 years (rare in MM)
@@ -685,6 +685,7 @@ Pattern of answer option lengths. **DEFAULT: "Uniform"**
 - Acronym expansion: "IVIg (intravenous immunoglobulin)" vs "Acyclovir" → Still **Uniform** (grammar rule, not content difference)
 - Combo vs single drugs: "DRd (daratumumab, lenalidomide, dexamethasone)" vs "Bortezomib" → Still **Uniform** (both are treatment options)
 - Slightly longer phrasing: "High-risk cytogenetics" vs "Standard-risk" → Still **Uniform** (same conceptual type)
+- Compound answers: "Dara-VRd only" / "VRd only" / "Both Dara-VRd and VRd" → Still **Uniform** (third just combines options, no new clinical content)
 
 **What DOES make a question "Variable":**
 - Mixed types: "Daratumumab" / "Bortezomib" / "Lenalidomide" / "Continue current therapy and monitor disease progression with serial M-protein levels" → **Variable** (3 drug names vs 1 management statement)

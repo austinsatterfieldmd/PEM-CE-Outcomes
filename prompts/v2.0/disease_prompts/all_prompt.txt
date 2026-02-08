@@ -583,14 +583,26 @@ Type of evidence supporting the question/answer.
 
 ### answer_length_pattern Criteria
 
+**CRITICAL RULE:** If `distractor_homogeneity` = "Homogeneous", then `answer_length_pattern` is almost always "Uniform".
+
+Tag "Variable" with Homogeneous distractors ONLY when one answer contains **additional clinical/educational content** the others lack - NOT when length differs due to:
+- Grammatical phrasing ("The drug blinatumomab" vs "Blinatumomab")
+- Compound answers ("Both A and B", "A and C", "All of the above")
+- Minor word count differences
+
+**Example - UNIFORM (despite length difference):**
+- "Blinatumomab only"
+- "Inotuzumab only"
+- "Both blinatumomab and inotuzumab"
+→ Third answer is longer but just combines options, no new clinical detail = **Uniform**
+
 **"Uniform"** = All options are CONCEPTUALLY similar in complexity:
 - All single drug names: "Blinatumomab" / "Inotuzumab" / "CAR-T" → **Uniform** (even if character counts differ)
 - All short clinical phrases: "Continue therapy" / "Switch treatment" / "Monitor MRD" → **Uniform**
 
-**"Variable"** = Options differ in TYPE or COMPLEXITY:
-- Mix of single words and phrases: "Blinatumomab" / "Continue current chemotherapy and monitor" → **Variable**
-- Mix of simple and detailed: "TKI" / "Add blinatumomab after achieving remission" → **Variable**
-- **DEFAULT if unsure** - 75% of user corrections change Uniform → Variable
+**"Variable"** = Options differ in TYPE or COMPLEXITY AND contain different amounts of clinical detail:
+- Mix of single words and detailed explanations: "Blinatumomab" / "Continue current chemotherapy and monitor for relapse" → **Variable**
+- One answer has extra clinical context others lack: "TKI" / "Add blinatumomab after achieving remission with MRD monitoring" → **Variable**
 
 **"Correct longest/shortest"** = The CORRECT answer is noticeably longer/shorter than ALL distractors:
 - Correct answer is a detailed explanation while distractors are single words → **Correct longest**

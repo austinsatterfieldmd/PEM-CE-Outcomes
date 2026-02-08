@@ -297,7 +297,7 @@ EZH2 mutation status is important for tazemetostat selection. Tag when:
 - Watch-and-wait candidacy assessment
 
 ### 10. age_group
-**OPTIONAL** - Patient age category when explicitly mentioned.
+**REQUIRED when patient age is stated** - Tag the age category whenever a specific age (e.g., "68-year-old") appears in the question stem.
 
 **Valid values:**
 - `"Pediatric"` - Under 18 years (rare in FL)
@@ -506,14 +506,26 @@ Type of evidence supporting the question/answer.
 
 ### answer_length_pattern Criteria
 
+**CRITICAL RULE:** If `distractor_homogeneity` = "Homogeneous", then `answer_length_pattern` is almost always "Uniform".
+
+Tag "Variable" with Homogeneous distractors ONLY when one answer contains **additional clinical/educational content** the others lack - NOT when length differs due to:
+- Grammatical phrasing ("The drug rituximab" vs "Rituximab")
+- Compound answers ("Both A and B", "A and C", "All of the above")
+- Minor word count differences
+
+**Example - UNIFORM (despite length difference):**
+- "Rituximab monotherapy only"
+- "Obinutuzumab monotherapy only"
+- "Both rituximab and obinutuzumab monotherapy"
+→ Third answer is longer but just combines options, no new clinical detail = **Uniform**
+
 **"Uniform"** = All options are CONCEPTUALLY similar in complexity:
 - All single drug names: "Rituximab" / "Obinutuzumab" / "Lenalidomide" → **Uniform** (even if character counts differ)
 - All short clinical phrases: "Watch and wait" / "Start BR" / "Give rituximab" → **Uniform**
 
-**"Variable"** = Options differ in TYPE or COMPLEXITY:
-- Mix of single words and phrases: "Rituximab" / "Start bendamustine-rituximab and monitor for transformation" → **Variable**
-- Mix of simple and detailed: "Tazemetostat" / "Check EZH2 status before selecting therapy" → **Variable**
-- **DEFAULT if unsure** - 75% of user corrections change Uniform → Variable
+**"Variable"** = Options differ in TYPE or COMPLEXITY AND contain different amounts of clinical detail:
+- Mix of single words and detailed explanations: "Rituximab" / "Start bendamustine-rituximab and monitor for transformation" → **Variable**
+- One answer has extra clinical context others lack: "Tazemetostat" / "Check EZH2 status before selecting therapy" → **Variable**
 
 **"Correct longest/shortest"** = The CORRECT answer is noticeably longer/shorter than ALL distractors:
 - Correct answer is a detailed explanation while distractors are single words → **Correct longest**

@@ -338,7 +338,7 @@ Note: In DLBCL, very high Ki-67 (>80%) often correlates with MYC-driven biology.
 - "Fit" or "unfit" for intensive therapy
 
 ### 10. age_group
-**OPTIONAL** - Patient age category when explicitly mentioned.
+**REQUIRED when patient age is stated** - Tag the age category whenever a specific age (e.g., "57-year-old") appears in the question stem.
 
 **Valid values:**
 - `"Pediatric"` - Under 18 years
@@ -555,14 +555,26 @@ Type of evidence supporting the question/answer.
 
 ### answer_length_pattern Criteria
 
+**CRITICAL RULE:** If `distractor_homogeneity` = "Homogeneous", then `answer_length_pattern` is almost always "Uniform".
+
+Tag "Variable" with Homogeneous distractors ONLY when one answer contains **additional clinical/educational content** the others lack - NOT when length differs due to:
+- Grammatical phrasing ("The drug rituximab" vs "Rituximab")
+- Compound answers ("Both A and B", "A and C", "All of the above")
+- Minor word count differences
+
+**Example - UNIFORM (despite length difference):**
+- "Axi-cel only"
+- "Liso-cel only"
+- "Both axi-cel and liso-cel"
+→ Third answer is longer but just combines options, no new clinical detail = **Uniform**
+
 **"Uniform"** = All options are CONCEPTUALLY similar in complexity:
 - All single drug names: "Axi-cel" / "Liso-cel" / "Tisa-cel" → **Uniform** (even if character counts differ)
 - All short clinical phrases: "Proceed to CAR-T" / "Give Pola-BR" / "Start glofitamab" → **Uniform**
 
-**"Variable"** = Options differ in TYPE or COMPLEXITY:
-- Mix of single words and phrases: "R-CHOP" / "Consider adding polatuzumab vedotin to R-CHP backbone" → **Variable**
-- Mix of simple and detailed: "CAR-T" / "Bridge to transplant after achieving remission" → **Variable**
-- **DEFAULT if unsure** - 75% of user corrections change Uniform → Variable
+**"Variable"** = Options differ in TYPE or COMPLEXITY AND contain different amounts of clinical detail:
+- Mix of single words and detailed explanations: "R-CHOP" / "Consider adding polatuzumab vedotin to R-CHP backbone" → **Variable**
+- One answer has extra clinical context others lack: "CAR-T" / "Bridge to transplant after achieving remission with close monitoring" → **Variable**
 
 **"Correct longest/shortest"** = The CORRECT answer is noticeably longer/shorter than ALL distractors:
 - Correct answer is a detailed explanation while distractors are single words → **Correct longest**
