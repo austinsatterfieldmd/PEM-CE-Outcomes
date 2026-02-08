@@ -378,6 +378,10 @@ Molecular target(s) of the drug.
 - `"PI3K"` - PI3K inhibitors
 - `"CD19"` - CAR-T
 
+**⚠️ CRITICAL - Bispecific antibodies:**
+- **DO NOT TAG CD3** - For bispecifics (mosunetuzumab, epcoritamab, glofitamab), ONLY tag the tumor target (CD20). CD3 is the T-cell engager component and should NOT be tagged as a drug target.
+- **ONLY ONE drug target for bispecifics**: drug_target_1 = "CD20", drug_target_2 = null
+
 ### 17. prior_therapy_1 through prior_therapy_3
 Relevant prior treatments if mentioned.
 
