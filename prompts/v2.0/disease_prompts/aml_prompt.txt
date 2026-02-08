@@ -533,6 +533,51 @@ Type of evidence supporting the question/answer.
 - `answer_format`: `"Single best"`, `"Compound (A+B)"`, `"All of above"`, `"None of above"`
 - `answer_length_pattern`: `"Uniform"`, `"Variable"`, `"Correct longest"`, `"Correct shortest"`
 - `distractor_homogeneity`: `"Homogeneous"`, `"Heterogeneous"`
+
+### answer_length_pattern Criteria (CRITICAL - Common Error)
+
+**CRITICAL RULE:** If `distractor_homogeneity` = "Homogeneous", then `answer_length_pattern` is almost always "Uniform".
+
+Tag "Variable" with Homogeneous distractors ONLY when one answer contains **additional clinical/educational content** the others lack - NOT when length differs due to:
+- Grammatical phrasing ("The drug gilteritinib" vs "Gilteritinib")
+- Compound answers ("Both A and B", "A and C", "All of the above")
+- Minor word count differences
+
+**Example - UNIFORM (despite length difference):**
+- "Venetoclax only"
+- "Azacitidine only"
+- "Both venetoclax and azacitidine"
+-> Third answer is longer but just combines options, no new clinical detail = **Uniform**
+
+**"Uniform"** = All options are CONCEPTUALLY similar in complexity:
+- All single drug names: "Gilteritinib" / "Midostaurin" / "Quizartinib" -> **Uniform** (even if character counts differ)
+- All short clinical phrases: "Continue therapy" / "Switch treatment" / "Proceed to transplant" -> **Uniform**
+
+**"Variable"** = Options differ in TYPE or COMPLEXITY AND contain different amounts of clinical detail:
+- Mix of single words and detailed explanations: "Gilteritinib" / "Continue current chemotherapy and monitor for response with repeat bone marrow" -> **Variable**
+- One answer has extra clinical context others lack: "FLT3 inhibitor" / "Add venetoclax after achieving remission with MRD monitoring" -> **Variable**
+
+**"Correct longest/shortest"** = The CORRECT answer is noticeably longer/shorter than ALL distractors:
+- Correct answer is a detailed explanation while distractors are single words -> **Correct longest**
+- Correct answer is a single drug while distractors are multi-drug regimens -> **Correct shortest**
+
+**IMPORTANT:** If answer lengths ARE variable AND the correct answer is the longest -> tag `"Correct longest"` (not just "Variable"). Similarly for shortest. These are more specific than "Variable" and should be used when applicable.
+
+### distractor_homogeneity Criteria (CRITICAL - Common Error)
+
+**"Homogeneous"** = All distractors are the SAME TYPE of answer:
+- All drug names: "Gilteritinib" / "Midostaurin" / "Venetoclax" / "Ivosidenib" -> **Homogeneous**
+- All clinical actions: "Hold therapy" / "Dose reduce" / "Discontinue" / "Continue" -> **Homogeneous**
+- All trial names: "RATIFY" / "ADMIRAL" / "VIALE-A" / "AGILE" -> **Homogeneous**
+- Mix of single drugs and combos: "Venetoclax" / "Ven/aza" / "7+3" / "CPX-351" -> **Homogeneous** (all are treatment options)
+
+**CRITICAL:** Implausible distractors are still the same TYPE. Tag `flaw_implausible_distractor: true` but keep `distractor_homogeneity: "Homogeneous"` if all options are drugs/treatments.
+
+**"Heterogeneous"** = Distractors are DIFFERENT TYPES of answers:
+- Treatment + Safety + Mechanism: "Gilteritinib" / "Differentiation syndrome occurs in 20%" / "FLT3 inhibition" -> **Heterogeneous**
+- Drug + Trial + Endpoint: "Midostaurin" / "RATIFY study" / "Overall survival" -> **Heterogeneous**
+- Mix of domains: "Add FLT3 inhibitor" / "Monitor for TLS" / "Proceed to transplant" -> **Heterogeneous**
+
 - `flaw_absolute_terms`: true/false
 - `flaw_grammatical_cue`: true/false
 - `flaw_implausible_distractor`: true/false
