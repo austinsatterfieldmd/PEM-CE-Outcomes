@@ -48,7 +48,7 @@ interface Props {
   onReject: () => void
 }
 
-const API_BASE = 'http://127.0.0.1:8000/api'
+const API_BASE = 'http://127.0.0.1:8002/api'
 
 export default function DedupClusterView({ cluster, onClose, onConfirm, onReject }: Props) {
   const [selectedCanonical, setSelectedCanonical] = useState<number | null>(

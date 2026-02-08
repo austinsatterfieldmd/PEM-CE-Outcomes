@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { Zap, Upload, FileText, AlertCircle, CheckCircle, Clock, ChevronDown, ChevronUp, Download, Target, BookOpen } from 'lucide-react';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8002/api';
 
 interface QuestionAnalysis {
   question_number: number;

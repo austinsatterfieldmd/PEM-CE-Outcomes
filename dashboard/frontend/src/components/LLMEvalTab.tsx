@@ -31,7 +31,7 @@ import {
   RefreshCw,
 } from 'lucide-react'
 
-const API_BASE = 'http://localhost:8001/api'
+const API_BASE = 'http://localhost:8002/api'
 
 // Types for eval metrics
 interface BatchStats {
