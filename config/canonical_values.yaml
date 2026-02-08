@@ -610,6 +610,7 @@ verified_values:
   - Bleeding
   - Pancytopenias
   - Bruising
+  - Weight loss
   treatment:
   - Idecabtagene vicleucel
   - Ciltacabtagene autoleucel
@@ -652,6 +653,11 @@ verified_values:
   - Pegaspargase
   - Obecabtagene autoleucel
   - Umbralisib
+  - Loncastuximab tesirine
+  - Brentuximab vedotin
+  - Zanubrutinib
+  - Inotuzumab ozogamicin
+  - Calaspargase pegol
   biomarker:
   - del(17p)
   - MRD
@@ -680,6 +686,12 @@ verified_values:
   - CRLF2 rearrangement
   - JAK2 mutation
   - TCF3::PBX1 fusion
+  - BCL2 rearrangement
+  - CD19
+  - del(13q)
+  - C481S mutation
+  - MRD negativity
+  - Minimal residual disease (MRD)
   drug_class:
   - CAR-T therapy
   - Bispecific antibody
@@ -694,6 +706,7 @@ verified_values:
   - BCL-2 inhibitor
   - tyrosine kinase inhibitor
   - Asparaginase
+  - BTK inhibitor
   disease_type:
   - High-risk
   - Blastoid
@@ -739,6 +752,7 @@ verified_values:
   - Prior chemotherapy
   - Pegaspargase
   - Prior ADC
+  - Prior ibrutinib
   toxicity_type:
   - Infections
   - VTE
@@ -757,6 +771,8 @@ verified_values:
   - Hypertension
   - Silent inactivation
   - Hypersensitivity
+  - Bleeding
+  - Neurologic toxicity
   trial:
   - IsKia
   - UNITY-NHL
@@ -770,6 +786,18 @@ verified_values:
   - CLL14
   - E1910
   - FELIX
+  - AUGMENT
+  - ECHO
+  - TRANSFORM
+  - PHOENIX
+  - POLARIX
+  - LOTIS-2
+  - BELINDA
+  - ECHELON-3
+  - ELEVATE-TN
+  - ALPINE
+  - TOWER
+  - ELIANA
   efficacy_endpoint:
   - MRD negativity rate
   - Overall response rate (ORR)
@@ -779,6 +807,9 @@ verified_values:
   - Progression-free survival (PFS)
   - Duration of remission (DoR)
   - MRD-negative CR
+  - Event-free survival (EFS)
+  - Complete remission rate (CR)
+  - Relapse-free survival (RFS)
   toxicity_organ:
   - Hepatic
   - Cardiac
