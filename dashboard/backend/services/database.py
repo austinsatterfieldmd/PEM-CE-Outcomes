@@ -2818,12 +2818,11 @@ class DatabaseService:
             """)
             total_questions = cursor.fetchone()[0]
 
-            # Count tagged unique oncology questions only
+            # Count tagged unique oncology questions (has a tags record = tagged)
             cursor.execute("""
                 SELECT COUNT(*) FROM tags t
                 JOIN questions q ON t.question_id = q.id
-                WHERE t.topic IS NOT NULL
-                AND (q.is_oncology IS NULL OR q.is_oncology = 1)
+                WHERE (q.is_oncology IS NULL OR q.is_oncology = 1)
                 AND (q.canonical_source_id IS NULL OR q.canonical_source_id = CAST(q.source_id AS TEXT))
             """)
             tagged_questions = cursor.fetchone()[0]
