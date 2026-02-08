@@ -674,6 +674,12 @@ Moore's CME outcome level.
 - `"3 - Knowledge"` - Question tests recall of facts/information
 - `"4 - Competence"` - Question tests ability to apply knowledge to clinical scenarios
 
+**CRITICAL RULE:** If the clinical vignette is NOT REQUIRED to answer the question, it's **Level 3 (Knowledge)**, not Level 4.
+
+**Test:** Could someone answer this question correctly WITHOUT reading the patient details?
+- YES → `"3 - Knowledge"` (the vignette is just context/decoration)
+- NO → `"4 - Competence"` (must apply knowledge to the specific patient)
+
 ### 31. data_response_type
 Type of response elicited.
 **Valid values:**
@@ -718,6 +724,8 @@ Pattern of answer option lengths. **DEFAULT: "Uniform"**
 - `"Variable"` - **RARE.** Only when options are fundamentally different types — typically correlates with "Heterogeneous" distractors. Example: 3 options are drug names, but 1 option is a multi-sentence clinical statement.
 - `"Correct longest"` - Correct answer is dramatically longer than all distractors (flaw indicator)
 - `"Correct shortest"` - Correct answer is dramatically shorter than all distractors
+
+**IMPORTANT:** If answer lengths ARE variable AND the correct answer is the longest → tag `"Correct longest"` (not just "Variable"). Similarly for shortest. These are more specific than "Variable" and should be used when applicable.
 
 **What does NOT make a question "Variable":**
 - Acronym expansion: "IVIg (intravenous immunoglobulin)" vs "Acyclovir" → Still **Uniform** (grammar rule, not content difference)

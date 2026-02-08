@@ -580,6 +580,12 @@ Type of evidence supporting the question/answer.
 - `"3 - Knowledge"` - Tests recall of facts
 - `"4 - Competence"` - Tests application to clinical scenarios
 
+**CRITICAL RULE:** If the clinical vignette is NOT REQUIRED to answer the question, it's **Level 3 (Knowledge)**, not Level 4.
+
+**Test:** Could someone answer this question correctly WITHOUT reading the patient details?
+- YES → `"3 - Knowledge"` (the vignette is just context/decoration)
+- NO → `"4 - Competence"` (must apply knowledge to the specific patient)
+
 ### 31-42. [Same as universal format fields]
 
 - `data_response_type`: `"Numeric"`, `"Qualitative"`, `"Comparative"`, `"Boolean"`
@@ -615,6 +621,8 @@ Tag "Variable" with Homogeneous distractors ONLY when one answer contains **addi
 **"Correct longest/shortest"** = The CORRECT answer is noticeably longer/shorter than ALL distractors:
 - Correct answer is a detailed explanation while distractors are single words → **Correct longest**
 - Correct answer is a single drug while distractors are multi-drug regimens → **Correct shortest**
+
+**IMPORTANT:** If answer lengths ARE variable AND the correct answer is the longest → tag `"Correct longest"` (not just "Variable"). Similarly for shortest. These are more specific than "Variable" and should be used when applicable.
 
 ### distractor_homogeneity Criteria
 
