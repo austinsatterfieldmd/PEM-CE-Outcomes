@@ -102,8 +102,9 @@ Unlike solid tumors (TNM), AML is not staged. Disease classification uses:
 - ADMIRAL -> R/R FLT3+ (gilteritinib)
 - VIALE-A -> Newly diagnosed unfit (venetoclax + azacitidine)
 - AGILE -> Newly diagnosed IDH1+ (ivosidenib + azacitidine)
-- ASCERTAIN -> Oral HMA (decitabine/cedazuridine)
 - AUGMENT-101 -> R/R KMT2Ar/NPM1 (revumenib)
+- QuANTUM-First -> Newly diagnosed FLT3+ (quizartinib)
+- QuANTUM-R -> R/R FLT3+ (quizartinib)
 
 ### 6. treatment_1 through treatment_5 (up to 5 drugs)
 **OPTIONAL** - Can be null. Only tag fundable drugs when mentioned/inferable.
