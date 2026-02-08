@@ -7,6 +7,29 @@ This question has been classified as being about **Acute myeloid leukemia (AML)*
 
 ---
 
+## CRITICAL: Compound Answer Handling
+
+When the correct answer references options by letter/number (e.g., "B or C", "A and C", "Options 1 and 3"):
+
+1. **DO NOT assume option order matches the original question** - The options you receive may be in a different order than the actual test question.
+
+2. **Deduce the correct answer from clinical reasoning** - Read the substance of each option and determine which ones make sense as the correct answer based on the clinical scenario.
+
+3. **Tag based on the deduced correct content** - Once you identify what the compound answer actually refers to, tag those treatments/concepts.
+
+**Example (AML):**
+- **Stem:** 68-year-old with newly diagnosed AML, IDH1 mutation, unfit for intensive chemo. What is the most appropriate frontline treatment?
+- **Correct answer:** "A or B"
+- **Options presented:** Ivosidenib + azacitidine | Venetoclax + azacitidine | 7+3 induction | Best supportive care
+
+**How to deduce:** The patient is unfit for intensive chemo and has IDH1 mutation. Therefore "A or B" most likely refers to:
+- Ivosidenib + azacitidine (IDH1-targeted, non-intensive)
+- Venetoclax + azacitidine (non-intensive standard)
+
+**Tag accordingly:** treatment_1: Ivosidenib, treatment_2: Venetoclax, treatment_3: Azacitidine
+
+---
+
 ## Tag Fields
 
 You must assign values for all 70 tag fields (disease_state is already determined in Stage 1):
@@ -208,6 +231,11 @@ Unlike solid tumors (TNM), AML is not staged. Disease classification uses:
 - AML with MRC (myelodysplasia-related changes) -> CPX-351
 - TP53 mutated -> Often CPX-351 (poor prognosis regardless)
 
+### Backbone Chemotherapy (DO NOT TAG unless specifically asked about)
+- Cytarabine, daunorubicin, idarubicin, anthracyclines
+- These are backbone agents in 7+3, NOT fundable targets
+- **Exception:** Tag if question specifically asks about these drugs (e.g., "What is the mechanism of cytarabine?")
+
 ---
 
 ## treatment_1-5: Critical Tagging Rules
@@ -247,6 +275,10 @@ When the correct answer is a drug CLASS, you MUST tag all approved specific drug
 
 ### 7. biomarker_1 through biomarker_5 (up to 5 biomarkers)
 **OPTIONAL** - Can be null. Tag when clinically relevant.
+
+**DO NOT put in biomarker:**
+- **Drug targets** -> Use `drug_target` instead (e.g., FLT3, IDH1, BCL-2 are drug targets when discussing mechanism)
+- **Resistance mutations** -> Use `resistance_mechanism` instead (e.g., FLT3 secondary mutations)
 
 **Key AML Biomarkers:**
 
@@ -406,11 +438,22 @@ Molecular target(s) of the drug.
 ### 17. prior_therapy_1 through prior_therapy_3
 Relevant prior treatments if mentioned.
 
-**CRITICAL: Use these canonical values:**
-- `"Prior venetoclax + azacitidine"` - Post-ven/aza failure, relapsed after HMA-venetoclax
-- `"Prior HMA"` - After azacitidine or decitabine failure
+**CRITICAL: Prefer drug CLASS over specific drug names.**
+- Use `"Prior FLT3 inhibitor"` instead of "Prior gilteritinib" or "Prior midostaurin"
+- Use `"Prior IDH1 inhibitor"` instead of "Prior ivosidenib"
+- Use `"Prior HMA"` instead of "Prior azacitidine"
+
+**Exception - use specific regimen when clinically distinct:**
+- `"Prior venetoclax + azacitidine"` - Specific combo with unique resistance patterns
+- `"Prior intensive chemotherapy"` - Distinct from HMA-based therapy
+
+**Canonical values:**
+- `"Prior venetoclax + azacitidine"` - Post-ven/aza failure
+- `"Prior HMA"` - After azacitidine or decitabine failure (without venetoclax)
 - `"Prior intensive chemotherapy"` - After 7+3 or similar induction failure
 - `"Prior FLT3 inhibitor"` - After gilteritinib, midostaurin, quizartinib failure
+- `"Prior IDH1 inhibitor"` - After ivosidenib or olutasidenib failure
+- `"Prior IDH2 inhibitor"` - After enasidenib failure
 - `"Prior allogeneic transplant"` - Post-allo relapse
 
 **INFERENCE:**
@@ -524,6 +567,10 @@ Type of evidence supporting the question/answer.
 - `"4 - Competence"` - Tests application to clinical scenarios
 
 **CRITICAL RULE:** If the clinical vignette is NOT REQUIRED to answer the question, it's **Level 3 (Knowledge)**, not Level 4.
+
+**Test:** Could someone answer this question correctly WITHOUT reading the patient details?
+- YES -> `"3 - Knowledge"` (the vignette is just context/decoration)
+- NO -> `"4 - Competence"` (must apply knowledge to the specific patient)
 
 ### 31-42. [Format fields - same as universal]
 
