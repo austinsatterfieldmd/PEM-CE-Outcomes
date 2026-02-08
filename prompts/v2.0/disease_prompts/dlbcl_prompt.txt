@@ -586,6 +586,9 @@ Tag "Variable" with Homogeneous distractors ONLY when one answer contains **addi
 - All CAR-T products: "Axi-cel" / "Liso-cel" / "Tisa-cel" / "Brexu-cel" → **Homogeneous**
 - All clinical approaches: "Proceed to CAR-T" / "Give bispecific" / "Salvage chemo" / "Transplant" → **Homogeneous**
 - All trial names: "ZUMA-7" / "TRANSFORM" / "POLARIX" / "JULIET" → **Homogeneous**
+- Mix of single drugs and combos: "Axi-cel" / "Pola-BR" / "R-CHOP" / "Glofitamab" → **Homogeneous** (all are treatment options)
+
+**CRITICAL:** Implausible distractors are still the same TYPE. Tag `flaw_implausible_distractor: true` but keep `distractor_homogeneity: "Homogeneous"` if all options are drugs/treatments.
 
 **"Heterogeneous"** = Distractors are DIFFERENT TYPES of answers:
 - Treatment + Biomarker + Prognosis: "Axi-cel" / "Double-hit lymphoma" / "Poor prognosis" → **Heterogeneous**

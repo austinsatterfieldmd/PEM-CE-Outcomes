@@ -129,19 +129,19 @@ While Rai and Binet staging systems exist, modern CLL treatment is driven by:
 **OPTIONAL** - Can be null, but try to infer. CLL uses specific terminology.
 
 **Valid values:**
-- `"Treatment-naive"` - First-line, frontline, previously untreated (preferred for CLL)
+- `"Newly diagnosed"` - First-line, frontline, previously untreated (preferred for CLL)
 - `"R/R"` - Relapsed/Refractory, any line after initial therapy failure
 - `"Maintenance"` - Ongoing/continuous therapy (less common terminology in CLL)
 
-**DO NOT USE:** 1L, 2L, 2L+, 3L+ - Use "Treatment-naive" or "R/R" instead
+**DO NOT USE:** 1L, 2L, 2L+, 3L+ - Use "Newly diagnosed" or "R/R" instead
 
 **Triggers:**
-- "treatment-naive", "frontline", "previously untreated", "first-line" → Treatment-naive
+- "treatment-naive", "frontline", "previously untreated", "first-line" → Newly diagnosed
 - "relapsed", "refractory", "R/R CLL", "after progression on", "prior BTKi" → R/R
 - "after ibrutinib failure", "BTKi-refractory", "second-line", "third-line" → R/R
 
 **INFERENCE from trial context:**
-- RESONATE-2, ELEVATE-TN, CLL14 → Treatment-naive
+- RESONATE-2, ELEVATE-TN, CLL14 → Newly diagnosed
 - RESONATE, ALPINE (R/R cohort), MURANO → R/R
 - BRUIN → R/R (pirtobrutinib after covalent BTKi)
 
@@ -587,6 +587,9 @@ Tag "Variable" with Homogeneous distractors ONLY when one answer contains **addi
 - All drug names: "Ibrutinib" / "Acalabrutinib" / "Venetoclax" / "Zanubrutinib" → **Homogeneous**
 - All clinical actions: "Hold therapy" / "Dose reduce" / "Discontinue" / "Continue" → **Homogeneous**
 - All trial names: "RESONATE" / "ALPINE" / "CLL14" / "MURANO" → **Homogeneous**
+- Mix of single drugs and combos: "Zanubrutinib" / "Bendamustine + rituximab" / "Bortezomib" / "Venetoclax" → **Homogeneous** (all are treatment options, even if one is a combo or one is implausible for CLL)
+
+**CRITICAL:** Implausible distractors (like bortezomib in CLL) are still the same TYPE (drug/treatment). Tag `flaw_implausible_distractor: true` but keep `distractor_homogeneity: "Homogeneous"`.
 
 **"Heterogeneous"** = Distractors are DIFFERENT TYPES of answers:
 - Treatment + Safety + Mechanism: "Ibrutinib" / "Atrial fibrillation occurs in 10%" / "BTK inhibition" → **Heterogeneous**
@@ -608,7 +611,7 @@ Tag "Variable" with Homogeneous distractors ONLY when one answer contains **addi
 2. **IGHV status matters for prognosis** - Mutated vs unmutated affects outcomes
 3. **BTKi class distinction** - Covalent vs non-covalent is clinically meaningful (C481S resistance)
 4. **Venetoclax requires TLS precautions** - Prophylaxis and ramp-up are standard
-5. **Treatment-naive vs R/R** - Different trials, different approved regimens
+5. **Newly diagnosed vs R/R** - Different trials, different approved regimens
 6. **Fixed-duration vs continuous** - Key differentiator (venetoclax-based vs BTKi)
 7. **Tag from CORRECT answer only** - Don't tag distractors
 8. **Watch-and-wait is valid** - Not all CLL requires immediate treatment (iwCLL criteria)
@@ -625,7 +628,7 @@ Respond with ONLY a JSON object containing all 70 fields. Use `null` for fields 
     "disease_stage": null,
     "disease_type_1": "del(17p)/TP53-mutated",
     "disease_type_2": null,
-    "treatment_line": "Treatment-naive",
+    "treatment_line": "Newly diagnosed",
     "treatment_1": "Ibrutinib",
     "treatment_2": null,
     "treatment_3": null,
@@ -713,7 +716,7 @@ Respond with ONLY a JSON object containing all 70 fields. Use `null` for fields 
     "disease_stage": null,
     "disease_type_1": "del(17p)/TP53-mutated",
     "disease_type_2": null,
-    "treatment_line": "Treatment-naive",
+    "treatment_line": "Newly diagnosed",
     "treatment_1": "Acalabrutinib",
     "biomarker_1": "del(17p)",
     "age_group": "Transitional",
@@ -725,7 +728,7 @@ Respond with ONLY a JSON object containing all 70 fields. Use `null` for fields 
 ```
 **Rationale:**
 - del(17p) detected → disease_type_1: "del(17p)/TP53-mutated", biomarker_1: "del(17p)"
-- Newly diagnosed → treatment_line: "Treatment-naive"
+- Newly diagnosed → treatment_line: "Newly diagnosed"
 - Age 72 → age_group: "Transitional" (65-75)
 - Acalabrutinib is a covalent BTKi
 - Hypertension noted as comorbidity
@@ -770,7 +773,7 @@ Respond with ONLY a JSON object containing all 70 fields. Use `null` for fields 
     "disease_stage": null,
     "disease_type_1": null,
     "disease_type_2": null,
-    "treatment_line": "Treatment-naive",
+    "treatment_line": "Newly diagnosed",
     "treatment_1": "Venetoclax",
     "treatment_2": "Obinutuzumab",
     "trial_1": "CLL14",
@@ -815,7 +818,7 @@ Respond with ONLY a JSON object containing all 70 fields. Use `null` for fields 
 {
     "topic": "Treatment selection",
     "disease_type_1": null,
-    "treatment_line": "Treatment-naive",
+    "treatment_line": "Newly diagnosed",
     "treatment_1": "Ibrutinib",
     "treatment_2": "Acalabrutinib",
     "treatment_3": "Zanubrutinib",
@@ -831,7 +834,7 @@ Respond with ONLY a JSON object containing all 70 fields. Use `null` for fields 
 - As of Oct 2024, THREE covalent BTKis approved for CLL: ibrutinib, acalabrutinib, zanubrutinib
 - Tag ALL THREE in treatment_1-3
 - drug_class_1: "Covalent BTKi" - all three are covalent inhibitors
-- Use "Treatment-naive" not "1L" for CLL treatment line
+- Use "Newly diagnosed" not "1L" for CLL treatment line
 
 **KEY LEARNING:** When the correct answer is a drug class, infer ALL approved drugs in that class based on the activity date. For BTKis, distinguish covalent vs non-covalent.
 
