@@ -91,6 +91,16 @@ interface EvalSummary {
   generated_at: string
 }
 
+interface DiseaseStats {
+  disease: string
+  total_questions: number
+  questions_with_edits: number
+  question_accuracy: number
+  total_fields: number
+  edited_fields: number
+  field_accuracy: number
+}
+
 interface DisagreementData {
   total_disagreements: number
   by_dissenter: Record<string, {
@@ -105,6 +115,7 @@ interface DisagreementData {
 interface EvalMetrics {
   summary: EvalSummary
   by_batch: BatchStats[]
+  by_disease: DiseaseStats[]
   by_model: ModelStats[]
   by_agreement: AgreementStats[]
   by_field_group: FieldGroupStats[]
@@ -123,6 +134,14 @@ const AGREEMENT_COLORS: Record<string, string> = {
   unanimous: '#10b981',  // green
   majority: '#f59e0b',   // amber
   conflict: '#ef4444',   // red
+}
+
+const DISEASE_COLORS: Record<string, string> = {
+  ALL: '#ef4444',     // red
+  CLL: '#10b981',     // green
+  DLBCL: '#3b82f6',   // blue
+  FL: '#8b5cf6',      // violet
+  MCL: '#f59e0b',     // amber
 }
 
 // Custom tooltip
@@ -209,7 +228,7 @@ export default function LLMEvalTab() {
 
   if (!metrics) return null
 
-  const { summary, by_batch, by_model, by_agreement, by_field_group, top_problem_fields, model_disagreement_analysis } = metrics
+  const { summary, by_batch, by_disease, by_model, by_agreement, by_field_group, top_problem_fields, model_disagreement_analysis } = metrics
 
   return (
     <div className="space-y-6">
@@ -261,6 +280,48 @@ export default function LLMEvalTab() {
           </div>
         </div>
       </div>
+
+      {/* Disease Breakdown */}
+      {by_disease && by_disease.length > 0 && (
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200/60 p-5">
+          <h3 className="text-sm font-semibold text-slate-700 mb-4 flex items-center gap-2">
+            <Activity className="w-4 h-4" />
+            Accuracy by Disease
+          </h3>
+          <div className="h-48">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={by_disease} margin={{ top: 10, right: 10, left: 0, bottom: 20 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis
+                  dataKey="disease"
+                  tick={{ fill: '#64748b', fontSize: 11 }}
+                  axisLine={{ stroke: '#cbd5e1' }}
+                />
+                <YAxis
+                  domain={[80, 100]}
+                  tick={{ fill: '#64748b', fontSize: 11 }}
+                  axisLine={{ stroke: '#cbd5e1' }}
+                  tickFormatter={(v) => `${v}%`}
+                />
+                <Tooltip content={<ChartTooltip />} />
+                <Bar dataKey="field_accuracy" name="Field Accuracy" radius={[4, 4, 0, 0]}>
+                  {by_disease.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={DISEASE_COLORS[entry.disease] || '#94a3b8'} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="mt-3 grid grid-cols-5 gap-2 text-xs">
+            {by_disease.map((d) => (
+              <div key={d.disease} className="text-center">
+                <span className="font-medium" style={{ color: DISEASE_COLORS[d.disease] }}>{d.disease}</span>
+                <div className="text-slate-500">{d.total_questions} Q / {d.field_accuracy}%</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Charts Row 1: Batch Trend + Model Comparison */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

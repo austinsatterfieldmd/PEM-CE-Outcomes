@@ -21,9 +21,12 @@ import logging
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/eval", tags=["evaluation"])
 
-# Path to checkpoint file
+# Path to checkpoint directory
 PROJECT_ROOT = Path(__file__).parent.parent.parent.parent
-CHECKPOINT_FILE = PROJECT_ROOT / "data" / "checkpoints" / "stage2_tagged_multiple_myeloma.json"
+CHECKPOINT_DIR = PROJECT_ROOT / "data" / "checkpoints"
+
+# Pattern for tagged checkpoint files (stage2_tagged_*.json but not .bak files)
+CHECKPOINT_PATTERN = "stage2_tagged_*.json"
 
 # Field groups for analysis
 FIELD_GROUPS = {
@@ -129,9 +132,20 @@ class EvalSummary(BaseModel):
     generated_at: str
 
 
+class DiseaseStats(BaseModel):
+    disease: str
+    total_questions: int
+    questions_with_edits: int
+    question_accuracy: float
+    total_fields: int
+    edited_fields: int
+    field_accuracy: float
+
+
 class EvalMetrics(BaseModel):
     summary: EvalSummary
     by_batch: List[BatchStats]
+    by_disease: List[DiseaseStats]
     by_model: List[ModelStats]
     by_agreement: List[AgreementStats]
     by_field_group: List[FieldGroupStats]
@@ -201,12 +215,40 @@ def get_real_errors(q: dict) -> list[str]:
 
 
 def load_checkpoint() -> list[dict]:
-    """Load the tagged checkpoint data."""
-    if not CHECKPOINT_FILE.exists():
-        raise HTTPException(status_code=404, detail=f"Checkpoint file not found: {CHECKPOINT_FILE}")
+    """Load all tagged checkpoint data from multiple disease files."""
+    if not CHECKPOINT_DIR.exists():
+        raise HTTPException(status_code=404, detail=f"Checkpoint directory not found: {CHECKPOINT_DIR}")
 
-    with open(CHECKPOINT_FILE, "r", encoding="utf-8") as f:
-        return json.load(f)
+    all_questions = []
+    checkpoint_files = list(CHECKPOINT_DIR.glob(CHECKPOINT_PATTERN))
+
+    # Filter out .bak files
+    checkpoint_files = [f for f in checkpoint_files if not f.name.endswith('.bak')]
+
+    if not checkpoint_files:
+        raise HTTPException(status_code=404, detail=f"No checkpoint files found matching {CHECKPOINT_PATTERN}")
+
+    logger.info(f"Loading {len(checkpoint_files)} checkpoint files: {[f.name for f in checkpoint_files]}")
+
+    for checkpoint_file in checkpoint_files:
+        try:
+            with open(checkpoint_file, "r", encoding="utf-8") as f:
+                questions = json.load(f)
+                # Add disease info from filename
+                disease = checkpoint_file.stem.replace("stage2_tagged_", "").upper()
+                for q in questions:
+                    q["_source_disease"] = disease
+                all_questions.extend(questions)
+                logger.info(f"Loaded {len(questions)} questions from {checkpoint_file.name}")
+        except Exception as e:
+            logger.warning(f"Error loading {checkpoint_file.name}: {e}")
+            continue
+
+    if not all_questions:
+        raise HTTPException(status_code=404, detail="No questions loaded from checkpoint files")
+
+    logger.info(f"Total questions loaded: {len(all_questions)}")
+    return all_questions
 
 
 def compute_metrics(questions: list[dict]) -> EvalMetrics:
@@ -262,6 +304,40 @@ def compute_metrics(questions: list[dict]) -> EvalMetrics:
         f_acc = (stats["total_fields"] - stats["edited_fields"]) / stats["total_fields"] * 100 if stats["total_fields"] > 0 else 0
         by_batch.append(BatchStats(
             batch=batch,
+            total_questions=stats["total_questions"],
+            questions_with_edits=stats["questions_with_edits"],
+            question_accuracy=round(q_acc, 1),
+            total_fields=stats["total_fields"],
+            edited_fields=stats["edited_fields"],
+            field_accuracy=round(f_acc, 1)
+        ))
+
+    # ========== By Disease ==========
+    disease_stats = defaultdict(lambda: {
+        "total_questions": 0,
+        "questions_with_edits": 0,
+        "total_fields": 0,
+        "edited_fields": 0
+    })
+
+    for q in questions:
+        disease = q.get("_source_disease", "Unknown")
+        real_errors = get_real_errors(q)
+        field_votes = q.get("field_votes", {}) or {}
+
+        disease_stats[disease]["total_questions"] += 1
+        disease_stats[disease]["total_fields"] += len(field_votes)
+
+        if real_errors:
+            disease_stats[disease]["questions_with_edits"] += 1
+            disease_stats[disease]["edited_fields"] += len(real_errors)
+
+    by_disease = []
+    for disease, stats in sorted(disease_stats.items()):
+        q_acc = (stats["total_questions"] - stats["questions_with_edits"]) / stats["total_questions"] * 100 if stats["total_questions"] > 0 else 0
+        f_acc = (stats["total_fields"] - stats["edited_fields"]) / stats["total_fields"] * 100 if stats["total_fields"] > 0 else 0
+        by_disease.append(DiseaseStats(
+            disease=disease,
             total_questions=stats["total_questions"],
             questions_with_edits=stats["questions_with_edits"],
             question_accuracy=round(q_acc, 1),
@@ -494,6 +570,7 @@ def compute_metrics(questions: list[dict]) -> EvalMetrics:
     return EvalMetrics(
         summary=summary,
         by_batch=by_batch,
+        by_disease=by_disease,
         by_model=by_model,
         by_agreement=by_agreement,
         by_field_group=by_field_group,
