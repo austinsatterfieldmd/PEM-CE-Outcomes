@@ -815,7 +815,7 @@ Respond with ONLY a JSON object containing all 70 fields. Use `null` for fields 
     "disease_stage": null,
     "disease_type_1": "Double-hit",
     "disease_type_2": null,
-    "treatment_line": "1L",
+    "treatment_line": "Newly diagnosed",
     "treatment_1": "DA-EPOCH-R",
     "biomarker_1": "MYC rearrangement",
     "biomarker_2": "BCL2 rearrangement",
@@ -834,7 +834,7 @@ Respond with ONLY a JSON object containing all 70 fields. Use `null` for fields 
 {
     "topic": "Clinical efficacy",
     "disease_type_1": null,
-    "treatment_line": "1L",
+    "treatment_line": "Newly diagnosed",
     "treatment_1": "Polatuzumab vedotin",
     "treatment_2": "Rituximab",
     "trial_1": "POLARIX",

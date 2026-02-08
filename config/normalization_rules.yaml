@@ -498,6 +498,18 @@ normalization_aliases:
   - Newly Diagnosed
   - newly diagnosed
   - NEWLY DIAGNOSED
+  - 1L
+  - Treatment naive
+  - treatment naive
+  - Treatment-naive
+  - treatment-naive
+  - Frontline
+  - frontline
+  - First-line
+  - first-line
+  - 1st line
+  - First line
+  - first line
   Transplant-eligible:
   - HSCT-eligible
   - HSCT eligible

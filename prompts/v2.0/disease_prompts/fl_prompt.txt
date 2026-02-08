@@ -777,7 +777,7 @@ Respond with ONLY a JSON object containing all 70 fields. Use `null` for fields 
     "topic": "Treatment selection",
     "disease_stage": null,
     "disease_type_1": "Transformed",
-    "treatment_line": "1L",
+    "treatment_line": "Newly diagnosed",
     "treatment_1": "R-CHOP",
     "disease_specific_factor": "Transformation",
     "symptom_1": "B symptoms",

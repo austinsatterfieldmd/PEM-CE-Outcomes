@@ -611,6 +611,7 @@ verified_values:
   - Pancytopenias
   - Bruising
   - Weight loss
+  - Pancytopenia
   treatment:
   - Idecabtagene vicleucel
   - Ciltacabtagene autoleucel
@@ -822,6 +823,16 @@ verified_values:
   - Liver
   - GI tract
 normalization_rules:
+  treatment_line:
+    1L: Newly diagnosed
+    Treatment naive: Newly diagnosed
+    treatment naive: Newly diagnosed
+    Treatment-naive: Newly diagnosed
+    treatment-naive: Newly diagnosed
+    First-line: Newly diagnosed
+    first-line: Newly diagnosed
+    Frontline: Newly diagnosed
+    frontline: Newly diagnosed
   treatment:
     daratumumab: Daratumumab
     bortezomib: Bortezomib
