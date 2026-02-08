@@ -597,7 +597,8 @@ def update_remaining_file(results: List[Dict[str, Any]], input_file: str):
         tagged_qgds = set()
         for r in results:
             if 'error' not in r:
-                qgd = r.get('qgd') or r.get('question_id')
+                # Results store source_id (which is the QGD/QUESTIONGROUPDESIGNATION)
+                qgd = r.get('source_id') or r.get('qgd') or r.get('question_id')
                 if qgd:
                     tagged_qgds.add(str(qgd))
 
@@ -609,9 +610,9 @@ def update_remaining_file(results: List[Dict[str, Any]], input_file: str):
         df_remaining = pd.read_excel(remaining_path)
         original_count = len(df_remaining)
 
-        # Find QGD column (could be QGD or SOURCE_ID or similar)
+        # Find QGD column (could be QGD or QUESTIONGROUPDESIGNATION or SOURCE_ID)
         qgd_col = None
-        for col in ['QGD', 'qgd', 'SOURCE_ID', 'source_id']:
+        for col in ['QGD', 'qgd', 'QUESTIONGROUPDESIGNATION', 'questiongroupdesignation', 'SOURCE_ID', 'source_id']:
             if col in df_remaining.columns:
                 qgd_col = col
                 break
