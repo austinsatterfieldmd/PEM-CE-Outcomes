@@ -618,9 +618,15 @@ verified_values:
   - ASCT
   - Acalabrutinib
   - Ibrutinib
+  - Mosunetuzumab
+  - Axicabtagene ciloleucel
+  - Tisagenlecleucel
+  - Umbralisib
+  - Tafasitamab
   biomarker:
   - del(17p)
   - MRD
+  - t(14;18)
   drug_class:
   - CAR-T therapy
   - Bispecific antibody
@@ -628,8 +634,12 @@ verified_values:
   - Proteasome inhibitor
   - IMiD
   - Covalent BTKi
+  - PI3K inhibitor
   disease_type:
   - High-risk
+  - B-ALL
+  - Grade 3B
+  - Low-grade
   prior_therapy:
   - Prior anti-CD38
   - Prior PI
@@ -641,13 +651,18 @@ verified_values:
   - VTE
   - VOD/SOS
   - Atrial fibrillation
+  - Cytopenias
   trial:
   - IsKia
+  - UNITY-NHL
   efficacy_endpoint:
   - MRD negativity rate
+  - Overall response rate (ORR)
+  - Stable disease
   toxicity_organ:
   - Hepatic
   - Cardiac
+  - Hematologic
 normalization_rules:
   treatment:
     daratumumab: Daratumumab
