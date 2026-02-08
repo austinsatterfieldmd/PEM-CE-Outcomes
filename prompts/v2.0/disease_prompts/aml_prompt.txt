@@ -112,7 +112,7 @@ Unlike solid tumors (TNM), AML is not staged. Disease classification uses:
 **CRITICAL RULES:**
 - Only tag drugs of interest to pharmaceutical CME funders
 - Put each drug in a separate field (treatment_1, treatment_2, etc.)
-- **CAPITALIZE drug names**
+- **Use proper case for drug names** (e.g., "Revumenib", not "REVUMENIB" or "revumenib")
 - **TAG TREATMENTS FROM THE CORRECT ANSWER**
 
 ---

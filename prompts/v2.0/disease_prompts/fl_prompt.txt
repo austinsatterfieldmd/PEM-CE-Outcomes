@@ -166,7 +166,7 @@ You must assign values for all 70 tag fields (disease_state is already determine
 **CRITICAL RULES:**
 - Only tag drugs of interest to pharmaceutical CME funders
 - Put each drug in a separate field
-- **CAPITALIZE drug names**
+- **Use proper case for drug names** (e.g., "Rituximab", not "RITUXIMAB")
 - **TAG TREATMENTS FROM THE CORRECT ANSWER**
 
 ### treatment_1-5: Critical Tagging Rules

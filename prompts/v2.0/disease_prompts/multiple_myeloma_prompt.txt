@@ -216,7 +216,7 @@ Key test: What is the educational focus?
 - DO NOT tag: dexamethasone (backbone), general steroids
 - For combinations, tag ONLY the fundable drugs
 - Put each drug in a separate field (treatment_1, treatment_2, etc.)
-- **CAPITALIZE drug names** - Use "Daratumumab" not "daratumumab", "Bortezomib" not "bortezomib"
+- **Use proper case for drug names** (e.g., "Daratumumab", not "DARATUMUMAB") - Use "Daratumumab" not "daratumumab", "Bortezomib" not "bortezomib"
 - **TAG TREATMENTS FROM THE CORRECT ANSWER** - If the correct answer contains specific drug names, TAG THEM. Example: Q: "Which treatment for this R/R MM patient?" A: "Isatuximab plus carfilzomib and dexamethasone" → treatment_1: "Isatuximab", treatment_2: "Carfilzomib". The drugs in the correct answer ARE the treatments being discussed.
 
 **Fundable therapies (EXAMPLES - not exhaustive):**
