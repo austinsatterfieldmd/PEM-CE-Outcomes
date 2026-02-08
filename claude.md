@@ -132,6 +132,43 @@ Detailed session logs are saved in `docs/SESSION_LOG_YYYY-MM-DD.md` for audit tr
 
 ---
 
+## ⚠️ CRITICAL: Database Queries Must Match Dashboard View
+
+**When querying the database, ALWAYS use the same filters as the dashboard** to avoid confusion between what Claude sees and what the user sees.
+
+### Dashboard View Filter (Canonical Questions Only)
+The dashboard only shows **canonical questions** - it excludes duplicates. Always include this filter:
+
+```sql
+WHERE (q.canonical_source_id IS NULL OR q.canonical_source_id = CAST(q.source_id AS TEXT))
+```
+
+### Example: Correct Way to Query Tag Values
+```python
+# CORRECT - matches dashboard view
+cursor.execute('''
+    SELECT t.treatment_line, COUNT(*) as cnt
+    FROM tags t
+    JOIN questions q ON t.question_id = q.id
+    WHERE t.treatment_line IS NOT NULL
+    AND (q.canonical_source_id IS NULL OR q.canonical_source_id = CAST(q.source_id AS TEXT))
+    GROUP BY t.treatment_line
+''')
+
+# WRONG - includes duplicates, won't match dashboard
+cursor.execute('''
+    SELECT t.treatment_line, COUNT(*) FROM tags t GROUP BY t.treatment_line
+''')
+```
+
+### Why This Matters
+- Raw DB queries include ALL records (including duplicates)
+- Dashboard filters to canonical questions only
+- This caused confusion where Claude reported 6 questions but user only saw 1
+- Always verify counts match what user sees in dashboard
+
+---
+
 ## ⚠️ CRITICAL: Performance Score Calculations
 
 **The raw data columns are NOT percentages - they are counts!**
