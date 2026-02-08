@@ -267,6 +267,10 @@ MCL has a specific CAR-T product approved:
 ### 7. biomarker_1 through biomarker_5 (up to 5 biomarkers)
 **OPTIONAL** - Can be null. Tag when clinically relevant.
 
+**DO NOT put in biomarker:**
+- **Resistance mutations** → Use `resistance_mechanism` instead (e.g., C481S goes in resistance_mechanism, NOT biomarker)
+- **Drug targets** → Use `drug_target` instead (e.g., CD19, CD20 are drug targets, not biomarkers)
+
 **Key MCL Biomarkers:**
 
 **Diagnostic:**
@@ -299,8 +303,7 @@ Q: "MCL with blastoid morphology and Ki-67 >80%. What is the prognosis?"
 ✓ biomarker_2: TP53 mutation (if mentioned)
 WHY: High Ki-67 in MCL correlates with aggressive disease.
 
-**Predictive:**
-- `"C481S mutation"` or `"BTK C481S"` - Resistance to covalent BTKi
+**NOTE:** C481S mutation is a RESISTANCE MECHANISM, not a biomarker. Tag in `resistance_mechanism` field.
 
 **Targets:**
 - `"CD19"` - Target for CAR-T (brexu-cel)
@@ -446,11 +449,19 @@ Molecular target(s) of the drug.
 ### 17. prior_therapy_1 through prior_therapy_3
 Relevant prior treatments if mentioned.
 
+**CRITICAL: Prefer drug CLASS over specific drug names.**
+- Use `"Prior covalent BTKi"` instead of "Prior ibrutinib"
+- Use `"Prior anti-CD20"` instead of "Prior rituximab"
+- Use `"Prior CAR-T"` (class) unless specific product is uniquely relevant
+
+**Only use specific drug names when:**
+- The drug is unique in its indication (e.g., brexucabtagene autoleucel is the only CAR-T for MCL)
+- The question specifically discusses that drug's unique properties
+
 **MCL examples:**
 - `"Prior covalent BTKi"` - Previous ibrutinib, acalabrutinib, or zanubrutinib
-- `"Prior ibrutinib"` - Specific prior BTKi
 - `"Prior ASCT"` - Post-transplant relapse
-- `"Prior CAR-T"` - Post-CAR-T relapse
+- `"Prior CAR-T"` - Post-CAR-T relapse (or specific: "Prior brexucabtagene autoleucel")
 - `"Prior BR"` - Bendamustine-rituximab
 
 ### 18. resistance_mechanism

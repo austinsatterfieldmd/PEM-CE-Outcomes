@@ -283,6 +283,9 @@ If a question mentions CAR-T in MM context, the target should be BCMA or GPRC5D,
 ### 7. biomarker_1 through biomarker_5 (up to 5 biomarkers)
 **OPTIONAL** - Can be null. Tag when clinically relevant to the question.
 
+**DO NOT put in biomarker:**
+- **Drug targets** → Use `drug_target` instead (e.g., BCMA, CD38, GPRC5D are drug targets, not biomarkers)
+
 **MULTI-VALUE FIELD:** Use `biomarker_1`, `biomarker_2`, etc. for multiple biomarkers (up to 5). Use `null` for unused slots.
 
 **When to tag:**
@@ -559,7 +562,19 @@ Molecular target(s) of the drug mechanism.
 
 ### 17. prior_therapy_1 through prior_therapy_3
 Relevant prior treatments if mentioned.
-**MM examples:** `"Prior PI"`, `"Prior IMiD"`, `"Prior anti-CD38"`, `"Prior ASCT"`, `"Lenalidomide-refractory"`, `"Triple-class refractory"`.
+
+**CRITICAL: Prefer drug CLASS over specific drug names.**
+- Use `"Prior PI"` instead of "Prior bortezomib" or "Prior carfilzomib"
+- Use `"Prior IMiD"` instead of "Prior lenalidomide" or "Prior pomalidomide"
+- Use `"Prior anti-CD38"` instead of "Prior daratumumab" or "Prior isatuximab"
+- Use `"Prior CAR-T"` or `"Prior bispecific"` instead of specific product names
+
+**Only use specific drug names when:**
+- The drug is unique in its indication
+- The question specifically discusses that drug's unique properties
+- Documenting refractory status (e.g., "Lenalidomide-refractory")
+
+**MM examples:** `"Prior PI"`, `"Prior IMiD"`, `"Prior anti-CD38"`, `"Prior ASCT"`, `"Prior CAR-T"`, `"Prior bispecific"`, `"Lenalidomide-refractory"`, `"Triple-class refractory"`.
 
 ### 18. resistance_mechanism
 If resistance is discussed.

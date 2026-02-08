@@ -280,6 +280,10 @@ Bispecific antibodies are emerging as alternatives to CAR-T. **Tag the specific 
 ### 7. biomarker_1 through biomarker_5 (up to 5 biomarkers)
 **OPTIONAL** - Can be null. Tag when clinically relevant.
 
+**DO NOT put in biomarker:**
+- **Drug targets** → Use `drug_target` instead (e.g., CD19, CD20 are drug targets, not biomarkers)
+- **Cell of origin (GCB/ABC/Non-GCB)** → Use `disease_type` instead
+
 **Key DLBCL Biomarkers:**
 
 **Molecular/FISH:**
@@ -455,11 +459,20 @@ Molecular target(s) of the drug.
 ### 17. prior_therapy_1 through prior_therapy_3
 Relevant prior treatments if mentioned.
 
+**CRITICAL: Prefer drug CLASS over specific drug names.**
+- Use `"Prior CAR-T"` instead of "Prior axicabtagene ciloleucel" (unless specific product is uniquely relevant)
+- Use `"Prior bispecific"` instead of specific bispecific names
+- Use `"Prior ADC"` instead of specific ADC names
+
+**Exception - use specific drug when unique in indication:**
+- `"Prior Pola-R-CHP"` or `"Prior polatuzumab vedotin"` - Only ADC in 1L DLBCL (POLARIX), unique indication
+
 **DLBCL examples:**
 - `"Prior R-CHOP"` - First-line chemoimmunotherapy
-- `"Prior CAR-T"` - Post-CAR-T relapse
+- `"Prior Pola-R-CHP"` - Specific because unique in 1L setting
+- `"Prior CAR-T"` - Post-CAR-T relapse (prefer class)
 - `"Prior ASCT"` - Post-transplant relapse
-- `"Prior bispecific"` - After bispecific failure
+- `"Prior bispecific"` - After bispecific failure (prefer class)
 
 ### 18. resistance_mechanism
 If resistance is discussed.

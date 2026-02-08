@@ -301,13 +301,16 @@ Asparaginase is a key therapy in ALL with multiple formulations from different m
 ### 7. biomarker_1 through biomarker_5 (up to 5 biomarkers)
 **OPTIONAL** - Can be null. Tag when clinically relevant.
 
+**DO NOT put in biomarker:**
+- **BCR-ABL / Philadelphia chromosome** → Use `disease_type` (Ph+ or Ph-) instead. Only use `t(9;22)` in biomarker when cytogenetic TESTING is the focus.
+- **Drug targets** → Use `drug_target` instead (e.g., CD19, CD22 are drug targets, not biomarkers)
+- **TKI resistance mutations** → Use `resistance_mechanism` instead (e.g., T315I)
+
 **Key ALL Biomarkers:**
 
-**Predictive:**
-- `"BCR-ABL"` or `"Philadelphia chromosome"` - Predicts TKI response
-- `"CD19"` - Target for blinatumomab, CAR-T
-- `"CD22"` - Target for inotuzumab
-- `"T315I mutation"` - TKI resistance marker
+**Cytogenetic (use when testing is the focus):**
+- `"t(9;22)"` - Philadelphia chromosome cytogenetic notation
+- `"MRD positive"` or `"MRD negative"` - Minimal residual disease status
 
 **Prognostic/Risk Stratification (High-Risk Genetic Features):**
 - `"MRD"` or `"Minimal residual disease"` - Key prognostic marker
@@ -473,12 +476,22 @@ Molecular target(s) of the drug.
 ### 17. prior_therapy_1 through prior_therapy_3
 Relevant prior treatments if mentioned.
 
+**CRITICAL: Prefer drug CLASS over specific drug names.**
+- Use `"Prior TKI"` instead of "Prior dasatinib" or "Prior ponatinib"
+- Use `"Prior CAR-T"` instead of specific CAR-T product names
+- Use `"Prior bispecific"` instead of specific bispecific names
+
+**Exception - use specific drug when unique in indication:**
+- `"Prior blinatumomab"` - Only CD19 bispecific in ALL (unique, can use specific name)
+- `"Prior inotuzumab"` - Only CD22 ADC in ALL (unique, can use specific name)
+- `"Prior asparaginase"` - Relevant when discussing formulation switching
+
 **ALL examples:**
 - `"Prior asparaginase"` - Relevant for formulation switching
-- `"Prior blinatumomab"` - CD19 exposure history
-- `"Prior inotuzumab"` - CD22 exposure, VOD risk
-- `"Prior TKI"` - For Ph+ ALL
-- `"Prior CAR-T"` - Post-CAR-T relapse
+- `"Prior blinatumomab"` - CD19 exposure history (unique in indication)
+- `"Prior inotuzumab"` - CD22 exposure, VOD risk (unique in indication)
+- `"Prior TKI"` - For Ph+ ALL (prefer class)
+- `"Prior CAR-T"` - Post-CAR-T relapse (prefer class)
 - `"Prior HSCT"` - Transplant history
 
 ### 18. resistance_mechanism

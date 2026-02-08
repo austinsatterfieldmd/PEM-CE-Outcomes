@@ -276,13 +276,18 @@ BTK inhibitors are a cornerstone of CLL therapy. **Classify by binding mechanism
 ### 7. biomarker_1 through biomarker_5 (up to 5 biomarkers)
 **OPTIONAL** - Can be null. Tag when clinically relevant.
 
+**DO NOT put in biomarker:**
+- **Resistance mutations** → Use `resistance_mechanism` instead (e.g., C481S goes in resistance_mechanism, NOT biomarker)
+- **Drug targets** → Use `drug_target` instead (e.g., CD19, CD20, BCMA are drug targets, not biomarkers)
+- **Drug class markers** → If it's primarily about the drug mechanism, use drug_target
+
 **Key CLL Biomarkers:**
 
 **Predictive (treatment selection):**
 - `"del(17p)"` - Predicts poor response to chemo, indicates BTKi/venetoclax
 - `"TP53 mutation"` - Same implication as del(17p), often co-occurs
-- `"C481S mutation"` or `"BTK C481S"` - Resistance to covalent BTKi, indicates non-covalent BTKi
-- `"BCL-2 mutation"` - Resistance to venetoclax (rare)
+
+**NOTE:** C481S mutation and BCL-2 mutation are RESISTANCE MECHANISMS, not biomarkers. Tag them in `resistance_mechanism` field.
 
 **Prognostic:**
 - `"IGHV unmutated"` - Poor prognosis, continuous therapy often preferred
@@ -294,15 +299,12 @@ BTK inhibitors are a cornerstone of CLL therapy. **Classify by binding mechanism
 - `"NOTCH1 mutation"` - Poor prognosis, Richter risk
 - `"SF3B1 mutation"` - Intermediate prognosis
 
-**Targets:**
-- `"CD20"` - Target for obinutuzumab, rituximab
-- `"BTK"` - Target for BTK inhibitors
-- `"BCL-2"` - Target for venetoclax
+**NOTE:** CD20, BTK, BCL-2 are DRUG TARGETS, not biomarkers. Tag them in `drug_target` field.
 
-**CRITICAL - C481S Mutation:**
+**CRITICAL - C481S Mutation (Resistance Mechanism):**
 Look for **C481S mutation** (also written as Cys481Ser or BTK C481S) in the question stem or correct answer. This mutation confers resistance to covalent BTKi and is the primary indication for non-covalent BTKi therapy.
 
-**When to tag C481S:**
+**Tag C481S in `resistance_mechanism` (NOT biomarker) when:**
 - Explicitly mentioned in question or answer
 - "Acquired resistance to ibrutinib" with mechanism discussion
 - Question about switching from covalent to non-covalent BTKi
@@ -454,10 +456,18 @@ Molecular target(s) of the drug.
 ### 17. prior_therapy_1 through prior_therapy_3
 Relevant prior treatments if mentioned.
 
+**CRITICAL: Prefer drug CLASS over specific drug names.**
+- Use `"Prior covalent BTKi"` instead of "Prior ibrutinib" (unless ibrutinib is uniquely relevant)
+- Use `"Prior anti-CD20"` instead of "Prior rituximab"
+- Use `"Prior BCL-2 inhibitor"` instead of "Prior venetoclax"
+
+**Only use specific drug names when:**
+- The drug is unique in its indication (no other drugs in that class for CLL)
+- The question specifically discusses that drug's unique properties
+
 **CLL examples:**
 - `"Prior covalent BTKi"` - Previous ibrutinib, acalabrutinib, or zanubrutinib
-- `"Prior ibrutinib"` - Specific prior BTKi
-- `"Prior venetoclax"` - BCL-2 inhibitor exposure
+- `"Prior venetoclax"` - BCL-2 inhibitor exposure (acceptable since venetoclax is only BCL-2i in CLL)
 - `"Prior chemoimmunotherapy"` - FCR, BR history
 - `"Prior anti-CD20"` - Rituximab, obinutuzumab exposure
 
@@ -770,17 +780,17 @@ Respond with ONLY a JSON object containing all 70 fields. Use `null` for fields 
     "disease_type_2": null,
     "treatment_line": "R/R",
     "treatment_1": "Pirtobrutinib",
-    "biomarker_1": "C481S mutation",
+    "biomarker_1": null,
     "drug_class_1": "Non-covalent BTKi",
     "drug_target_1": "BTK",
-    "prior_therapy_1": "Prior ibrutinib",
+    "prior_therapy_1": "Prior covalent BTKi",
     "resistance_mechanism": "C481S mutation",
     ...
 }
 ```
 **Rationale:**
-- C481S mutation detected → biomarker_1 AND resistance_mechanism
-- Progression on ibrutinib → treatment_line: "R/R", prior_therapy_1: "Prior ibrutinib"
+- C481S mutation → resistance_mechanism ONLY (not biomarker - it's a resistance mechanism)
+- Progression on ibrutinib → treatment_line: "R/R", prior_therapy_1: "Prior covalent BTKi" (prefer class over specific drug)
 - Pirtobrutinib is non-covalent BTKi (works despite C481S)
 - BRUIN trial could be inferred if discussing efficacy data
 
@@ -871,6 +881,6 @@ Respond with ONLY a JSON object containing all 70 fields. Use `null` for fields 
 4. **One topic only** - Topic is required; never null
 5. **Boolean flaw fields** - Use `true` or `false` (not strings, not null)
 6. **BTKi classification** - Always distinguish covalent vs non-covalent
-7. **C481S is critical** - Tag in both biomarker AND resistance_mechanism when present
+7. **C481S is critical** - Tag in resistance_mechanism ONLY (not biomarker - it's a resistance mechanism)
 8. **disease_stage is always null for CLL**
 9. **Tag from correct answer** - Not distractors
