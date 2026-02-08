@@ -2,6 +2,20 @@
 
 This file provides context and guidelines for Claude Code when working on this project.
 
+## 🚀 New Conversation Checklist
+
+**At the start of each new conversation, remind the user:**
+
+1. **Backend may not be running** - Background processes don't persist across conversations
+2. **Check if dashboard is working** - If showing stale data, backend needs restart
+3. **User should run backend in their own terminal** (so it persists):
+   ```powershell
+   cd "c:\Dev\CE-Outcomes-Dashboard\dashboard"
+   python -m uvicorn backend.main:app --reload --host 127.0.0.1 --port 8000
+   ```
+
+---
+
 ## Working Style Preferences
 
 ### ⚠️ CRITICAL: No Edits Without Explicit Approval
