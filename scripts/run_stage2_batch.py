@@ -166,7 +166,27 @@ def aggregated_vote_to_dict(result: AggregatedVote, question: Dict) -> Dict[str,
     Convert AggregatedVote to serializable dict for JSON output.
 
     Preserves all model votes for review interface.
+    Handles API errors with partial model responses.
     """
+    # Check if this is an API error result
+    is_api_error = result.final_tags and result.final_tags.get('_api_error', False)
+
+    # Build field_votes only if we have tags (not in error case)
+    field_votes = {}
+    if result.tags:
+        field_votes = {
+            field_name: {
+                'final_value': vote.final_value,
+                'gpt_value': vote.gpt_value,
+                'claude_value': vote.claude_value,
+                'gemini_value': vote.gemini_value,
+                'agreement': vote.agreement_level.value,
+                'confidence': vote.confidence,
+                'dissenting_model': vote.dissenting_model
+            }
+            for field_name, vote in result.tags.items()
+        }
+
     return {
         # Question data
         'question_id': result.question_id,
@@ -185,24 +205,17 @@ def aggregated_vote_to_dict(result: AggregatedVote, question: Dict) -> Dict[str,
         'needs_review': result.needs_review,
         'review_reason': result.review_reason,
 
-        # Individual model votes (for review interface)
+        # API error flag (for dashboard to handle specially)
+        'api_error': is_api_error,
+        'error': result.final_tags.get('_error_message') if is_api_error else None,
+
+        # Individual model votes (for review interface - preserved even on error)
         'gpt_tags': result.gpt_tags,
         'claude_tags': result.claude_tags,
         'gemini_tags': result.gemini_tags,
 
-        # Per-field vote details
-        'field_votes': {
-            field_name: {
-                'final_value': vote.final_value,
-                'gpt_value': vote.gpt_value,
-                'claude_value': vote.claude_value,
-                'gemini_value': vote.gemini_value,
-                'agreement': vote.agreement_level.value,
-                'confidence': vote.confidence,
-                'dissenting_model': vote.dissenting_model
-            }
-            for field_name, vote in result.tags.items()
-        },
+        # Per-field vote details (empty if API error)
+        'field_votes': field_votes,
 
         # Web search info
         'web_searches_used': result.web_searches_used,

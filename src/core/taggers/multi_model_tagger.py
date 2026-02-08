@@ -482,17 +482,39 @@ IMPORTANT - Answer Options Usage:
 
         # Inject Stage 1 result (ensure disease_state and is_oncology are present)
         for tags in [gpt_tags, claude_tags, gemini_tags]:
-            tags["is_oncology"] = True  # All oncology at this point
-            if disease_state and not tags.get("disease_state"):
-                tags["disease_state"] = disease_state
+            if tags:  # Guard against None
+                tags["is_oncology"] = True  # All oncology at this point
+                if disease_state and not tags.get("disease_state"):
+                    tags["disease_state"] = disease_state
 
-        # Aggregate votes
-        aggregated = self.aggregator.aggregate(
-            question_id=question_id,
-            gpt_response=gpt_tags,
-            claude_response=claude_tags,
-            gemini_response=gemini_tags
-        )
+        # Aggregate votes - with error handling to preserve partial responses
+        try:
+            aggregated = self.aggregator.aggregate(
+                question_id=question_id,
+                gpt_response=gpt_tags or {},
+                claude_response=claude_tags or {},
+                gemini_response=gemini_tags or {}
+            )
+        except Exception as e:
+            # Aggregation failed - create error result with partial model responses
+            logger.error(f"Question {question_id}: Aggregation error - {e}")
+            # Store partial responses for review
+            aggregated = AggregatedVote(
+                question_id=question_id,
+                overall_agreement=AgreementLevel.CONFLICT,
+                overall_confidence=0.0,
+                needs_review=True,
+                review_reason=f"api_error:{str(e)[:100]}",
+                final_tags={
+                    "is_oncology": True,
+                    "disease_state": disease_state,
+                    "_api_error": True,
+                    "_error_message": str(e)
+                },
+                gpt_tags=gpt_tags,
+                claude_tags=claude_tags,
+                gemini_tags=gemini_tags
+            )
 
         # Ensure is_oncology is in final tags
         if aggregated.final_tags:
