@@ -19,6 +19,57 @@ CORRECTIONS_DIR = Path("data/corrections")
 class DiseasePromptManager:
     """Loads and caches disease-specific tagging prompts."""
 
+    # Mapping from Stage 1 disease_state to prompt filename
+    # Used when the disease_state doesn't directly match a prompt file
+    DISEASE_TO_PROMPT_MAPPING = {
+        # Pan-heme and category fallbacks
+        "Heme malignancies": "heme_malignancy_fallback",
+        "MPN": "mpn_fallback",
+        "NHL": "heme_malignancy_fallback",  # Generic NHL goes to pan-heme
+
+        # Rare heme diseases → specific prompts
+        "Waldenström": "waldenstrom",
+        "Waldenstrom": "waldenstrom",  # Without umlaut
+        "Waldenström macroglobulinemia": "waldenstrom",
+        "PTCL": "ptcl",
+        "Peripheral T-cell lymphoma": "ptcl",
+        "BPDCN": "bpdcn",
+        "MZL": "mzl",
+        "Marginal zone lymphoma": "mzl",
+        "CTCL": "ctcl",
+        "Cutaneous T-cell lymphoma": "ctcl",
+        "CMML": "cmml",
+        "PCNSL": "rare_lymphoma_fallback",  # Use lymphoma fallback
+
+        # Rare solid tumors → specific prompts or fallback
+        "NF1-associated plexiform neurofibroma": "nf1",
+        "Neuroblastoma": "neuroblastoma",
+        "Desmoid tumor": "rare_solid_tumor_fallback",
+        "Tenosynovial giant cell tumor": "rare_solid_tumor_fallback",
+        "TGCT": "rare_solid_tumor_fallback",
+        "Basal cell carcinoma": "rare_solid_tumor_fallback",
+        "GIST": "rare_solid_tumor_fallback",
+        "Mesothelioma": "rare_solid_tumor_fallback",
+        "Cholangiocarcinoma": "rare_solid_tumor_fallback",
+        "Cutaneous squamous cell carcinoma": "rare_solid_tumor_fallback",
+        "LCNEC": "rare_solid_tumor_fallback",
+
+        # Other mappings
+        "Myelofibrosis": "mf",  # Alias
+        "Polycythemia vera": "pv",
+        "Essential thrombocythemia": "et",
+    }
+
+    # Category-specific fallbacks based on disease patterns
+    # NOTE: Specific diseases (DLBCL, FL, MCL, etc.) have their own prompts
+    # These fallbacks catch generic/unspecified disease names
+    CATEGORY_FALLBACKS = {
+        # If disease contains these patterns, use specific fallback
+        "lymphoma": "heme_malignancy_fallback",  # Generic lymphoma → pan-heme
+        "leukemia": "heme_malignancy_fallback",
+        "myeloma": "heme_malignancy_fallback",
+    }
+
     def __init__(self, prompt_version: str = "v2.0"):
         """
         Initialize prompt manager.
@@ -98,6 +149,12 @@ class DiseasePromptManager:
         """
         Get disease-specific prompt.
 
+        Uses a three-tier lookup:
+        1. Check explicit DISEASE_TO_PROMPT_MAPPING
+        2. Try converting disease_state to filename directly
+        3. Check CATEGORY_FALLBACKS based on disease name patterns
+        4. Use generic fallback_prompt.txt
+
         Args:
             disease_state: Canonical disease name (e.g., "Breast cancer")
 
@@ -120,10 +177,19 @@ class DiseasePromptManager:
             logger.debug(f"Using cached prompt for {disease_state}")
             return self.disease_prompts[disease_state]
 
-        # Load from file
+        # Tier 1: Check explicit mapping
+        if disease_state in self.DISEASE_TO_PROMPT_MAPPING:
+            mapped_filename = self.DISEASE_TO_PROMPT_MAPPING[disease_state]
+            filepath = self.base_path / f"{mapped_filename}_prompt.txt"
+            prompt_text = self._load_prompt_file(filepath)
+            if prompt_text:
+                self.disease_prompts[disease_state] = prompt_text
+                logger.info(f"Loaded mapped prompt '{mapped_filename}' for {disease_state}")
+                return prompt_text
+
+        # Tier 2: Try direct filename conversion
         filename = self._disease_to_filename(disease_state)
         filepath = self.base_path / f"{filename}_prompt.txt"
-
         prompt_text = self._load_prompt_file(filepath)
 
         if prompt_text:
@@ -131,12 +197,23 @@ class DiseasePromptManager:
             self.disease_prompts[disease_state] = prompt_text
             logger.info(f"Loaded disease-specific prompt for {disease_state}")
             return prompt_text
-        else:
-            # Fall back to generic prompt
-            logger.warning(
-                f"No specific prompt found for {disease_state}, using fallback"
-            )
-            return self.get_fallback_prompt()
+
+        # Tier 3: Check category fallbacks based on name patterns
+        disease_lower = disease_state.lower()
+        for pattern, fallback_name in self.CATEGORY_FALLBACKS.items():
+            if pattern in disease_lower:
+                fallback_filepath = self.base_path / f"{fallback_name}_prompt.txt"
+                fallback_text = self._load_prompt_file(fallback_filepath)
+                if fallback_text:
+                    self.disease_prompts[disease_state] = fallback_text
+                    logger.info(f"Using category fallback '{fallback_name}' for {disease_state}")
+                    return fallback_text
+
+        # Tier 4: Use generic fallback
+        logger.warning(
+            f"No specific prompt found for {disease_state}, using generic fallback"
+        )
+        return self.get_fallback_prompt()
 
     def get_fallback_prompt(self) -> str:
         """
