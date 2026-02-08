@@ -7,6 +7,15 @@ This question has been classified as being about **Marginal zone lymphoma (MZL)*
 
 ---
 
+## CRITICAL: Compound Answer Handling
+
+When the correct answer references options by letter/number (e.g., "B or C"):
+1. **DO NOT assume option order matches the original question**
+2. **Deduce the correct answer from clinical reasoning**
+3. **Tag based on the deduced correct content**
+
+---
+
 ## MZL Overview
 
 **MZL subtypes:**

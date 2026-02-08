@@ -7,6 +7,15 @@ This question has been classified as being about **NF1-associated plexiform neur
 
 ---
 
+## CRITICAL: Compound Answer Handling
+
+When the correct answer references options by letter/number (e.g., "B or C"):
+1. **DO NOT assume option order matches the original question**
+2. **Deduce the correct answer from clinical reasoning**
+3. **Tag based on the deduced correct content**
+
+---
+
 ## NF1 Plexiform Neurofibroma Overview
 
 **Definition:** Benign but debilitating tumors arising in patients with Neurofibromatosis type 1 (NF1)
