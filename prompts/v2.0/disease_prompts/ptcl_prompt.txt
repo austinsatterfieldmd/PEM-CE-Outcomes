@@ -63,6 +63,8 @@ When the correct answer references options by letter/number (e.g., "B or C"):
 - **Clinical efficacy** - Trial results (ECHELON-2)
 - **Safety profile** - HDAC inhibitor toxicities
 - **Biomarker testing** - CD30 expression, ALK status
+- **Mechanism of action** - How HDAC inhibitors or ADCs work
+- **AE management** - Managing mucositis, cytopenias
 
 ### 2. disease_stage
 | Value | Triggers |
@@ -86,6 +88,12 @@ When the correct answer references options by letter/number (e.g., "B or C"):
 | `"R/R"` | Relapsed/refractory |
 | `"Consolidation"` | Post-induction (auto-SCT consideration) |
 
+### 6. treatment_eligibility
+| Value | Triggers |
+|-------|----------|
+| `"Transplant-eligible"` | Candidate for auto-SCT consolidation |
+| `"Transplant-ineligible"` | Not a transplant candidate |
+
 ### 7-11. treatment_1 through treatment_5
 **PTCL drugs:**
 - Brentuximab vedotin, Romidepsin, Belinostat, Pralatrexate
@@ -97,6 +105,14 @@ When the correct answer references options by letter/number (e.g., "B or C"):
 |-----------|---------|
 | `"CD30"` | Brentuximab vedotin eligibility |
 | `"ALK"` | ALCL subtype (ALK+ favorable) |
+| `"EBV"` | Some subtypes are EBV-associated |
+
+### 17-21. trial_1 through trial_5
+| Trial | Drug | Context |
+|-------|------|---------|
+| ECHELON-2 | BV + CHP | CD30+ PTCL frontline |
+| PROPEL | Pralatrexate | R/R PTCL |
+| BELIEF | Belinostat | R/R PTCL |
 
 ### 22-24. drug_class_1 through drug_class_3
 | Drug Class | Drugs |
@@ -106,6 +122,95 @@ When the correct answer references options by letter/number (e.g., "B or C"):
 | Antifolate | Pralatrexate |
 | PI3K inhibitor | Duvelisib |
 | EZH1/2 inhibitor | Valemetostat |
+
+### 25-27. drug_target_1 through drug_target_3
+| Target | Drug |
+|--------|------|
+| CD30 | Brentuximab vedotin |
+| HDAC | Romidepsin, Belinostat |
+| DHFR | Pralatrexate |
+
+### 28-30. prior_therapy_1 through prior_therapy_3
+**Tag when prior treatment is specified:**
+- `"Prior CHOP"` - After CHOP failure
+- `"Prior brentuximab vedotin"` - After BV failure
+- `"Prior HDAC inhibitor"` - After romidepsin/belinostat failure
+
+### 41-45. toxicity_type_1 through toxicity_type_5
+**PTCL drug toxicities:**
+- `"Mucositis"` - Pralatrexate (requires folate supplementation)
+- `"Peripheral neuropathy"` - Brentuximab vedotin
+- `"Thrombocytopenia"` - HDAC inhibitors
+- `"QTc prolongation"` - Romidepsin
+- `"Nausea/vomiting"` - HDAC inhibitors
+
+---
+
+## Group G: Question Format/Quality (15 fields)
+
+### 56. cme_outcome_level
+**Values:** `"3 - Knowledge"` or `"4 - Competence"`
+
+**CRITICAL RULE:** If the clinical vignette is NOT REQUIRED to answer the question, it's **Level 3 (Knowledge)**, not Level 4.
+
+**Test:** Could someone answer this question correctly WITHOUT reading the patient details?
+- YES → `"3 - Knowledge"` (the vignette is just context/decoration)
+- NO → `"4 - Competence"` (must apply knowledge to the specific patient)
+
+**PTCL examples:**
+- "What is the mechanism of romidepsin?" → **3 - Knowledge**
+- "Patient with CD30+ ALCL, what frontline regimen?" → **4 - Competence**
+- "What toxicity requires folate supplementation with pralatrexate?" → **3 - Knowledge**
+
+### 57-60. Format fields
+- `data_response_type`: "Numeric", "Qualitative", "Comparative", "Boolean"
+- `stem_type`: "Clinical vignette", "Direct question", "Incomplete statement"
+- `lead_in_type`: "Standard", "Negative (EXCEPT/NOT)", "Best answer"
+- `answer_format`: "Single best", "Compound (A+B)", "All of the above", "None of the above"
+
+### 61. answer_length_pattern
+**Values:** "Uniform", "Variable", "Correct longest", "Correct shortest"
+
+### answer_length_pattern Criteria (CRITICAL - Common Error)
+
+**CRITICAL RULE:** If `distractor_homogeneity` = "Homogeneous", then `answer_length_pattern` is almost always "Uniform".
+
+Tag "Variable" with Homogeneous distractors ONLY when one answer contains **additional clinical/educational content** the others lack - NOT when length differs due to:
+- Grammatical phrasing
+- Compound answers ("Both A and B")
+- Minor word count differences
+
+**"Uniform"** = All options are CONCEPTUALLY similar in complexity:
+- All single drug names: "Romidepsin" / "Belinostat" / "Pralatrexate" → **Uniform**
+
+**"Variable"** = Options differ in TYPE or COMPLEXITY with different amounts of clinical detail
+
+**"Correct longest/shortest"** = The CORRECT answer is noticeably longer/shorter than ALL distractors
+
+### 62. distractor_homogeneity
+
+### distractor_homogeneity Criteria (CRITICAL - Common Error)
+
+**"Homogeneous"** = All distractors are the SAME TYPE of answer:
+- All drug names → **Homogeneous**
+- All clinical actions → **Homogeneous**
+
+**CRITICAL:** Implausible distractors are still the same TYPE. Tag `flaw_implausible_distractor: true` but keep `distractor_homogeneity: "Homogeneous"` if all options are drugs/treatments.
+
+**"Heterogeneous"** = Distractors are DIFFERENT TYPES of answers:
+- Treatment + Safety + Mechanism mixed → **Heterogeneous**
+
+### 63-68. Flaw fields (all Boolean: true/false)
+- `flaw_absolute_terms`: true/false
+- `flaw_grammatical_cue`: true/false
+- `flaw_implausible_distractor`: true/false
+- `flaw_clang_association`: true/false
+- `flaw_convergence_vulnerability`: true/false
+- `flaw_double_negative`: true/false
+
+### 69-70. Computed fields
+- `answer_option_count`: Count of answer options (2-5)
+- `correct_answer_position`: Position of correct answer (A, B, C, D, E)
 
 ---
 
@@ -118,9 +223,31 @@ When the correct answer references options by letter/number (e.g., "B or C"):
 | R/R PTCL treatment | treatment_line: R/R, consider romidepsin/belinostat/pralatrexate |
 | HDAC inhibitor toxicity | drug_class: HDAC inhibitor, toxicity fields |
 | ATLL treatment | disease_type_1: ATLL, may include valemetostat |
+| Pralatrexate mucositis | toxicity: Mucositis, topic: Safety profile or AE management |
 
 ---
 
 ## Output Format
 
-Return JSON with all 70 fields. Use `null` for fields that don't apply. Include standard Group G question format fields.
+Return JSON with all 70 fields. Use `null` for fields that don't apply.
+
+```json
+{
+    "topic": "Treatment selection",
+    "disease_stage": "Advanced-stage",
+    "disease_type_1": "ALCL, ALK-negative",
+    "disease_type_2": null,
+    "treatment_line": "1L",
+    "treatment_eligibility": "Transplant-eligible",
+    "treatment_1": "Brentuximab vedotin",
+    ...
+    "biomarker_1": "CD30",
+    "drug_class_1": "Anti-CD30 ADC",
+    "trial_1": "ECHELON-2",
+    ...
+    "cme_outcome_level": "4 - Competence",
+    "answer_length_pattern": "Uniform",
+    "distractor_homogeneity": "Homogeneous",
+    ...
+}
+```

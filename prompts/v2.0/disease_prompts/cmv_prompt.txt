@@ -322,14 +322,11 @@ Values: "Phase 3 RCT", "Phase 2", "Real-world evidence", "Retrospective"
 ### 56. cme_outcome_level
 **Values:** `"3 - Knowledge"` or `"4 - Competence"`
 
-Apply this test:
-1. **Can someone answer correctly using ONLY memory/recall?**
-   - YES → `"3 - Knowledge"` (mechanisms, drug names, toxicities, guidelines)
-   - NO → Continue to step 2
+**CRITICAL RULE:** If the clinical vignette is NOT REQUIRED to answer the question, it's **Level 3 (Knowledge)**, not Level 4.
 
-2. **Does answering require applying knowledge to a specific patient scenario?**
-   - YES → `"4 - Competence"` (patient vignette with decision-making, antiviral selection)
-   - NO → `"3 - Knowledge"`
+**Test:** Could someone answer this question correctly WITHOUT reading the patient details?
+- YES → `"3 - Knowledge"` (the vignette is just context/decoration)
+- NO → `"4 - Competence"` (must apply knowledge to the specific patient)
 
 **CMV examples:**
 - "What is the mechanism of letermovir?" → **3 - Knowledge**
@@ -349,21 +346,51 @@ Apply this test:
 **Values:** "Single best", "Compound (A+B)", "All of the above", "None of the above"
 
 ### 61. answer_length_pattern
-**Values:** "Uniform", "Variable", "Correct longest"
-- Use "Correct longest" ONLY when the correct answer is SUBSTANTIALLY longer (>50% longer)
+**Values:** "Uniform", "Variable", "Correct longest", "Correct shortest"
+
+### answer_length_pattern Criteria (CRITICAL - Common Error)
+
+**CRITICAL RULE:** If `distractor_homogeneity` = "Homogeneous", then `answer_length_pattern` is almost always "Uniform".
+
+Tag "Variable" with Homogeneous distractors ONLY when one answer contains **additional clinical/educational content** the others lack - NOT when length differs due to:
+- Grammatical phrasing ("The drug ganciclovir" vs "Ganciclovir")
+- Compound answers ("Both A and B", "A and C", "All of the above")
+- Minor word count differences
+
+**"Uniform"** = All options are CONCEPTUALLY similar in complexity:
+- All single drug names: "Ganciclovir" / "Foscarnet" / "Maribavir" → **Uniform**
+- All short clinical phrases: "Start prophylaxis" / "Monitor viral load" / "Treat preemptively" → **Uniform**
+
+**"Variable"** = Options differ in TYPE or COMPLEXITY AND contain different amounts of clinical detail:
+- Mix of single words and detailed explanations → **Variable**
+- One answer has extra clinical context others lack → **Variable**
+
+**"Correct longest/shortest"** = The CORRECT answer is noticeably longer/shorter than ALL distractors:
+- Correct answer is a detailed explanation while distractors are single words → **Correct longest**
+- Correct answer is a single drug while distractors are multi-drug regimens → **Correct shortest**
 
 ### 62. distractor_homogeneity
-**Values:** "Homogeneous", "Heterogeneous"
-- "Homogeneous" = All options are same category (all antivirals, all doses)
-- "Heterogeneous" = Options mix categories
+
+### distractor_homogeneity Criteria (CRITICAL - Common Error)
+
+**"Homogeneous"** = All distractors are the SAME TYPE of answer:
+- All drug names: "Ganciclovir" / "Foscarnet" / "Maribavir" / "Letermovir" → **Homogeneous**
+- All clinical actions: "Hold therapy" / "Dose reduce" / "Discontinue" / "Switch drug" → **Homogeneous**
+- Mix of single drugs and combos is still **Homogeneous** (all are treatment options)
+
+**CRITICAL:** Implausible distractors are still the same TYPE. Tag `flaw_implausible_distractor: true` but keep `distractor_homogeneity: "Homogeneous"` if all options are drugs/treatments.
+
+**"Heterogeneous"** = Distractors are DIFFERENT TYPES of answers:
+- Treatment + Safety + Mechanism: "Ganciclovir" / "Neutropenia occurs in 30%" / "DNA polymerase inhibition" → **Heterogeneous**
+- Drug + Monitoring + Endpoint: "Maribavir" / "Weekly CMV PCR" / "Viral clearance" → **Heterogeneous**
 
 ### 63-68. Flaw fields (all Boolean: true/false)
-- `flaw_absolute_terms` - Contains "always", "never", "all", "none"
-- `flaw_grammatical_cue` - Grammar reveals answer
-- `flaw_implausible_distractor` - Obviously wrong option
-- `flaw_clang_association` - Similar-sounding words
-- `flaw_convergence_vulnerability` - Common element across options
-- `flaw_double_negative` - Confusing double negatives
+- `flaw_absolute_terms`: true/false - Contains "always", "never", "all", "none"
+- `flaw_grammatical_cue`: true/false - Grammar reveals answer
+- `flaw_implausible_distractor`: true/false - Obviously wrong option
+- `flaw_clang_association`: true/false - Similar-sounding words
+- `flaw_convergence_vulnerability`: true/false - Common element across options
+- `flaw_double_negative`: true/false - Confusing double negatives
 
 ### 69. answer_option_count
 **Computed field** - Count of answer options (2-5)

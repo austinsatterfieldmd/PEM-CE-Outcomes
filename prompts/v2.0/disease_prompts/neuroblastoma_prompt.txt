@@ -92,6 +92,82 @@ This question has been classified as being about **Neuroblastoma**. Your task is
 
 ---
 
+## Group G: Question Format/Quality (15 fields)
+
+### 56. cme_outcome_level
+**Values:** `"3 - Knowledge"` or `"4 - Competence"`
+
+**CRITICAL RULE:** If the clinical vignette is NOT REQUIRED to answer the question, it's **Level 3 (Knowledge)**, not Level 4.
+
+**Test:** Could someone answer this question correctly WITHOUT reading the patient details?
+- YES → `"3 - Knowledge"` (the vignette is just context/decoration)
+- NO → `"4 - Competence"` (must apply knowledge to the specific patient)
+
+**Neuroblastoma examples:**
+- "What is the target of dinutuximab?" → **3 - Knowledge**
+- "3-year-old with high-risk neuroblastoma, MYCN-amplified. What maintenance?" → **4 - Competence**
+- "What are the major toxicities of anti-GD2 therapy?" → **3 - Knowledge**
+
+### 57-60. Format fields
+- `data_response_type`: "Numeric", "Qualitative", "Comparative", "Boolean"
+- `stem_type`: "Clinical vignette", "Direct question", "Incomplete statement"
+- `lead_in_type`: "Standard", "Negative (EXCEPT/NOT)", "Best answer"
+- `answer_format`: "Single best", "Compound (A+B)", "All of the above", "None of the above"
+
+### 61. answer_length_pattern
+**Values:** "Uniform", "Variable", "Correct longest", "Correct shortest"
+
+### answer_length_pattern Criteria (CRITICAL - Common Error)
+
+**CRITICAL RULE:** If `distractor_homogeneity` = "Homogeneous", then `answer_length_pattern` is almost always "Uniform".
+
+Tag "Variable" with Homogeneous distractors ONLY when one answer contains **additional clinical/educational content** the others lack.
+
+**"Uniform"** = All options are CONCEPTUALLY similar in complexity
+**"Variable"** = Options differ in TYPE or COMPLEXITY with different amounts of clinical detail
+**"Correct longest/shortest"** = The CORRECT answer is noticeably longer/shorter than ALL distractors
+
+### 62. distractor_homogeneity
+
+### distractor_homogeneity Criteria (CRITICAL - Common Error)
+
+**"Homogeneous"** = All distractors are the SAME TYPE of answer
+**"Heterogeneous"** = Distractors are DIFFERENT TYPES of answers
+
+**CRITICAL:** Implausible distractors are still the same TYPE. Tag `flaw_implausible_distractor: true` but keep `distractor_homogeneity: "Homogeneous"` if all options are drugs/treatments.
+
+### 63-68. Flaw fields (all Boolean: true/false)
+- `flaw_absolute_terms`: true/false
+- `flaw_grammatical_cue`: true/false
+- `flaw_implausible_distractor`: true/false
+- `flaw_clang_association`: true/false
+- `flaw_convergence_vulnerability`: true/false
+- `flaw_double_negative`: true/false
+
+### 69-70. Computed fields
+- `answer_option_count`: Count of answer options (2-5)
+- `correct_answer_position`: Position of correct answer (A, B, C, D, E)
+
+---
+
 ## Output Format
 
-Return JSON with all 70 fields. Use `null` for fields that don't apply. Include standard Group G question format fields.
+Return JSON with all 70 fields. Use `null` for fields that don't apply.
+
+```json
+{
+    "topic": "Treatment selection",
+    "disease_stage": null,
+    "disease_type_1": "High-risk neuroblastoma",
+    ...
+    "treatment_1": "Dinutuximab",
+    "biomarker_1": "MYCN amplification",
+    "drug_class_1": "Anti-GD2 antibody",
+    "special_population_1": "Pediatric",
+    ...
+    "cme_outcome_level": "4 - Competence",
+    "answer_length_pattern": "Uniform",
+    "distractor_homogeneity": "Homogeneous",
+    ...
+}
+```
