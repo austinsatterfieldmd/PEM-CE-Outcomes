@@ -326,13 +326,14 @@ IMPORTANT - Answer Options Usage:
         question_text: str,
         correct_answer: Optional[str] = None,
         incorrect_answers: Optional[List[str]] = None,
-        kb_context: Optional[Dict] = None
+        kb_context: Optional[Dict] = None,
+        known_disease_state: Optional[str] = None
     ) -> AggregatedVote:
         """
         Tag a single question with 3-model voting.
 
         For v2.0 (two-stage):
-            1. Stage 1: Classify disease state (single model)
+            1. Stage 1: Classify disease state (single model) - SKIPPED if known_disease_state provided
             2. Stage 2: Disease-specific tagging (3 models)
 
         For v1.0 (single-stage):
@@ -345,6 +346,8 @@ IMPORTANT - Answer Options Usage:
             incorrect_answers: Optional list of incorrect answer options (needed for compound
                              answer analysis and question quality assessment)
             kb_context: Optional knowledge base context
+            known_disease_state: If provided, skip Stage 1 and use this disease state directly.
+                               This is used when re-running Stage 2 for questions with known disease.
 
         Returns:
             AggregatedVote with voting results
@@ -354,7 +357,8 @@ IMPORTANT - Answer Options Usage:
         if self.use_two_stage:
             # === V2.0: TWO-STAGE FLOW ===
             return await self._tag_question_two_stage(
-                question_id, question_text, correct_answer, incorrect_answers, kb_context
+                question_id, question_text, correct_answer, incorrect_answers, kb_context,
+                known_disease_state=known_disease_state
             )
         else:
             # === V1.0: SINGLE-STAGE FLOW ===
@@ -406,25 +410,36 @@ IMPORTANT - Answer Options Usage:
         question_text: str,
         correct_answer: Optional[str] = None,
         incorrect_answers: Optional[List[str]] = None,
-        kb_context: Optional[Dict] = None
+        kb_context: Optional[Dict] = None,
+        known_disease_state: Optional[str] = None
     ) -> AggregatedVote:
         """
         V2.0: Two-stage tagging with oncology gate + disease classification.
 
-        Stage 1: Classify is_oncology and disease_state
+        Stage 1: Classify is_oncology and disease_state - SKIPPED if known_disease_state provided
         Stage 2: If oncology, perform disease-specific 3-model tagging
                  If non-oncology, skip Stage 2 and return minimal result
+
+        Args:
+            known_disease_state: If provided, skip Stage 1 classification entirely and use this
+                               disease state. This prevents re-classification of questions that
+                               already have an assigned disease state from prior Stage 1 runs.
         """
         # === STAGE 1: Oncology Gate + Disease Classification ===
-        logger.info(f"Stage 1: Classifying oncology status and disease state for question {question_id}")
-        disease_info = await self.disease_classifier.classify(
-            question_text,
-            correct_answer
-        )
-        is_oncology = disease_info.get("is_oncology", True)  # Default to True for safety
-        disease_state = disease_info.get("disease_state")
-
-        logger.info(f"Stage 1 result: is_oncology={is_oncology}, disease_state={disease_state}")
+        # SKIP Stage 1 if disease state is already known (e.g., from batch input file)
+        if known_disease_state:
+            logger.info(f"Stage 1: SKIPPED - using known disease state: {known_disease_state}")
+            is_oncology = True  # If disease state is known, it's oncology
+            disease_state = known_disease_state
+        else:
+            logger.info(f"Stage 1: Classifying oncology status and disease state for question {question_id}")
+            disease_info = await self.disease_classifier.classify(
+                question_text,
+                correct_answer
+            )
+            is_oncology = disease_info.get("is_oncology", True)  # Default to True for safety
+            disease_state = disease_info.get("disease_state")
+            logger.info(f"Stage 1 result: is_oncology={is_oncology}, disease_state={disease_state}")
 
         # === NON-ONCOLOGY HANDLING ===
         # Skip Stage 2 for non-oncology questions (save $0.08)

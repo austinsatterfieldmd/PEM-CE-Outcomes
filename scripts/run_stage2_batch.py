@@ -299,12 +299,15 @@ async def process_batch(
                 if question.get('activities'):
                     kb_context['activity_names'] = question['activities']
 
+                # CRITICAL: Pass known_disease_state to SKIP Stage 1 classification
+                # This prevents re-classifying questions that already have disease_state from input
                 result = await tagger.tag_question(
                     question_id=question['id'],
                     question_text=question['question_stem'],
                     correct_answer=question.get('correct_answer'),
                     incorrect_answers=question.get('incorrect_answers'),
-                    kb_context=kb_context if kb_context else None
+                    kb_context=kb_context if kb_context else None,
+                    known_disease_state=question.get('disease_state')  # Skip Stage 1!
                 )
 
                 result_dict = aggregated_vote_to_dict(result, question)
