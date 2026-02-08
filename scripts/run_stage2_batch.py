@@ -469,15 +469,19 @@ def main():
         except Exception as e:
             logger.warning(f"Could not load existing output file: {e}")
 
-    # Create lookup of existing human-reviewed entries by question_id
+    # Create lookup of existing human-reviewed entries by source_id (QGD)
+    # NOTE: We use source_id (not question_id) because question_id is just the DataFrame
+    # index which can collide across different batch runs with different input data
     human_reviewed_lookup = {}
     for item in existing_data:
         if item.get('human_reviewed', False):
-            human_reviewed_lookup[item['question_id']] = item
+            human_reviewed_lookup[item['source_id']] = item
+
+    # Also create lookup of ALL existing entries by source_id to detect duplicates
+    existing_source_ids = {item['source_id'] for item in existing_data}
 
     # Merge: preserve human-reviewed entries, add/update non-reviewed
     merged_results = []
-    new_result_ids = {r['question_id'] for r in results}
 
     # First, add all human-reviewed entries from existing data
     for item in existing_data:
@@ -486,11 +490,11 @@ def main():
 
     # Then add new results (skip if already have human-reviewed version)
     for result in results:
-        if result['question_id'] not in human_reviewed_lookup:
+        if result['source_id'] not in human_reviewed_lookup:
             merged_results.append(result)
 
-    # Sort by question_id for consistency
-    merged_results.sort(key=lambda x: x['question_id'])
+    # Sort by source_id for consistency
+    merged_results.sort(key=lambda x: x['source_id'])
 
     with open(output_path, 'w', encoding='utf-8') as f:
         json.dump(merged_results, f, indent=2, ensure_ascii=False)
