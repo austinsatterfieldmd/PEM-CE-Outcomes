@@ -375,14 +375,18 @@ Q: "Patient achieves MRD negativity after blinatumomab. What does this predict?"
 **OPTIONAL** - Captures eligibility for intensive treatment.
 
 **Valid values for ALL:**
-- `"HSCT-eligible"` - Candidate for allogeneic stem cell transplant
-- `"HSCT-ineligible"` - Not candidate for transplant
+- `"Transplant-eligible"` - Candidate for allogeneic stem cell transplant
+- `"Transplant-ineligible"` - Not candidate for transplant
 - `"CAR-T eligible"` - Meets criteria for CAR-T therapy
+
+**NOTE:** Use "Transplant-eligible/ineligible" (not "HSCT-eligible/ineligible")
 
 **When to tag:**
 - Clinical vignette discusses transplant candidacy
 - Question about allo-HSCT decision-making
 - CAR-T eligibility criteria discussed
+- **Question asks about a specific patient population** (e.g., "transplant-ineligible patients")
+- Trial subgroup analysis by eligibility status
 
 ### 10. age_group
 **CRITICAL for ALL** - Age significantly impacts treatment approach.

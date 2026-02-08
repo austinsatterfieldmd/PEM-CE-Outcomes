@@ -341,13 +341,17 @@ TP53 mutation/del(17p) in MCL indicates aggressive disease with poor response to
 **OPTIONAL** - Captures eligibility for intensive treatment.
 
 **Valid values for MCL:**
-- `"ASCT-eligible"` - Candidate for autologous stem cell transplant (young, fit)
-- `"ASCT-ineligible"` - Not a transplant candidate (older, comorbidities)
+- `"Transplant-eligible"` - Candidate for autologous stem cell transplant (young, fit)
+- `"Transplant-ineligible"` - Not a transplant candidate (older, comorbidities)
 - `"CAR-T eligible"` - Meets criteria for brexu-cel
+
+**NOTE:** Use "Transplant-eligible/ineligible" (not "ASCT-eligible/ineligible" or "HSCT-eligible/ineligible")
 
 **When to tag:**
 - Discussion of intensive vs less intensive induction
 - ASCT consolidation discussion
+- **Question asks about a specific patient population** (e.g., "transplant-ineligible patients", "patients not fit for HSCT")
+- Trial subgroup analysis by eligibility status
 - CAR-T eligibility assessment
 
 **MCL-specific note:** Age and fitness significantly affect treatment approach in MCL. Young, fit patients often receive intensive cytarabine-based induction + ASCT.

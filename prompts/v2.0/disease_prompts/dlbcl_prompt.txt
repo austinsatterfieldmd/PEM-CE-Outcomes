@@ -354,15 +354,19 @@ Note: In DLBCL, very high Ki-67 (>80%) often correlates with MYC-driven biology.
 **OPTIONAL** - Captures eligibility for intensive treatment.
 
 **Valid values for DLBCL:**
-- `"ASCT-eligible"` - Candidate for autologous stem cell transplant
-- `"ASCT-ineligible"` - Not a transplant candidate
+- `"Transplant-eligible"` - Candidate for autologous stem cell transplant
+- `"Transplant-ineligible"` - Not a transplant candidate
 - `"CAR-T eligible"` - Meets criteria for CAR-T (fitness, access)
 - `"CAR-T ineligible"` - Not a CAR-T candidate
+
+**NOTE:** Use "Transplant-eligible/ineligible" (not "ASCT-eligible/ineligible")
 
 **When to tag:**
 - Clinical vignette discusses transplant or CAR-T candidacy
 - Age/fitness affecting treatment choice
 - "Fit" or "unfit" for intensive therapy
+- **Question asks about a specific patient population** (e.g., "transplant-ineligible patients")
+- Trial subgroup analysis by eligibility status
 
 ### 10. age_group
 **REQUIRED when patient age is stated** - Tag the age category whenever a specific age (e.g., "57-year-old") appears in the question stem.
