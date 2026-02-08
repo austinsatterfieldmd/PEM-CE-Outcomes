@@ -514,7 +514,7 @@ def main():
                 if r.get('needs_review'):
                     needs_review += 1
                 # Count questions flagged for new tag values
-                review_reason = r.get('review_reason', '')
+                review_reason = r.get('review_reason') or ''
                 if 'new_tag_values' in review_reason:
                     new_tag_values += 1
 
