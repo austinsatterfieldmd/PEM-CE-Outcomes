@@ -247,6 +247,26 @@ class TagNormalizer:
 
         return normalized
 
+    def _apply_cross_field_rules(self, tags: Dict[str, Any], result: Dict[str, Any]) -> None:
+        """Apply cross-field normalization rules that depend on multiple tag values.
+
+        Modifies tags dict in place.
+
+        Rules:
+        - If answer_length_pattern is null/conflict AND distractor_homogeneity is
+          "Homogeneous", default answer_length_pattern to "Uniform"
+        """
+        distractor = tags.get("distractor_homogeneity")
+        answer_length = tags.get("answer_length_pattern")
+
+        if distractor and distractor.strip().lower() == "homogeneous":
+            if not answer_length or answer_length.strip() == "":
+                tags["answer_length_pattern"] = "Uniform"
+                logger.info(
+                    f"Q{result.get('question_id', '?')}: Normalized answer_length_pattern to 'Uniform' "
+                    f"(conflict resolved by homogeneous distractor rule)"
+                )
+
     def normalize_result(self, result: Dict[str, Any]) -> Dict[str, Any]:
         """Normalize a single question result.
 
@@ -285,8 +305,11 @@ class TagNormalizer:
             qid = result.get("question_id", "?")
             logger.debug(f"Q{qid} normalized: {len(changes)} changes")
 
-        # Check for new tag values and flag for review
+        # Cross-field normalization rules
         final_tags = normalized.get("final_tags", {})
+        self._apply_cross_field_rules(final_tags, normalized)
+
+        # Check for new tag values and flag for review
         new_value_fields = self.find_new_tag_values(final_tags)
 
         if new_value_fields:
