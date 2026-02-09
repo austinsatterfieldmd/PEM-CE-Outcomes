@@ -130,6 +130,25 @@ The database queries in [database.py](dashboard/backend/services/database.py) no
 ### Session Logs
 Detailed session logs are saved in `docs/SESSION_LOG_YYYY-MM-DD.md` for audit trail.
 
+### Review Notes
+
+When the user says **"pull my review notes"**, query the `review_notes` column in the `tags` table:
+
+```sql
+SELECT q.source_id, t.disease_state, t.review_notes, t.review_reason
+FROM tags t
+JOIN questions q ON t.question_id = q.id
+WHERE t.review_notes IS NOT NULL AND t.review_notes != ''
+ORDER BY q.source_id DESC
+LIMIT 10
+```
+
+- **Location:** `tags.review_notes` column in `dashboard/data/questions.db`
+- **Written by:** User via the dashboard review UI ("Save & Mark Reviewed" with notes)
+- **Purpose:** User observations about tagging quality, prompt gaps, and action items
+- **Ordering:** Use `q.source_id DESC` as proxy for most recent (no updated_at timestamp)
+- **Action:** Compile notes into actionable prompt/config improvements
+
 ---
 
 ## ⚠️ CRITICAL: Database Queries Must Match Dashboard View
