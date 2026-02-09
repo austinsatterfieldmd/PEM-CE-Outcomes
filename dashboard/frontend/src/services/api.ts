@@ -593,6 +593,7 @@ export async function getQuestionDetail(id: number): Promise<QuestionDetailData>
       needs_review: question.needs_review,
       review_flags: question.review_flags,
       review_reason: question.review_reason,
+      review_notes: question.review_notes || null,
       flagged_at: question.flagged_at,
       agreement_level: question.agreement_level,
       tag_status: question.tag_status,

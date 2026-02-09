@@ -26,11 +26,7 @@ export function isDevMode(): boolean {
   if (import.meta.env.VITE_DISABLE_AUTH === 'true') {
     return true
   }
-  // Dev mode with no auth configured
-  if (import.meta.env.DEV) {
-    return true
-  }
-  // Production but Supabase not configured - bypass auth gracefully
+  // Supabase not configured - bypass auth gracefully
   if (!isSupabaseConfigured()) {
     return true
   }
