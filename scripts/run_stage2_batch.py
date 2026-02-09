@@ -294,8 +294,8 @@ async def process_batch(
 
                 # Build temporal context for LLM
                 kb_context = {}
-                if question.get('startdate'):
-                    kb_context['activity_start_date'] = question['startdate']
+                if question.get('activity_dates'):
+                    kb_context['activity_start_date'] = question['activity_dates']
                 if question.get('activities'):
                     kb_context['activity_names'] = question['activities']
 
