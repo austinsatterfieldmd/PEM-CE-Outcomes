@@ -152,6 +152,12 @@ When a question mentions a drug class (e.g., "CDK4/6 inhibitor", "checkpoint inh
 - Only include drugs that were approved/available at the time the activity was created
 - Example: "CDK4/6 inhibitor" for adjuvant in 2022 → only abemaciclib; in 2024+ → abemaciclib and ribociclib
 
+**IMPORTANT: Drug class expansion applies to AE management and Safety profile topics too.**
+When a question asks about managing an AE or safety profile of a drug CLASS (not a specific drug), infer and tag the specific approved drugs using disease context and STARTDATE:
+- Example: "Patient receives a CAR-T therapy for DLBCL and develops CRS. What do you do?" → Infer specific CAR-T products approved for DLBCL at STARTDATE (e.g., axicabtagene ciloleucel, lisocabtagene maraleucel, tisagenlecleucel)
+- Example: "Patient on a checkpoint inhibitor develops immune-related pneumonitis" → Infer specific checkpoint inhibitors approved for the disease at STARTDATE
+- The causative drug is clinically relevant context — funders need to know WHICH drugs are associated with the AE being discussed
+
 **Multi-drug examples:**
 - "pembrolizumab + chemotherapy" → `treatment_1: "pembrolizumab"` (chemo not tagged)
 - "trastuzumab + pertuzumab" → `treatment_1: "trastuzumab", treatment_2: "pertuzumab"` (both fundable)
@@ -693,9 +699,10 @@ Respond with ONLY a JSON object containing all 66 fields. Use `null` for fields 
 - **cme_outcome_level**: "3 - Knowledge" - tests recall of MOA facts
 - No stage/type/line context as pan-tumor
 
-### Example 3: Supportive Care Question
+### Example 3: AE Management with Drug Class Expansion
 
-**Question:** "What is the recommended management of immune-related pneumonitis from checkpoint inhibitors?"
+**Question:** "A patient with NSCLC on a checkpoint inhibitor develops immune-related pneumonitis. What is the recommended management?"
+**STARTDATE:** 2024-01-01
 
 **Answer:** "Hold immunotherapy and initiate corticosteroids; consider infliximab for steroid-refractory cases"
 
@@ -706,11 +713,11 @@ Respond with ONLY a JSON object containing all 66 fields. Use `null` for fields 
     "disease_stage": null,
     "disease_type": null,
     "treatment_line": null,
-    "treatment_1": null,
-    "treatment_2": null,
-    "treatment_3": null,
-    "treatment_4": null,
-    "treatment_5": null,
+    "treatment_1": "Pembrolizumab",
+    "treatment_2": "Nivolumab",
+    "treatment_3": "Cemiplimab",
+    "treatment_4": "Atezolizumab",
+    "treatment_5": "Durvalumab",
     "biomarker_1": null,
     "biomarker_2": null,
     "biomarker_3": null,
@@ -721,11 +728,11 @@ Respond with ONLY a JSON object containing all 66 fields. Use `null` for fields 
     "trial_3": null,
     "trial_4": null,
     "trial_5": null,
-    "drug_class_1": null,
-    "drug_class_2": null,
+    "drug_class_1": "Anti-PD-1",
+    "drug_class_2": "Anti-PD-L1",
     "drug_class_3": null,
-    "drug_target_1": null,
-    "drug_target_2": null,
+    "drug_target_1": "PD-1",
+    "drug_target_2": "PD-L1",
     "drug_target_3": null,
     "prior_therapy_1": null,
     "prior_therapy_2": null,
@@ -757,7 +764,7 @@ Respond with ONLY a JSON object containing all 66 fields. Use `null` for fields 
     "evidence_type": null,
     "cme_outcome_level": "4 - Competence",
     "data_response_type": "Qualitative",
-    "stem_type": "Direct question",
+    "stem_type": "Clinical vignette",
     "lead_in_type": "Standard",
     "answer_format": "Single best",
     "answer_length_pattern": "Variable",
@@ -773,11 +780,12 @@ Respond with ONLY a JSON object containing all 66 fields. Use `null` for fields 
 
 **Rationale:**
 - **topic**: "AE management" - question about managing an adverse event
+- **treatment_1-5**: "checkpoint inhibitor" is a drug CLASS → expand to all checkpoint inhibitors approved for NSCLC as of STARTDATE (pembrolizumab, nivolumab, cemiplimab, atezolizumab, durvalumab)
+- **drug_class_1/2**: Anti-PD-1 and Anti-PD-L1 — the two subclasses of checkpoint inhibitors in NSCLC
 - **toxicity_type_1**: "ILD/pneumonitis" - the specific AE being discussed
 - **toxicity_organ**: "Pulmonary" - the affected organ system
 - **cme_outcome_level**: "4 - Competence" - requires applying management knowledge
-- No fundable drug tagged (corticosteroids, infliximab are supportive care, not fundable)
-- Generic supportive care applicable across diseases
+- Corticosteroids and infliximab are supportive care, not tagged as treatments
 
 ### Example 4: Unknown Trial Name
 

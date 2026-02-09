@@ -220,6 +220,13 @@ A: "CAR T-cell therapy"
 ✓ treatment_3: Tisagenlecleucel
 WHY: The class answer should include all approved products.
 
+**Rule 4: Drug Class Expansion for AE Management and Safety Profile**
+When topic is "AE management" or "Safety profile" and the question mentions a drug CLASS (not a specific drug), infer and tag all approved specific drugs for that class in this disease using the drug class table above.
+- Use disease context and STARTDATE to determine which specific drugs were approved
+- Example: "Patient on a CAR-T therapy develops CRS" → tag all approved CAR-T products for this disease
+- Example: "BTKi-associated atrial fibrillation management" → tag all approved BTKi drugs for this disease
+- The causative drug class is clinically relevant — funders need to know WHICH specific drugs are associated with the AE
+
 ---
 
 ## CAR-T PRODUCT DISAMBIGUATION (CRITICAL FOR FUNDERS)

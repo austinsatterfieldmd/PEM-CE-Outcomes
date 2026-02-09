@@ -280,6 +280,12 @@ If a question mentions CAR-T in MM context, the target should be BCMA or GPRC5D,
 
 - Use `null` for all treatment fields if no fundable treatment mentioned
 
+**IMPORTANT: Drug class expansion applies to AE management and Safety profile topics too.**
+When a question asks about managing an AE or safety profile of a drug CLASS (not a specific drug), infer and tag the specific approved drugs using disease context and STARTDATE:
+- Example: "Patient on BCMA-directed therapy develops CRS" → Infer specific BCMA therapies approved at STARTDATE (e.g., teclistamab, idecabtagene vicleucel)
+- Example: "CAR-T-associated ICANS in myeloma" → Infer approved CAR-T products (ide-cel, cilta-cel)
+- The causative drug class is clinically relevant — funders need to know WHICH specific drugs are associated with the AE
+
 ### 7. biomarker_1 through biomarker_5 (up to 5 biomarkers)
 **OPTIONAL** - Can be null. Tag when clinically relevant to the question.
 

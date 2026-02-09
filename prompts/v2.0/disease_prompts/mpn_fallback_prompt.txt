@@ -171,6 +171,12 @@ You must assign values for all 70 tag fields (disease_state is already determine
 - Generic "cytoreductive therapy" when specific drug is obvious
 - Supportive care unless it's the focus of the question
 
+**Drug Class Expansion for AE Management and Safety Profile:**
+When topic is "AE management" or "Safety profile" and the question mentions a drug CLASS (not a specific drug), infer and tag all approved specific drugs for that class.
+- Example: "JAK inhibitor-associated anemia management" → tag Ruxolitinib, Fedratinib, Pacritinib, Momelotinib
+- Example: "Patient on a JAK inhibitor develops thrombocytopenia" → tag all approved JAK inhibitors for this MPN
+- The causative drug class is clinically relevant — funders need to know WHICH specific drugs are associated with the AE
+
 ### 12-16. biomarker_1 through biomarker_5
 **Tag MPN driver mutations and markers**
 

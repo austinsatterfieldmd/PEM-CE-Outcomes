@@ -1141,7 +1141,13 @@ Tag ONLY drugs of pharmaceutical interest for CME funding:
 When question mentions a drug class without specific agent:
 - Expand to all approved drugs in that class (as of question STARTDATE)
 - Put each drug in a separate treatment slot
-- Example: "CDK4/6 inhibitor" for metastatic → treatment_1-3: palbociclib, ribociclib, abemaciclib
+- Example: "Anti-EGFR antibody" for mCRC → treatment_1-2: cetuximab, panitumumab
+
+**IMPORTANT: Drug class expansion applies to AE management and Safety profile topics too.**
+When a question asks about managing an AE or safety profile of a drug CLASS (not a specific drug), infer and tag the specific approved drugs using disease context and STARTDATE:
+- Example: "Patient on a checkpoint inhibitor develops colitis" → Infer approved checkpoint inhibitors for CRC (pembrolizumab, nivolumab, etc.)
+- Example: "Anti-EGFR-associated skin toxicity management" → Infer cetuximab, panitumumab
+- The causative drug class is clinically relevant — funders need to know WHICH specific drugs are associated with the AE
 
 ---
 

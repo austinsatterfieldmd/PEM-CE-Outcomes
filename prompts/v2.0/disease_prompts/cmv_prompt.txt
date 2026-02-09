@@ -156,6 +156,12 @@ May use:
 - Supportive care (G-CSF for neutropenia)
 - Underlying disease treatments (immunosuppressants)
 
+**Drug Class Expansion for AE Management and Safety Profile:**
+When topic is "AE management" or "Safety profile" and the question mentions a drug CLASS (not a specific drug), infer and tag all approved specific drugs for that class.
+- Example: "DNA polymerase inhibitor-associated nephrotoxicity" → tag Ganciclovir, Valganciclovir, Foscarnet, Cidofovir
+- Example: "Antiviral-associated myelosuppression in CMV" → tag specific antivirals known for myelosuppression
+- The causative drug class is clinically relevant — funders need to know WHICH specific drugs are associated with the AE
+
 ### 12-16. biomarker_1 through biomarker_5
 **CMV-relevant biomarkers**
 

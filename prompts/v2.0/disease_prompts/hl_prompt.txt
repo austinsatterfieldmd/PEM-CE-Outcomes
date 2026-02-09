@@ -161,6 +161,13 @@ When the correct answer is a drug CLASS, you MUST tag all approved specific drug
 | "PD-1 inhibitor" (for HL) | Pembrolizumab, Nivolumab |
 | "Checkpoint inhibitor" (for HL) | Pembrolizumab, Nivolumab |
 
+**Rule 3: Drug Class Expansion for AE Management and Safety Profile**
+When topic is "AE management" or "Safety profile" and the question mentions a drug CLASS (not a specific drug), infer and tag all approved specific drugs for that class in HL using the drug class table above.
+- Use disease context and STARTDATE to determine which specific drugs were approved
+- Example: "Patient on a checkpoint inhibitor develops immune-related AE" → tag Pembrolizumab, Nivolumab
+- Example: "ADC-associated peripheral neuropathy in HL" → tag Brentuximab vedotin
+- The causative drug class is clinically relevant — funders need to know WHICH specific drugs are associated with the AE
+
 ---
 
 ### 7. biomarker_1 through biomarker_5 (up to 5 biomarkers)

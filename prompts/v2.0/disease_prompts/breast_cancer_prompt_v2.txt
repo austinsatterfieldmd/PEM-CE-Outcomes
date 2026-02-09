@@ -1107,6 +1107,12 @@ When question mentions a drug class without specific agent:
 - Put each drug in a separate treatment slot
 - Example: "CDK4/6 inhibitor" for metastatic → treatment_1-3: palbociclib, ribociclib, abemaciclib
 
+**IMPORTANT: Drug class expansion applies to AE management and Safety profile topics too.**
+When a question asks about managing an AE or safety profile of a drug CLASS (not a specific drug), infer and tag the specific approved drugs using disease context and STARTDATE:
+- Example: "Patient on a CDK4/6 inhibitor develops neutropenia" → Infer all approved CDK4/6 inhibitors for this setting
+- Example: "ADC-associated ILD in breast cancer" → Infer approved ADCs (trastuzumab deruxtecan, sacituzumab govitecan, etc.)
+- The causative drug class is clinically relevant — funders need to know WHICH specific drugs are associated with the AE
+
 ---
 
 ## Biomarker Redundancy Rules
