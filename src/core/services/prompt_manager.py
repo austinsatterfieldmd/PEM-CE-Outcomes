@@ -426,6 +426,31 @@ class PromptManager:
         else:
             raise FileNotFoundError(f"Fallback prompt not found at {fallback_path}")
 
+    # Explicit mapping for diseases whose names don't convert cleanly to filenames.
+    # Must stay in sync with DiseasePromptManager.DISEASE_TO_PROMPT_MAPPING.
+    DISEASE_FILENAME_OVERRIDES = {
+        "Hodgkin lymphoma": "hl",
+        "HL": "hl",
+        "cHL": "hl",
+        "Waldenström": "waldenstrom",
+        "Waldenstrom": "waldenstrom",
+        "Waldenström macroglobulinemia": "waldenstrom",
+        "Heme malignancies": "heme_malignancy_fallback",
+        "MPN": "mpn_fallback",
+        "NHL": "heme_malignancy_fallback",
+        "PTCL": "ptcl",
+        "Peripheral T-cell lymphoma": "ptcl",
+        "BPDCN": "bpdcn",
+        "MZL": "mzl",
+        "Marginal zone lymphoma": "mzl",
+        "CTCL": "ctcl",
+        "Cutaneous T-cell lymphoma": "ctcl",
+        "CMML": "cmml",
+        "Myelofibrosis": "mf",
+        "Polycythemia vera": "pv",
+        "Essential thrombocythemia": "et",
+    }
+
     def _disease_to_filename(self, disease_state: str) -> str:
         """
         Map disease_state to filename.
@@ -443,6 +468,10 @@ class PromptManager:
             >>> manager._disease_to_filename("NSCLC")
             "nsclc"
         """
+        # Check explicit overrides first
+        if disease_state in self.DISEASE_FILENAME_OVERRIDES:
+            return self.DISEASE_FILENAME_OVERRIDES[disease_state]
+
         # Convert to lowercase and replace spaces/special chars with underscores
         filename = disease_state.lower()
         filename = filename.replace(" ", "_")

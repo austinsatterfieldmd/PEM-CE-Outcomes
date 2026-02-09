@@ -49,6 +49,7 @@ load_dotenv(PROJECT_ROOT / ".env")
 from src.core.taggers.multi_model_tagger import MultiModelTagger
 from src.core.taggers.vote_aggregator import AggregatedVote, AgreementLevel
 from src.core.preprocessing.tag_normalizer import normalize_results
+from src.core.services.disease_prompt_manager import DiseasePromptManager
 import sqlite3
 
 # Configure logging
@@ -421,6 +422,12 @@ def main():
         dest="exclude_db",
         help="Disable automatic exclusion of existing questions (DANGEROUS - will re-tag and waste money)"
     )
+    parser.add_argument(
+        "--allow-fallback",
+        action="store_true",
+        default=False,
+        help="Allow tagging with a fallback prompt (by default, script stops if no dedicated prompt exists)"
+    )
     args = parser.parse_args()
 
     # Set default paths based on disease
@@ -452,6 +459,40 @@ def main():
         return
 
     logger.info(f"Loaded {len(questions)} {args.disease} questions")
+
+    # Validate that a dedicated prompt exists for this disease (not a fallback)
+    if not args.dry_run and not args.allow_fallback:
+        prompt_mgr = DiseasePromptManager(prompt_version="v2.0")
+        # Check Tier 1 (explicit mapping) and Tier 2 (direct filename) only
+        has_dedicated = False
+        prompt_name = None
+
+        # Tier 1: explicit mapping
+        if args.disease in prompt_mgr.DISEASE_TO_PROMPT_MAPPING:
+            mapped = prompt_mgr.DISEASE_TO_PROMPT_MAPPING[args.disease]
+            filepath = prompt_mgr.base_path / f"{mapped}_prompt.txt"
+            if filepath.exists():
+                has_dedicated = True
+                prompt_name = f"{mapped}_prompt.txt"
+
+        # Tier 2: direct filename conversion
+        if not has_dedicated:
+            filename = prompt_mgr._disease_to_filename(args.disease)
+            filepath = prompt_mgr.base_path / f"{filename}_prompt.txt"
+            if filepath.exists():
+                has_dedicated = True
+                prompt_name = f"{filename}_prompt.txt"
+
+        if not has_dedicated:
+            logger.error(
+                f"STOPPED: No dedicated prompt found for '{args.disease}'. "
+                f"This disease would use a fallback prompt, which produces lower quality tags. "
+                f"Either add a mapping in disease_prompt_manager.py or create a dedicated prompt. "
+                f"Use --allow-fallback to override (not recommended)."
+            )
+            sys.exit(1)
+        else:
+            logger.info(f"Verified dedicated prompt: {prompt_name}")
 
     # Estimate cost
     estimated_cost = len(questions) * 0.32  # ~$0.30-0.35 per question
