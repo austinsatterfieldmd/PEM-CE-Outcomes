@@ -1423,18 +1423,73 @@ export function QuestionReviewDetail({ questionId, onClose, onReviewComplete }: 
           )}
 
           {/* Activities */}
-          {data.activities && data.activities.length > 0 && (
+          {(data.activity_details?.length || data.activities?.length > 0) && (
             <div>
               <div className="flex items-center gap-2 mb-3">
                 <Activity className="h-5 w-5 text-slate-500" />
-                <h3 className="font-semibold text-slate-900">Activities</h3>
+                <h3 className="font-semibold text-slate-900">
+                  Activities ({data.activity_details?.length || data.activities.length})
+                  {data.activity_details?.length && (() => {
+                    const dates = data.activity_details
+                      .map(a => a.activity_date)
+                      .filter(Boolean)
+                      .map(d => new Date(d!))
+                      .sort((a, b) => a.getTime() - b.getTime())
+                    if (dates.length > 0) {
+                      const earliest = dates[0]
+                      const latest = dates[dates.length - 1]
+                      const formatDate = (d: Date) => d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+                      return (
+                        <span className="text-xs font-normal text-slate-400 ml-1">
+                          ({formatDate(earliest)} - {formatDate(latest)})
+                        </span>
+                      )
+                    }
+                    return null
+                  })()}
+                </h3>
               </div>
-              <div className="flex flex-wrap gap-2">
-                {data.activities.map((activity, idx) => (
-                  <span key={idx} className="px-3 py-1 bg-blue-50 text-blue-700 rounded-lg text-sm">
-                    {activity}
-                  </span>
-                ))}
+              <div className="space-y-2 max-h-60 overflow-y-auto">
+                {data.activity_details?.length ? (
+                  [...data.activity_details]
+                    .sort((a, b) => {
+                      if (a.activity_date && b.activity_date) {
+                        const dateCompare = new Date(b.activity_date).getTime() - new Date(a.activity_date).getTime()
+                        if (dateCompare !== 0) return dateCompare
+                      } else if (a.activity_date) {
+                        return -1
+                      } else if (b.activity_date) {
+                        return 1
+                      }
+                      return a.activity_name.localeCompare(b.activity_name)
+                    })
+                    .map((activityInfo, idx) => (
+                      <div key={idx} className="px-3 py-2 bg-slate-50 rounded-lg text-sm hover:bg-slate-100 transition-colors">
+                        <div className="flex items-start gap-3">
+                          {activityInfo.activity_date && (
+                            <span className="flex-shrink-0 px-2 py-1 bg-violet-100 text-violet-700 rounded text-xs font-medium whitespace-nowrap">
+                              {new Date(activityInfo.activity_date).toLocaleDateString('en-US', {
+                                month: 'short',
+                                year: 'numeric'
+                              })}
+                            </span>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <span className="text-slate-700 font-medium block truncate">{activityInfo.activity_name}</span>
+                            {activityInfo.quarter && (
+                              <span className="text-xs text-slate-400">{activityInfo.quarter}</span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                ) : (
+                  data.activities.map((activity, idx) => (
+                    <span key={idx} className="px-3 py-1 bg-blue-50 text-blue-700 rounded-lg text-sm">
+                      {activity}
+                    </span>
+                  ))
+                )}
               </div>
             </div>
           )}
