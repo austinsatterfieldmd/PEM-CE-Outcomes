@@ -41,8 +41,8 @@ When the correct answer references options by letter/number (e.g., "B or C"):
 ### Systemic Therapies
 | Drug | Class | Notes |
 |------|-------|-------|
-| **Mogamulizumab** | Anti-CCR4 antibody | MAVORIC trial, for MF/SS |
-| **Brentuximab vedotin** | Anti-CD30 ADC | CD30+ CTCL (ALCANZA) |
+| **Mogamulizumab** | Monoclonal antibody | MAVORIC trial, for MF/SS |
+| **Brentuximab vedotin** | Antibody-drug conjugate (ADC) | CD30+ CTCL (ALCANZA) |
 | **Romidepsin** | HDAC inhibitor | IV administration |
 | **Vorinostat** | HDAC inhibitor | Oral |
 | **Bexarotene** | Retinoid | Oral systemic |
@@ -135,7 +135,7 @@ When answer is a drug CLASS, tag all approved specific drugs.
 | Answer Class | Tag ALL of these |
 |--------------|------------------|
 | "HDAC inhibitor" | Romidepsin, Vorinostat |
-| "Anti-CD30 ADC" | Brentuximab vedotin |
+| "Antibody-drug conjugate (ADC)" | Brentuximab vedotin |
 
 **CTCL drugs:**
 - Mogamulizumab, Brentuximab vedotin
@@ -169,8 +169,8 @@ When topic is "AE management" or "Safety profile" and the question mentions a dr
 ### 22-24. drug_class_1 through drug_class_3
 | Drug Class | Drugs |
 |------------|-------|
-| Anti-CCR4 antibody | Mogamulizumab |
-| Anti-CD30 ADC | Brentuximab vedotin |
+| Monoclonal antibody | Mogamulizumab |
+| Antibody-drug conjugate (ADC) | Brentuximab vedotin |
 | HDAC inhibitor | Romidepsin, Vorinostat |
 | Retinoid | Bexarotene |
 
@@ -337,7 +337,7 @@ Values: "Phase 3 RCT", "Phase 2", "Real-world evidence"
     "treatment_line": "R/R",
     "treatment_1": "Brentuximab vedotin",
     "biomarker_1": "CD30",
-    "drug_class_1": "Anti-CD30 ADC",
+    "drug_class_1": "Antibody-drug conjugate (ADC)",
     "cme_outcome_level": "4 - Competence",
     ...
 }
@@ -382,7 +382,7 @@ Values: "Phase 3 RCT", "Phase 2", "Real-world evidence"
     "treatment_line": "R/R",
     "treatment_1": "Mogamulizumab",
     "trial_1": "MAVORIC",
-    "drug_class_1": "Anti-CCR4 antibody",
+    "drug_class_1": "Monoclonal antibody",
     "cme_outcome_level": "3 - Knowledge",
     ...
 }
@@ -422,7 +422,7 @@ Return JSON with all 70 fields. Use `null` for fields that don't apply.
     "trial_3": null,
     "trial_4": null,
     "trial_5": null,
-    "drug_class_1": "Anti-CCR4 antibody",
+    "drug_class_1": "Monoclonal antibody",
     "drug_class_2": null,
     "drug_class_3": null,
     "drug_target_1": "CCR4",

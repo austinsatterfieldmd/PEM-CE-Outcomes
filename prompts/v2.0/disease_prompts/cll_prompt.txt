@@ -206,7 +206,7 @@ When the correct answer is a drug CLASS, you MUST tag all approved specific drug
 | "Covalent BTKi" | Ibrutinib, Acalabrutinib, Zanubrutinib |
 | "Non-covalent BTKi" | Pirtobrutinib |
 | "BCL-2 inhibitor" | Venetoclax |
-| "Anti-CD20" | Obinutuzumab, Rituximab |
+| "Monoclonal antibody" | Obinutuzumab, Rituximab |
 
 EXAMPLE:
 Q: "Which therapy class is preferred for del(17p) CLL?"

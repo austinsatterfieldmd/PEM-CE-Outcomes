@@ -106,11 +106,11 @@ Tag PD-L1 status when relevant to treatment selection:
 | **MET Inhibitors** | capmatinib, tepotinib |
 | **RET Inhibitors** | selpercatinib, pralsetinib |
 | **NTRK Inhibitors** | larotrectinib, entrectinib |
-| **Anti-PD-1** | pembrolizumab, nivolumab, cemiplimab |
-| **Anti-PD-L1** | atezolizumab, durvalumab |
-| **Anti-CTLA-4** | ipilimumab, tremelimumab |
-| **HER2-Directed** | trastuzumab deruxtecan |
-| **Anti-VEGF** | bevacizumab, ramucirumab |
+| **Immune checkpoint inhibitor (PD-1)** | pembrolizumab, nivolumab, cemiplimab |
+| **Immune checkpoint inhibitor (PD-L1)** | atezolizumab, durvalumab |
+| **Immune checkpoint inhibitor (CTLA-4)** | ipilimumab, tremelimumab |
+| **Antibody-drug conjugate (ADC)** | trastuzumab deruxtecan |
+| **Monoclonal antibody (VEGF)** | bevacizumab, ramucirumab |
 | **ADCs** | trastuzumab deruxtecan, datopotamab deruxtecan |
 
 ---
@@ -355,7 +355,7 @@ Tag PD-L1 status when relevant to treatment selection:
     "trial_3": null,
     "trial_4": null,
     "trial_5": null,
-    "drug_class_1": "Anti-PD-1",
+    "drug_class_1": "Immune checkpoint inhibitor",
     "drug_class_2": null,
     "drug_class_3": null,
     "drug_target_1": "PD-1",
@@ -432,7 +432,7 @@ Tag PD-L1 status when relevant to treatment selection:
     "trial_3": null,
     "trial_4": null,
     "trial_5": null,
-    "drug_class_1": "Anti-PD-L1",
+    "drug_class_1": "Immune checkpoint inhibitor",
     "drug_class_2": null,
     "drug_class_3": null,
     "drug_target_1": "PD-L1",
@@ -587,7 +587,7 @@ Tag PD-L1 status when relevant to treatment selection:
     "trial_3": null,
     "trial_4": null,
     "trial_5": null,
-    "drug_class_1": "Anti-PD-1",
+    "drug_class_1": "Immune checkpoint inhibitor",
     "drug_class_2": null,
     "drug_class_3": null,
     "drug_target_1": "PD-1",
@@ -652,7 +652,7 @@ Tag PD-L1 status when relevant to treatment selection:
 - MET amplification arising during EGFR TKI → resistance_mechanism: `"MET amplification"`, NOT biomarker_1
 
 ### Edge Case 4: Combination Immunotherapy
-- Nivolumab + ipilimumab → treatment_1: `"nivolumab"`, treatment_2: `"ipilimumab"`, drug_class_1: `"Anti-PD-1"`, drug_class_2: `"Anti-CTLA-4"`
+- Nivolumab + ipilimumab → treatment_1: `"nivolumab"`, treatment_2: `"ipilimumab"`, drug_class_1: `"Immune checkpoint inhibitor"`, drug_target_1: `"PD-1"`, drug_target_2: `"CTLA-4"`
 
 
 ---
@@ -793,7 +793,7 @@ Examples by disease (see disease-specific module for details):
 **OPTIONAL** - Therapeutic class of drugs mentioned.
 
 **Common values (use these when applicable, but may use other values if confident):**
-`"CDK4/6 inhibitor"`, `"EGFR TKI"`, `"ALK inhibitor"`, `"ROS1 inhibitor"`, `"KRAS G12C inhibitor"`, `"BRAF inhibitor"`, `"MEK inhibitor"`, `"HER2 TKI"`, `"BTK inhibitor"`, `"BCL-2 inhibitor"`, `"PI3K inhibitor"`, `"AKT inhibitor"`, `"PARP inhibitor"`, `"FLT3 inhibitor"`, `"IDH inhibitor"`, `"JAK inhibitor"`, `"Menin inhibitor"`, `"FGFR inhibitor"`, `"MET inhibitor"`, `"RET inhibitor"`, `"NTRK inhibitor"`, `"Anti-PD-1"`, `"Anti-PD-L1"`, `"Anti-CTLA-4"`, `"Checkpoint inhibitor combination"`, `"CAR-T therapy"`, `"Bispecific T-cell engager"`, `"Bispecific antibody"`, `"Antibody-drug conjugate (ADC)"`, `"HER2-directed ADC"`, `"Trop-2-directed ADC"`, `"BCMA-directed ADC"`, `"Anti-CD20 mAb"`, `"Anti-CD38 mAb"`, `"Anti-HER2 mAb"`, `"Anti-VEGF mAb"`, `"Aromatase inhibitor"`, `"SERD"`, `"IMiD"`, `"Proteasome inhibitor"`, `"Hypomethylating agent"`
+`"Monoclonal antibody"`, `"Antibody-drug conjugate (ADC)"`, `"Bispecific antibody"`, `"CAR-T therapy"`, `"Immune checkpoint inhibitor"`, `"CDK4/6 inhibitor"`, `"EGFR TKI"`, `"ALK inhibitor"`, `"ROS1 inhibitor"`, `"KRAS G12C inhibitor"`, `"BRAF inhibitor"`, `"MEK inhibitor"`, `"HER2 TKI"`, `"BTK inhibitor"`, `"BCL-2 inhibitor"`, `"PI3K inhibitor"`, `"AKT inhibitor"`, `"PARP inhibitor"`, `"FLT3 inhibitor"`, `"IDH inhibitor"`, `"JAK inhibitor"`, `"Menin inhibitor"`, `"FGFR inhibitor"`, `"MET inhibitor"`, `"RET inhibitor"`, `"NTRK inhibitor"`, `"Bispecific T-cell engager"`, `"Aromatase inhibitor"`, `"SERD"`, `"IMiD"`, `"Proteasome inhibitor"`, `"Hypomethylating agent"`, `"Targeted cytotoxin"`
 
 ### 23-25. drug_target_1 through drug_target_3
 **OPTIONAL** - Molecular target of the drug(s) mentioned.
@@ -1114,6 +1114,12 @@ These rules apply to ALL diseases. Disease-specific rules in the disease module 
 | **Mechanism of action** | How drug works | "What is the target of X?" |
 | **Study design** | Enrollment, endpoints, trial structure | "Which patients were enrolled in TRIAL-X?" |
 
+### 4. Tag from CORRECT answer only
+Only tag treatments, biomarkers, toxicities, and other clinical entities from the CORRECT answer. Do NOT tag entities from incorrect options (distractors).
+- **Standard questions ("Which of the following...")**: Tag ONLY entities from the correct answer
+- **Compound questions ("Which combination...", "All of the following EXCEPT...")**: Tag entities from ALL relevant options
+- **Example**: If Q asks "Which toxicity is most associated with X?" and A: CRS, B: ICANS, C: Neuropathy, D: Hepatotoxicity with correct answer A, ONLY tag CRS as toxicity, NOT the distractors.
+
 ---
 
 ## Treatment Tagging Rules
@@ -1288,7 +1294,7 @@ Respond with ONLY a JSON object containing all 66 fields. Use `null` for fields 
     "trial_3": null,
     "trial_4": null,
     "trial_5": null,
-    "drug_class_1": "HER2-directed ADC",
+    "drug_class_1": "Antibody-drug conjugate (ADC)",
     "drug_class_2": null,
     "drug_class_3": null,
     "drug_target_1": "HER2",

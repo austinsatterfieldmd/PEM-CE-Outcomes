@@ -149,24 +149,17 @@ drug_classes:
   - BRAF/MEK combination
   - HER2 TKI
   immunotherapy:
-  - Anti-PD-1
-  - Anti-PD-L1
-  - Anti-CTLA-4
-  - Anti-LAG-3
-  - Anti-TIGIT
-  - ICI combination
+  - Immune checkpoint inhibitor
   antibody_therapy:
-  - Anti-HER2
-  - Anti-CD20
-  - Anti-CD38
-  - Anti-BCMA
-  - Anti-CD19
+  - Monoclonal antibody
   - Bispecific antibody
-  - ADC (Antibody-drug conjugate)
+  - Antibody-drug conjugate (ADC)
   cellular_therapy:
-  - CAR-T
+  - CAR-T therapy
   - CAR-NK
   - TIL therapy
+  other:
+  - Targeted cytotoxin
   small_molecule:
   - CDK4/6 inhibitor
   - PARP inhibitor
@@ -181,8 +174,7 @@ drug_classes:
   - Proteasome inhibitor
   - IMiD (Immunomodulatory drug)
   - XPO1 inhibitor (selinexor)
-  - Anti-CD38
-  - Anti-BCMA
+  - Monoclonal antibody
   - Bispecific antibody
   - CAR-T therapy
   - Antibody-drug conjugate (ADC)
@@ -617,6 +609,9 @@ verified_values:
   - Headache
   - Rash
   - Chest tightness
+  - Skin lesions
+  - Palpitations
+  - CMV viremia
   treatment:
   - Idecabtagene vicleucel
   - Ciltacabtagene autoleucel
@@ -672,6 +667,14 @@ verified_values:
   - Azacitidine
   - Decitabine
   - Parsaclisib
+  - CTX130
+  - Phototherapy
+  - Mechlorethamine
+  - Tagraxofusp
+  - CAR T-cell therapy
+  - Hydroxyurea
+  - Ropeginterferon alfa-2b
+  - Ganciclovir
   biomarker:
   - del(17p)
   - MRD
@@ -710,6 +713,13 @@ verified_values:
   - KMT2A rearrangement
   - ASXL1
   - RUNX1
+  - CD70
+  - Sézary cells
+  - CD123
+  - MYD88 mutation
+  - JAK2-negative
+  - CD117
+  - CMV PCR
   drug_class:
   - CAR-T therapy
   - Bispecific antibody
@@ -728,6 +738,10 @@ verified_values:
   - Immune checkpoint inhibitor
   - BTK degrader
   - HMA
+  - CAR-T therapy
+  - Cytoreductive agent
+  - Interferon
+  - Antiviral
   disease_type:
   - High-risk
   - Blastoid
@@ -753,6 +767,12 @@ verified_values:
   - T-ALL
   - CMML-0
   - MZL
+  - Mycosis fungoides
+  - Patch stage
+  - HIV-associated HL
+  - High-risk ET
+  - CMV reactivation
+  - Allogeneic HSCT
   prior_therapy:
   - Prior anti-CD38
   - Prior PI
@@ -780,6 +800,7 @@ verified_values:
   - Prior ADC
   - Prior ibrutinib
   - Prior non-covalent BTKi
+  - Prior R-CVP
   toxicity_type:
   - Infections
   - VTE
@@ -803,6 +824,8 @@ verified_values:
   - Diarrhea
   - Infusion reaction
   - Thrombosis
+  - Hypogammaglobulinemia
+  - Myelosuppression
   trial:
   - IsKia
   - UNITY-NHL
@@ -836,6 +859,8 @@ verified_values:
   - ROCCA
   - CITADEL-204
   - MAGNOLIA
+  - FLAIR
+  - SURPASS ET
   efficacy_endpoint:
   - MRD negativity rate
   - Overall response rate (ORR)
@@ -851,6 +876,7 @@ verified_values:
   - MRD negativity
   - ORR
   - Duration of response (DoR)
+  - Clinical response rate
   toxicity_organ:
   - Hepatic
   - Cardiac
@@ -864,6 +890,8 @@ verified_values:
   - Bone
   - Liver
   - GI tract
+  - Blood
+  - Skin
 normalization_rules:
   treatment_line:
     1L: Newly diagnosed

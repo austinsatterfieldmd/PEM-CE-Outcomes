@@ -40,9 +40,9 @@ When the correct answer references options by letter/number (e.g., "B or C"):
 
 | Drug Class | Drugs | Use |
 |------------|-------|-----|
-| Anti-CD20 antibody | Rituximab, Obinutuzumab | B-cell lymphomas |
+| Monoclonal antibody | Rituximab, Obinutuzumab | B-cell lymphomas |
 | BTK inhibitor | Ibrutinib | PCNSL, others |
-| Anti-CD30 ADC | Brentuximab vedotin | CD30+ lymphomas |
+| Antibody-drug conjugate (ADC) | Brentuximab vedotin | CD30+ lymphomas |
 | HDAC inhibitor | Romidepsin, Belinostat | T-cell lymphomas |
 | Bispecific antibody | Mosunetuzumab, Epcoritamab, Glofitamab | CD20xCD3 |
 | CAR-T | Axi-cel, Liso-cel, Tisa-cel | R/R aggressive B-cell |
@@ -126,7 +126,7 @@ When answer is a drug CLASS, tag all approved specific drugs.
 
 | Answer Class | Tag ALL of these |
 |--------------|------------------|
-| "Anti-CD20" | Rituximab, Obinutuzumab |
+| "Monoclonal antibody" | Rituximab, Obinutuzumab |
 | "Bispecific antibody" | Mosunetuzumab, Epcoritamab, Glofitamab |
 | "CAR-T" | Axi-cel, Liso-cel, Tisa-cel |
 | "BTK inhibitor" | Ibrutinib, Zanubrutinib |
@@ -134,7 +134,7 @@ When answer is a drug CLASS, tag all approved specific drugs.
 ### 12-16. biomarker_1 through biomarker_5
 | Biomarker | Context |
 |-----------|---------|
-| `"CD20"` | Anti-CD20 eligibility |
+| `"CD20"` | Monoclonal antibody eligibility |
 | `"CD30"` | Brentuximab eligibility |
 | `"MYC"` | Burkitt lymphoma |
 | `"EBV"` | EBV-associated lymphomas |
@@ -156,11 +156,11 @@ When topic is "AE management" or "Safety profile" and the question mentions a dr
 ### 22-24. drug_class_1 through drug_class_3
 | Drug Class | Drugs |
 |------------|-------|
-| Anti-CD20 antibody | Rituximab, Obinutuzumab |
+| Monoclonal antibody | Rituximab, Obinutuzumab |
 | BTK inhibitor | Ibrutinib, Zanubrutinib |
 | Bispecific antibody | Mosunetuzumab, Epcoritamab, Glofitamab |
-| CAR-T | Axi-cel, Liso-cel, Tisa-cel |
-| Anti-CD30 ADC | Brentuximab vedotin |
+| CAR-T therapy | Axi-cel, Liso-cel, Tisa-cel |
+| Antibody-drug conjugate (ADC) | Brentuximab vedotin |
 | HDAC inhibitor | Romidepsin, Belinostat |
 
 ### 25-27. drug_target_1 through drug_target_3

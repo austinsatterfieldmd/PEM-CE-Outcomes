@@ -133,10 +133,15 @@ ET classification uses:
 
 **NOTE:** Unlike PV, ruxolitinib is NOT FDA-approved for ET
 
-### Backbone Cytoreduction (DO NOT TAG unless specifically asked about)
-- Hydroxyurea (HU) - First-line cytoreduction (standard of care)
-- Aspirin - Standard antiplatelet
-- **Exception:** Tag if question specifically asks about these agents
+### Cytoreductive Agents
+| Drug | Status | Context | Notes |
+|------|--------|---------|-------|
+| **Hydroxyurea** | Standard of care | 1L cytoreduction | Most commonly used first-line agent |
+
+**Key Points:**
+- Tag hydroxyurea whenever it is mentioned or inferable from the correct answer
+- Hydroxyurea IS a fundable treatment of interest — always tag it
+- Aspirin (standard antiplatelet) — do NOT tag unless specifically asked about
 
 ---
 
@@ -153,6 +158,7 @@ When the correct answer is a drug CLASS, you MUST tag all approved specific drug
 
 | Answer Class | Tag ALL of these |
 |--------------|------------------|
+| "Cytoreductive therapy" | Hydroxyurea |
 | "Platelet-lowering agent" | Anagrelide |
 | "Interferon" | Ropeginterferon alfa-2b |
 
@@ -246,7 +252,7 @@ When topic is "AE management" or "Safety profile" and the question mentions a dr
 **ET-relevant classes:**
 - `"Platelet-lowering agent"` (anagrelide)
 - `"Interferon"` (ropeginterferon, peginterferon)
-- `"Cytoreductive agent"` (hydroxyurea - if tagged)
+- `"Cytoreductive agent"` (hydroxyurea)
 
 ### 16. drug_target_1 through drug_target_3
 **ET-relevant targets:**

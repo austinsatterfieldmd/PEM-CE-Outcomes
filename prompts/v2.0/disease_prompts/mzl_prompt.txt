@@ -138,7 +138,7 @@ When answer is a drug CLASS, tag all approved specific drugs.
 | Answer Class | Tag ALL of these |
 |--------------|------------------|
 | "BTK inhibitor" (MZL) | Zanubrutinib, Ibrutinib |
-| "Anti-CD20" | Rituximab |
+| "Monoclonal antibody" | Rituximab |
 
 **MZL drugs:**
 - Rituximab, Bendamustine, Lenalidomide
@@ -171,7 +171,7 @@ When topic is "AE management" or "Safety profile" and the question mentions a dr
 ### 22-24. drug_class_1 through drug_class_3
 | Drug Class | Drugs |
 |------------|-------|
-| Anti-CD20 antibody | Rituximab |
+| Monoclonal antibody | Rituximab |
 | BTK inhibitor | Zanubrutinib, Ibrutinib |
 | IMiD | Lenalidomide |
 | Alkylating agent | Bendamustine |

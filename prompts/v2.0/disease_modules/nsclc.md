@@ -94,11 +94,11 @@ Tag PD-L1 status when relevant to treatment selection:
 | **MET Inhibitors** | capmatinib, tepotinib |
 | **RET Inhibitors** | selpercatinib, pralsetinib |
 | **NTRK Inhibitors** | larotrectinib, entrectinib |
-| **Anti-PD-1** | pembrolizumab, nivolumab, cemiplimab |
-| **Anti-PD-L1** | atezolizumab, durvalumab |
-| **Anti-CTLA-4** | ipilimumab, tremelimumab |
-| **HER2-Directed** | trastuzumab deruxtecan |
-| **Anti-VEGF** | bevacizumab, ramucirumab |
+| **Immune checkpoint inhibitor (PD-1)** | pembrolizumab, nivolumab, cemiplimab |
+| **Immune checkpoint inhibitor (PD-L1)** | atezolizumab, durvalumab |
+| **Immune checkpoint inhibitor (CTLA-4)** | ipilimumab, tremelimumab |
+| **Antibody-drug conjugate (ADC)** | trastuzumab deruxtecan |
+| **Monoclonal antibody (VEGF)** | bevacizumab, ramucirumab |
 | **ADCs** | trastuzumab deruxtecan, datopotamab deruxtecan |
 
 ---
@@ -343,7 +343,7 @@ Tag PD-L1 status when relevant to treatment selection:
     "trial_3": null,
     "trial_4": null,
     "trial_5": null,
-    "drug_class_1": "Anti-PD-1",
+    "drug_class_1": "Immune checkpoint inhibitor",
     "drug_class_2": null,
     "drug_class_3": null,
     "drug_target_1": "PD-1",
@@ -420,7 +420,7 @@ Tag PD-L1 status when relevant to treatment selection:
     "trial_3": null,
     "trial_4": null,
     "trial_5": null,
-    "drug_class_1": "Anti-PD-L1",
+    "drug_class_1": "Immune checkpoint inhibitor",
     "drug_class_2": null,
     "drug_class_3": null,
     "drug_target_1": "PD-L1",
@@ -575,7 +575,7 @@ Tag PD-L1 status when relevant to treatment selection:
     "trial_3": null,
     "trial_4": null,
     "trial_5": null,
-    "drug_class_1": "Anti-PD-1",
+    "drug_class_1": "Immune checkpoint inhibitor",
     "drug_class_2": null,
     "drug_class_3": null,
     "drug_target_1": "PD-1",
@@ -640,4 +640,4 @@ Tag PD-L1 status when relevant to treatment selection:
 - MET amplification arising during EGFR TKI → resistance_mechanism: `"MET amplification"`, NOT biomarker_1
 
 ### Edge Case 4: Combination Immunotherapy
-- Nivolumab + ipilimumab → treatment_1: `"nivolumab"`, treatment_2: `"ipilimumab"`, drug_class_1: `"Anti-PD-1"`, drug_class_2: `"Anti-CTLA-4"`
+- Nivolumab + ipilimumab → treatment_1: `"nivolumab"`, treatment_2: `"ipilimumab"`, drug_class_1: `"Immune checkpoint inhibitor"`, drug_target_1: `"PD-1"`, drug_target_2: `"CTLA-4"`

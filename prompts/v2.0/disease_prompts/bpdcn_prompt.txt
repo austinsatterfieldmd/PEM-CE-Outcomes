@@ -130,7 +130,7 @@ When answer is a drug CLASS, tag the specific approved drug.
 
 | Answer Class | Tag |
 |--------------|-----|
-| "CD123-directed therapy" | Tagraxofusp |
+| "Targeted cytotoxin" | Tagraxofusp |
 | "BCL-2 inhibitor" | Venetoclax |
 
 **BPDCN drugs:**
@@ -162,7 +162,7 @@ When topic is "AE management" or "Safety profile" and the question mentions a dr
 ### 22-24. drug_class_1 through drug_class_3
 | Drug Class | Drug |
 |------------|------|
-| CD123-directed therapy | Tagraxofusp |
+| Targeted cytotoxin | Tagraxofusp |
 | BCL-2 inhibitor | Venetoclax |
 
 ### 25-27. drug_target_1 through drug_target_3
@@ -339,7 +339,7 @@ Note: No phase 3 RCT data for BPDCN (rare disease)
     "trial_3": null,
     "trial_4": null,
     "trial_5": null,
-    "drug_class_1": "CD123-directed therapy",
+    "drug_class_1": "Targeted cytotoxin",
     "drug_class_2": null,
     "drug_class_3": null,
     "drug_target_1": "CD123",
@@ -425,7 +425,7 @@ Note: No phase 3 RCT data for BPDCN (rare disease)
     "trial_3": null,
     "trial_4": null,
     "trial_5": null,
-    "drug_class_1": "CD123-directed therapy",
+    "drug_class_1": "Targeted cytotoxin",
     "drug_class_2": null,
     "drug_class_3": null,
     "drug_target_1": null,
@@ -511,7 +511,7 @@ Note: No phase 3 RCT data for BPDCN (rare disease)
     "trial_3": null,
     "trial_4": null,
     "trial_5": null,
-    "drug_class_1": "CD123-directed therapy",
+    "drug_class_1": "Targeted cytotoxin",
     "drug_class_2": null,
     "drug_class_3": null,
     "drug_target_1": "CD123",

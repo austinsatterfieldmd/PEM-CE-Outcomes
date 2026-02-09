@@ -23,7 +23,7 @@ Respond with ONLY a JSON object containing all 66 fields. Use `null` for fields 
     "trial_3": null,
     "trial_4": null,
     "trial_5": null,
-    "drug_class_1": "HER2-directed ADC",
+    "drug_class_1": "Antibody-drug conjugate (ADC)",
     "drug_class_2": null,
     "drug_class_3": null,
     "drug_target_1": "HER2",

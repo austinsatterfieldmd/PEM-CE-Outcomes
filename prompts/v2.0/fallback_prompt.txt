@@ -205,7 +205,7 @@ Relevant biomarkers mentioned:
 ## Group A: Treatment Metadata (10 fields)
 
 ### 8. drug_class_1 through drug_class_3
-Therapeutic class of the fundable drug(s). Examples: `"CDK4/6 inhibitor"`, `"HER2-directed ADC"`, `"Anti-PD-1"`, `"Bispecific antibody"`, `"CAR-T therapy"`, `"Monoclonal antibody"`.
+Therapeutic class of the fundable drug(s). Examples: `"Monoclonal antibody"`, `"Antibody-drug conjugate (ADC)"`, `"Bispecific antibody"`, `"CAR-T therapy"`, `"Immune checkpoint inhibitor"`, `"CDK4/6 inhibitor"`, `"Proteasome inhibitor"`, `"IMiD"`.
 
 **Drug class standardization rules:**
 Use generic drug class names and distinguish by drug_target. This enables analysis across drug classes.
@@ -225,6 +225,20 @@ Use generic drug class names and distinguish by drug_target. This enables analys
   - Ide-cel, Cilta-cel (BCMA CAR-T): `drug_class: "CAR-T therapy"` + `drug_target: "BCMA"`
   - Axi-cel, Liso-cel, Brexu-cel (CD19 CAR-T): `drug_class: "CAR-T therapy"` + `drug_target: "CD19"`
   - ✗ INCORRECT: `drug_class: "BCMA CAR-T"` (put target in drug_target field)
+
+- **Antibody-drug conjugates (ADCs)**: Use `drug_class: "Antibody-drug conjugate (ADC)"` for all ADCs — distinguish by drug_target
+  - Trastuzumab deruxtecan, Trastuzumab emtansine (HER2 ADC): `drug_class: "Antibody-drug conjugate (ADC)"` + `drug_target: "HER2"`
+  - Brentuximab vedotin (CD30 ADC): `drug_class: "Antibody-drug conjugate (ADC)"` + `drug_target: "CD30"`
+  - Sacituzumab govitecan (Trop-2 ADC): `drug_class: "Antibody-drug conjugate (ADC)"` + `drug_target: "Trop-2"`
+  - ✗ INCORRECT: `drug_class: "HER2-directed ADC"` (put target in drug_target field)
+  - ✗ INCORRECT: `drug_class: "Anti-CD30 ADC"` (put target in drug_target field)
+
+- **Immune checkpoint inhibitors**: Use `drug_class: "Immune checkpoint inhibitor"` for all checkpoint inhibitors — distinguish by drug_target
+  - Pembrolizumab, Nivolumab, Cemiplimab (anti-PD-1): `drug_class: "Immune checkpoint inhibitor"` + `drug_target: "PD-1"`
+  - Atezolizumab, Durvalumab, Avelumab (anti-PD-L1): `drug_class: "Immune checkpoint inhibitor"` + `drug_target: "PD-L1"`
+  - Ipilimumab, Tremelimumab (anti-CTLA-4): `drug_class: "Immune checkpoint inhibitor"` + `drug_target: "CTLA-4"`
+  - ✗ INCORRECT: `drug_class: "Anti-PD-1"` (put target in drug_target field)
+  - ✗ INCORRECT: `drug_class: "Anti-PD-L1"` (put target in drug_target field)
 
 ### 9. drug_target_1 through drug_target_3
 Molecular target(s). Examples: `"EGFR"`, `"HER2"`, `"PD-1"`, `"BCMA"`, `"CD19"`.
@@ -550,7 +564,7 @@ Respond with ONLY a JSON object containing all 66 fields. Use `null` for fields 
     "trial_3": null,
     "trial_4": null,
     "trial_5": null,
-    "drug_class_1": "Anti-PD-1",
+    "drug_class_1": "Immune checkpoint inhibitor",
     "drug_class_2": null,
     "drug_class_3": null,
     "drug_target_1": "PD-1",
@@ -606,7 +620,7 @@ Respond with ONLY a JSON object containing all 66 fields. Use `null` for fields 
 - **disease_type**: null - not explicitly mentioned (KEYNOTE-756 is breast cancer but not stated in question)
 - **treatment_line**: "Neoadjuvant" - pCR indicates pre-surgery treatment
 - **treatment_1**: "pembrolizumab" - the fundable drug from correct answer (chemotherapy not tagged)
-- **drug_class_1**: "Anti-PD-1" - pembrolizumab's drug class
+- **drug_class_1**: "Immune checkpoint inhibitor" - pembrolizumab's drug class
 - **efficacy_endpoint_1**: "Pathologic complete response (pCR)" - the endpoint being evaluated
 - **trial_1**: "KEYNOTE-756" - explicitly stated
 - **evidence_type**: "Phase 3 RCT" - stated in the question stem
@@ -642,7 +656,7 @@ Respond with ONLY a JSON object containing all 66 fields. Use `null` for fields 
     "trial_3": null,
     "trial_4": null,
     "trial_5": null,
-    "drug_class_1": "HER2-directed ADC",
+    "drug_class_1": "Antibody-drug conjugate (ADC)",
     "drug_class_2": null,
     "drug_class_3": null,
     "drug_target_1": "HER2",
@@ -694,7 +708,7 @@ Respond with ONLY a JSON object containing all 66 fields. Use `null` for fields 
 
 **Rationale:**
 - **topic**: "Mechanism of action" - general MOA question, not disease-specific
-- **drug_class_1**: "HER2-directed ADC" - directly from the answer
+- **drug_class_1**: "Antibody-drug conjugate (ADC)" - trastuzumab deruxtecan is an ADC; target goes in drug_target
 - **drug_target_1**: "HER2" - the target from the ADC
 - **cme_outcome_level**: "3 - Knowledge" - tests recall of MOA facts
 - No stage/type/line context as pan-tumor
@@ -728,8 +742,8 @@ Respond with ONLY a JSON object containing all 66 fields. Use `null` for fields 
     "trial_3": null,
     "trial_4": null,
     "trial_5": null,
-    "drug_class_1": "Anti-PD-1",
-    "drug_class_2": "Anti-PD-L1",
+    "drug_class_1": "Immune checkpoint inhibitor",
+    "drug_class_2": null,
     "drug_class_3": null,
     "drug_target_1": "PD-1",
     "drug_target_2": "PD-L1",
@@ -781,7 +795,7 @@ Respond with ONLY a JSON object containing all 66 fields. Use `null` for fields 
 **Rationale:**
 - **topic**: "AE management" - question about managing an adverse event
 - **treatment_1-5**: "checkpoint inhibitor" is a drug CLASS → expand to all checkpoint inhibitors approved for NSCLC as of STARTDATE (pembrolizumab, nivolumab, cemiplimab, atezolizumab, durvalumab)
-- **drug_class_1/2**: Anti-PD-1 and Anti-PD-L1 — the two subclasses of checkpoint inhibitors in NSCLC
+- **drug_class_1**: "Immune checkpoint inhibitor" — generic class; PD-1 and PD-L1 targets captured in drug_target fields
 - **toxicity_type_1**: "ILD/pneumonitis" - the specific AE being discussed
 - **toxicity_organ**: "Pulmonary" - the affected organ system
 - **cme_outcome_level**: "4 - Competence" - requires applying management knowledge
@@ -901,7 +915,7 @@ Respond with ONLY a JSON object containing all 66 fields. Use `null` for fields 
     "trial_3": null,
     "trial_4": null,
     "trial_5": null,
-    "drug_class_1": "Anti-PD-1",
+    "drug_class_1": "Immune checkpoint inhibitor",
     "drug_class_2": null,
     "drug_class_3": null,
     "drug_target_1": "PD-1",
@@ -954,7 +968,7 @@ Respond with ONLY a JSON object containing all 66 fields. Use `null` for fields 
 **Rationale:**
 - **topic**: "Treatment indication" - asking about the role/indication, not patient-specific selection
 - **disease_type**: "MSI-H/dMMR" - goes in disease_type, not biomarker (to avoid redundancy)
-- **drug_class_1**: "Anti-PD-1" - the drug class being discussed
+- **drug_class_1**: "Immune checkpoint inhibitor" - the drug class being discussed
 - **treatment_1/2**: Both main checkpoint inhibitors approved for MSI-H tumors expanded
 - **treatment_line**: "1L" - first-line indicated by answer
 - **evidence_type**: "Guideline recommendation" - standard of care indication

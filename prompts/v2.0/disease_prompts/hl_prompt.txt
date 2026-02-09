@@ -106,7 +106,7 @@ You must assign values for all 70 tag fields (disease_state is already determine
 
 ## HL DRUG LANDSCAPE (CRITICAL)
 
-### Anti-CD30 Antibody-Drug Conjugate
+### Antibody-Drug Conjugate (ADC)
 | Drug | Status | Context | Key Trial |
 |------|--------|---------|-----------|
 | **Brentuximab vedotin** | FDA approved | 1L (with AVD), R/R, post-ASCT maintenance | ECHELON-1, AETHERA |
@@ -157,7 +157,7 @@ When the correct answer is a drug CLASS, you MUST tag all approved specific drug
 
 | Answer Class | Tag ALL of these |
 |--------------|------------------|
-| "Anti-CD30 ADC" | Brentuximab vedotin |
+| "Antibody-drug conjugate (ADC)" | Brentuximab vedotin |
 | "PD-1 inhibitor" (for HL) | Pembrolizumab, Nivolumab |
 | "Checkpoint inhibitor" (for HL) | Pembrolizumab, Nivolumab |
 
@@ -254,9 +254,8 @@ When topic is "AE management" or "Safety profile" and the question mentions a dr
 
 ### 15. drug_class_1 through drug_class_3
 **HL-relevant classes:**
-- `"Anti-CD30 ADC"` (brentuximab vedotin)
-- `"PD-1 inhibitor"` (pembrolizumab, nivolumab)
-- `"Checkpoint inhibitor"` (pembrolizumab, nivolumab)
+- `"Antibody-drug conjugate (ADC)"` (brentuximab vedotin)
+- `"Immune checkpoint inhibitor"` (pembrolizumab, nivolumab)
 
 ### 16. drug_target_1 through drug_target_3
 **HL-relevant targets:**
@@ -437,7 +436,7 @@ Respond with ONLY a JSON object containing all 70 fields. Use `null` for fields 
     "treatment_1": "Brentuximab vedotin",
     "treatment_2": null,
     ...
-    "drug_class_1": "Anti-CD30 ADC",
+    "drug_class_1": "Antibody-drug conjugate (ADC)",
     "drug_target_1": "CD30",
     "trial_1": "ECHELON-1",
     ...
@@ -462,7 +461,7 @@ Respond with ONLY a JSON object containing all 70 fields. Use `null` for fields 
     "treatment_line": "1L",
     "treatment_1": "Brentuximab vedotin",
     "biomarker_1": "CD30",
-    "drug_class_1": "Anti-CD30 ADC",
+    "drug_class_1": "Antibody-drug conjugate (ADC)",
     "drug_target_1": "CD30",
     "trial_1": "ECHELON-1",
     "efficacy_endpoint_1": "Modified PFS (mPFS)",
@@ -512,7 +511,7 @@ Respond with ONLY a JSON object containing all 70 fields. Use `null` for fields 
     "disease_stage": null,
     "disease_type_1": "Classical HL",
     "treatment_1": "Brentuximab vedotin",
-    "drug_class_1": "Anti-CD30 ADC",
+    "drug_class_1": "Antibody-drug conjugate (ADC)",
     "toxicity_type_1": "Peripheral neuropathy",
     "toxicity_organ": "Neurologic",
     ...

@@ -405,6 +405,16 @@ Apply this test:
 
 ---
 
+## Critical Tagging Rules
+
+### 1. Tag from CORRECT answer only
+Only tag treatments, biomarkers, toxicities, and other clinical entities from the CORRECT answer. Do NOT tag entities from incorrect options (distractors).
+- **Standard questions ("Which of the following...")**: Tag ONLY entities from the correct answer
+- **Compound questions ("Which combination...", "All of the following EXCEPT...")**: Tag entities from ALL relevant options
+- **Example**: If Q asks "Which toxicity is most associated with X?" and A: CRS, B: ICANS, C: Neuropathy, D: Hepatotoxicity with correct answer A, ONLY tag CRS as toxicity, NOT the distractors.
+
+---
+
 ## MPN Inference Patterns
 
 | Question Pattern | Inferred Tags |

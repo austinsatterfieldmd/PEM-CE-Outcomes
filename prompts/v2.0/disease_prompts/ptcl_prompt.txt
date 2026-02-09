@@ -45,7 +45,7 @@ When the correct answer references options by letter/number (e.g., "B or C"):
 | **Romidepsin** | HDAC inhibitor | - | IV administration |
 | **Belinostat** | HDAC inhibitor | BELIEF | IV, less cardiac toxicity than romidepsin |
 | **Pralatrexate** | Antifolate | PROPEL | Requires folate/B12 supplementation |
-| **Brentuximab vedotin** | Anti-CD30 ADC | - | CD30+ required |
+| **Brentuximab vedotin** | Antibody-drug conjugate (ADC) | - | CD30+ required |
 
 ### Emerging/Newer Agents
 | Drug | Class | Notes |
@@ -144,7 +144,7 @@ When answer is a drug CLASS, tag all approved specific drugs.
 | Answer Class | Tag ALL of these |
 |--------------|------------------|
 | "HDAC inhibitor" | Romidepsin, Belinostat |
-| "Anti-CD30 ADC" | Brentuximab vedotin |
+| "Antibody-drug conjugate (ADC)" | Brentuximab vedotin |
 | "PI3K inhibitor" | Duvelisib |
 
 **PTCL drugs:**
@@ -182,7 +182,7 @@ When topic is "AE management" or "Safety profile" and the question mentions a dr
 | Drug Class | Drugs |
 |------------|-------|
 | HDAC inhibitor | Romidepsin, Belinostat |
-| Anti-CD30 ADC | Brentuximab vedotin |
+| Antibody-drug conjugate (ADC) | Brentuximab vedotin |
 | Antifolate | Pralatrexate |
 | PI3K inhibitor | Duvelisib |
 | EZH1/2 inhibitor | Valemetostat |
@@ -363,7 +363,7 @@ Values: "Phase 3 RCT" (ECHELON-2), "Phase 2", "Real-world evidence"
     "trial_3": null,
     "trial_4": null,
     "trial_5": null,
-    "drug_class_1": "Anti-CD30 ADC",
+    "drug_class_1": "Antibody-drug conjugate (ADC)",
     "drug_class_2": null,
     "drug_class_3": null,
     "drug_target_1": "CD30",

@@ -82,7 +82,7 @@ HER2 IHC 0 OR negative → HER2-negative
 |------------|---------|-----------|
 | CDK4/6 inhibitor | 1L mBC | palbociclib, ribociclib, abemaciclib |
 | CDK4/6 inhibitor | Adjuvant | abemaciclib, ribociclib (post-2024) |
-| Anti-HER2 ADC | Any | trastuzumab deruxtecan, trastuzumab emtansine |
+| Antibody-drug conjugate (ADC) | HER2 | trastuzumab deruxtecan, trastuzumab emtansine |
 | PARP inhibitor | gBRCA+ mBC | olaparib, talazoparib |
 
 ---
@@ -211,7 +211,7 @@ HER2 IHC 0 OR negative → HER2-negative
     "trial_3": null,
     "trial_4": null,
     "trial_5": null,
-    "drug_class_1": "Anti-HER2 mAb",
+    "drug_class_1": "Monoclonal antibody",
     "drug_class_2": null,
     "drug_class_3": null,
     "drug_target_1": "HER2",
@@ -281,7 +281,7 @@ HER2 IHC 0 OR negative → HER2-negative
     "trial_3": null,
     "trial_4": null,
     "trial_5": null,
-    "drug_class_1": "HER2-directed ADC",
+    "drug_class_1": "Antibody-drug conjugate (ADC)",
     "drug_class_2": null,
     "drug_class_3": null,
     "drug_target_1": "HER2",
@@ -421,7 +421,7 @@ HER2 IHC 0 OR negative → HER2-negative
     "trial_3": null,
     "trial_4": null,
     "trial_5": null,
-    "drug_class_1": "Anti-PD-1",
+    "drug_class_1": "Immune checkpoint inhibitor",
     "drug_class_2": null,
     "drug_class_3": null,
     "drug_target_1": "PD-1",

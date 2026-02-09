@@ -198,7 +198,7 @@ When the correct answer is a drug CLASS, you MUST tag all approved specific drug
 | "Bispecific antibodies" (Apr 2024+) | Mosunetuzumab, Epcoritamab |
 | "CAR-T therapy" (FL) | Axicabtagene ciloleucel |
 | "PI3K inhibitor" | Idelalisib, Duvelisib, Copanlisib |
-| "Anti-CD20" | Rituximab, Obinutuzumab |
+| "Monoclonal antibody" | Rituximab, Obinutuzumab |
 
 EXAMPLE (FL q4883):
 Q: "Which therapy class has shown benefit for R/R FL?"

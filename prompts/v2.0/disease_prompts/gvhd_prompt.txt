@@ -362,8 +362,7 @@ When topic is "AE management" or "Safety profile" and the question mentions a dr
 - `"BTK inhibitor"` (ibrutinib)
 - `"ROCK2 inhibitor"` (belumosudil)
 - `"CSF-1R inhibitor"` (axatilimab)
-- `"Anti-integrin antibody"` (vedolizumab)
-- `"Anti-CD6 antibody"` (itolizumab)
+- `"Monoclonal antibody"` (vedolizumab, itolizumab)
 
 ### 16. drug_target_1 through drug_target_3
 **GVHD-relevant targets:**

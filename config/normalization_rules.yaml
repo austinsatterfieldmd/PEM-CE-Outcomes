@@ -302,18 +302,60 @@ drug_class_aliases:
   anti-PD1: Anti-PD-1
   anti-PDL1: Anti-PD-L1
   anti-CTLA4: Anti-CTLA-4
-  PI: proteasome inhibitor
-  IMiD: IMiD (Immunomodulatory drug)
-  immunomodulatory drug: IMiD (Immunomodulatory drug)
-  immunomodulatory agent: IMiD (Immunomodulatory drug)
-  ADC: ADC (Antibody-drug conjugate)
-  antibody drug conjugate: ADC (Antibody-drug conjugate)
-  bispecific: bispecific antibody
-  BiTE: bispecific antibody
-  CAR T: CAR-T
-  CAR-T cell: CAR-T
-  CAR T-cell: CAR-T
-  car-t: CAR-T
+  PI: Proteasome inhibitor
+  tyrosine kinase inhibitor: Tyrosine kinase inhibitor
+  # IMiD canonical form
+  IMiD (Immunomodulatory drug): IMiD
+  immunomodulatory drug: IMiD
+  immunomodulatory agent: IMiD
+  # ADC canonical form
+  ADC: Antibody-drug conjugate (ADC)
+  antibody drug conjugate: Antibody-drug conjugate (ADC)
+  Antibody-drug conjugate: Antibody-drug conjugate (ADC)
+  # Target-inclusive ADC → generic (target belongs in drug_target field)
+  Anti-CD30 ADC: Antibody-drug conjugate (ADC)
+  CD30-directed ADC: Antibody-drug conjugate (ADC)
+  Anti-CD33 ADC: Antibody-drug conjugate (ADC)
+  HER2-directed ADC: Antibody-drug conjugate (ADC)
+  Anti-HER2 ADC: Antibody-drug conjugate (ADC)
+  Trop-2-directed ADC: Antibody-drug conjugate (ADC)
+  Nectin-4-directed ADC: Antibody-drug conjugate (ADC)
+  BCMA-directed ADC: Antibody-drug conjugate (ADC)
+  # Target-inclusive antibody → generic
+  Anti-CCR4 antibody: Monoclonal antibody
+  Anti-CD20 antibody: Monoclonal antibody
+  Anti-CD38 antibody: Monoclonal antibody
+  Anti-CD19 antibody: Monoclonal antibody
+  Anti-HER2 mAb: Monoclonal antibody
+  Anti-HER2 antibody: Monoclonal antibody
+  Anti-VEGF antibody: Monoclonal antibody
+  Anti-EGFR antibody: Monoclonal antibody
+  Anti-PD-1 antibody: Immune checkpoint inhibitor
+  Anti-PD-L1 antibody: Immune checkpoint inhibitor
+  Anti-CTLA-4 antibody: Immune checkpoint inhibitor
+  # Target-inclusive CAR-T → generic
+  BCMA-directed CAR-T: CAR-T therapy
+  BCMA CAR-T: CAR-T therapy
+  CD19-directed CAR-T: CAR-T therapy
+  CD19 CAR-T: CAR-T therapy
+  Allogeneic CAR-T therapy: CAR-T therapy
+  Allogeneic CAR-T: CAR-T therapy
+  # Target-inclusive bispecific → generic
+  BCMA bispecific: Bispecific antibody
+  BCMA-directed bispecific: Bispecific antibody
+  CD20 bispecific: Bispecific antibody
+  CD20-directed bispecific: Bispecific antibody
+  # Other target-inclusive classes
+  CD123-directed therapy: Targeted cytotoxin
+  CD123-directed cytotoxin: Targeted cytotoxin
+  # Bispecific/CAR-T shorthand
+  bispecific: Bispecific antibody
+  BiTE: Bispecific antibody
+  CAR T: CAR-T therapy
+  CAR-T cell: CAR-T therapy
+  CAR T-cell: CAR-T therapy
+  car-t: CAR-T therapy
+  CAR-T: CAR-T therapy
 disease_type_aliases:
   TNBC: Triple-negative
   triple negative: Triple-negative
