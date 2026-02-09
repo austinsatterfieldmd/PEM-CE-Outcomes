@@ -231,6 +231,8 @@ When topic is "AE management" or "Safety profile" and the question mentions a dr
 
 ## CAR-T PRODUCT DISAMBIGUATION (CRITICAL FOR FUNDERS)
 
+**NOTE:** This table lists COMMON drugs for reference. It is NOT exhaustive. If a question mentions a drug, drug class, or mechanism not listed here, STILL tag it using the appropriate fields (treatment_1-5, drug_class_1-3, drug_target_1-3). Always tag what the question discusses, even if not in this table.
+
 CAR-T therapy is a major treatment modality in R/R DLBCL. **Tag the specific product when identifiable.**
 
 | Product | Generic Name | Manufacturer | Key Trial | Indication |

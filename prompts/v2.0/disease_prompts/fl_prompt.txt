@@ -218,6 +218,8 @@ When topic is "AE management" or "Safety profile" and the question mentions a dr
 
 ## KEY FL TREATMENTS
 
+**NOTE:** This table lists COMMON drugs for reference. It is NOT exhaustive. If a question mentions a drug, drug class, or mechanism not listed here, STILL tag it using the appropriate fields (treatment_1-5, drug_class_1-3, drug_target_1-3). Always tag what the question discusses, even if not in this table.
+
 ### Anti-CD20 Antibodies
 - `"Rituximab"` - Backbone of FL therapy
 - `"Obinutuzumab"` - Type II anti-CD20 (GALLIUM trial)

@@ -809,6 +809,7 @@ verified_values:
   - Prior ibrutinib
   - Prior non-covalent BTKi
   - Prior R-CVP
+  - Preemptive therapy
   toxicity_type:
   - Infections
   - VTE
@@ -887,6 +888,7 @@ verified_values:
   - Duration of response (DoR)
   - Clinical response rate
   - CMV viremia clearance
+  - Time to CMV reactivation
   toxicity_organ:
   - Hepatic
   - Cardiac
