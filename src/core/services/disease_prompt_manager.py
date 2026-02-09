@@ -28,6 +28,9 @@ class DiseasePromptManager:
         "NHL": "heme_malignancy_fallback",  # Generic NHL goes to pan-heme
 
         # Rare heme diseases → specific prompts
+        "Hodgkin lymphoma": "hl",
+        "HL": "hl",
+        "cHL": "hl",
         "Waldenström": "waldenstrom",
         "Waldenstrom": "waldenstrom",  # Without umlaut
         "Waldenström macroglobulinemia": "waldenstrom",
