@@ -1,6 +1,6 @@
 import { useEffect, useState, memo, useMemo } from 'react'
-import { X, Check, AlertCircle, Tag, Activity, FileText, TrendingUp, Pencil, Save, XCircle, AlertTriangle, CheckCircle, ChevronDown, ChevronRight, HelpCircle } from 'lucide-react'
-import { getQuestionDetail, updateQuestionTags, updateOncologyStatus } from '../services/api'
+import { X, Check, AlertCircle, Tag, Activity, FileText, TrendingUp, Pencil, Save, XCircle, AlertTriangle, CheckCircle, ChevronDown, ChevronRight, HelpCircle, Database } from 'lucide-react'
+import { getQuestionDetail, updateQuestionTags, updateOncologyStatus, markDataError } from '../services/api'
 import type { QuestionDetailData } from '../types'
 import { FIELD_GROUPS } from '../types'
 import { useAuth } from './AuthProvider'
@@ -273,6 +273,7 @@ export function QuestionReviewDetail({ questionId, onClose, onReviewComplete }: 
   const [saving, setSaving] = useState(false)
   const [editedQuestionStem, setEditedQuestionStem] = useState('')
   const [showNotOncologyConfirm, setShowNotOncologyConfirm] = useState(false)
+  const [showDataErrorConfirm, setShowDataErrorConfirm] = useState(false)
   const [showFieldGuidance, setShowFieldGuidance] = useState(false)
   const [showAgreementLegend, setShowAgreementLegend] = useState(false)
   const [editedTags, setEditedTags] = useState<EditableTags>({
@@ -570,6 +571,29 @@ export function QuestionReviewDetail({ questionId, onClose, onReviewComplete }: 
     } catch (error) {
       console.error('Failed to update oncology status:', error)
       alert('Failed to update oncology status. Please try again.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  // Show data error confirmation
+  const handleMarkDataError = () => {
+    setShowDataErrorConfirm(true)
+  }
+
+  // Confirm marking as data error
+  const confirmMarkDataError = async () => {
+    setShowDataErrorConfirm(false)
+    setSaving(true)
+    try {
+      await markDataError(questionId, 'data_quality', 'Missing or malformed answer options')
+
+      if (onReviewComplete) {
+        onReviewComplete()
+      }
+    } catch (error) {
+      console.error('Failed to mark as data error:', error)
+      alert('Failed to mark as data error. Please try again.')
     } finally {
       setSaving(false)
     }
@@ -896,6 +920,16 @@ export function QuestionReviewDetail({ questionId, onClose, onReviewComplete }: 
                 >
                   <AlertTriangle className="h-4 w-4" />
                   Not Oncology
+                </button>
+
+                {/* Mark as Data Error Button */}
+                <button
+                  onClick={handleMarkDataError}
+                  disabled={saving}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-red-50 hover:bg-red-100 text-red-700 rounded-lg transition-all disabled:opacity-50"
+                >
+                  <Database className="h-4 w-4" />
+                  Data Error
                 </button>
 
                 {/* Mark as Reviewed (no changes) */}
@@ -1439,6 +1473,44 @@ export function QuestionReviewDetail({ questionId, onClose, onReviewComplete }: 
                   className="px-4 py-2 text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 rounded-lg transition-colors disabled:opacity-50"
                 >
                   {saving ? 'Removing...' : 'Yes, Remove'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Data Error Confirmation Modal */}
+      {showDataErrorConfirm && (
+        <>
+          <div className="fixed inset-0 bg-black/50 z-[60]" onClick={() => setShowDataErrorConfirm(false)} />
+          <div className="fixed inset-0 flex items-center justify-center z-[70] p-4">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+                  <Database className="h-6 w-6 text-red-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-900">Mark as Data Error?</h3>
+                  <p className="text-sm text-slate-500">Question has data quality issues</p>
+                </div>
+              </div>
+              <p className="text-slate-600 mb-6">
+                This question has missing or malformed data (e.g., missing answer options). It will be hidden from the dashboard and tracked separately for data cleanup.
+              </p>
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setShowDataErrorConfirm(false)}
+                  className="px-4 py-2 text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmMarkDataError}
+                  disabled={saving}
+                  className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors disabled:opacity-50"
+                >
+                  {saving ? 'Marking...' : 'Yes, Mark as Error'}
                 </button>
               </div>
             </div>

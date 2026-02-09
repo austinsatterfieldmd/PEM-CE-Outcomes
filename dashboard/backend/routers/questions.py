@@ -537,6 +537,44 @@ async def flag_question(question_id: int, request: FlagQuestionRequest):
     return {"message": "Question flagged for review", "reasons": request.reasons}
 
 
+@router.post("/{question_id}/data-error")
+async def mark_data_error(question_id: int, error_type: str = "data_quality", error_details: str = None):
+    """
+    Mark a question as having a data error.
+    Data error questions are hidden from the dashboard and tracked separately.
+    """
+    db = get_database()
+
+    # Check if question exists
+    question = db.get_question_detail(question_id)
+    if not question:
+        raise HTTPException(status_code=404, detail="Question not found")
+
+    # Mark as data error
+    db.mark_data_error(question_id, error_type, error_details)
+
+    return {"message": "Question marked as data error", "question_id": question_id, "error_type": error_type}
+
+
+@router.delete("/{question_id}/data-error")
+async def remove_data_error(question_id: int):
+    """
+    Remove a question from the data error list (unhides it).
+    """
+    db = get_database()
+    db.remove_data_error(question_id)
+    return {"message": "Question removed from data error list", "question_id": question_id}
+
+
+@router.get("/data-errors/list")
+async def list_data_errors():
+    """
+    List all questions marked as having data errors.
+    """
+    db = get_database()
+    return db.get_data_error_questions()
+
+
 @router.put("/{question_id}/oncology-status")
 async def update_oncology_status(question_id: int, request: UpdateOncologyStatusRequest):
     """

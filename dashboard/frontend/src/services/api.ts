@@ -814,6 +814,22 @@ export async function updateOncologyStatus(id: number, isOncology: boolean): Pro
   }
 }
 
+// Mark a question as having a data error (hides it from dashboard)
+export async function markDataError(id: number, errorType: string = 'data_quality', errorDetails?: string): Promise<void> {
+  const params = new URLSearchParams({ error_type: errorType })
+  if (errorDetails) {
+    params.append('error_details', errorDetails)
+  }
+
+  const response = await authFetch(`${API_BASE}/questions/${id}/data-error?${params}`, {
+    method: 'POST'
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to mark data error: ${response.statusText}`)
+  }
+}
+
 // ============== User-Defined Values API Functions ==============
 
 // Get all user-defined values (custom values that users have entered via "Other...")

@@ -466,6 +466,19 @@ class DatabaseService:
                 )
             """)
 
+            # Data error questions - track questions with data quality issues
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS data_error_questions (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    question_id INTEGER NOT NULL UNIQUE,
+                    error_type TEXT NOT NULL,
+                    error_details TEXT,
+                    reported_by TEXT DEFAULT 'user',
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE
+                )
+            """)
+
             # Migration: Add new columns to question_activities (for existing DBs)
             qa_migration_columns = [
                 ("activity_id", "INTEGER"),
@@ -512,7 +525,9 @@ class DatabaseService:
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_proposal_candidates_question ON tag_proposal_candidates(question_id)")
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_proposal_candidates_decision ON tag_proposal_candidates(decision)")
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_questions_canonical_source ON questions(canonical_source_id)")
-            
+            # Data error indexes
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_data_error_question ON data_error_questions(question_id)")
+
             # Full-text search virtual table
             cursor.execute("""
                 CREATE VIRTUAL TABLE IF NOT EXISTS questions_fts USING fts5(
@@ -875,6 +890,44 @@ class DatabaseService:
             """, (1 if is_oncology else 0, question_id))
             conn.commit()
 
+    def mark_data_error(self, question_id: int, error_type: str, error_details: Optional[str] = None):
+        """Mark a question as having a data error (hides it from dashboard)."""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT OR REPLACE INTO data_error_questions
+                (question_id, error_type, error_details, reported_by, created_at)
+                VALUES (?, ?, ?, 'user', CURRENT_TIMESTAMP)
+            """, (question_id, error_type, error_details))
+            conn.commit()
+
+    def remove_data_error(self, question_id: int):
+        """Remove a question from the data error list (unhides it)."""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM data_error_questions WHERE question_id = ?", (question_id,))
+            conn.commit()
+
+    def get_data_error_questions(self) -> List[Dict[str, Any]]:
+        """Get all questions marked as having data errors."""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT de.*, q.question_stem, q.source_id
+                FROM data_error_questions de
+                JOIN questions q ON de.question_id = q.id
+                ORDER BY de.created_at DESC
+            """)
+            rows = cursor.fetchall()
+            return [dict(row) for row in rows]
+
+    def is_data_error(self, question_id: int) -> bool:
+        """Check if a question is marked as having a data error."""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT 1 FROM data_error_questions WHERE question_id = ?", (question_id,))
+            return cursor.fetchone() is not None
+
     def insert_performance(
         self,
         question_id: int,
@@ -1212,6 +1265,9 @@ class DatabaseService:
 
             # Exclude confirmed duplicates (questions with canonical_source_id pointing to another question)
             where_clauses.append("(q.canonical_source_id IS NULL OR q.canonical_source_id = CAST(q.source_id AS TEXT))")
+
+            # Exclude data error questions
+            where_clauses.append("q.id NOT IN (SELECT question_id FROM data_error_questions)")
 
             # Full-text search
             if query:
@@ -2810,11 +2866,12 @@ class DatabaseService:
         with self.get_connection() as conn:
             cursor = conn.cursor()
 
-            # Count unique oncology questions (exclude non-oncology and confirmed duplicates)
+            # Count unique oncology questions (exclude non-oncology, confirmed duplicates, and data errors)
             cursor.execute("""
                 SELECT COUNT(*) FROM questions
                 WHERE (is_oncology IS NULL OR is_oncology = 1)
                 AND (canonical_source_id IS NULL OR canonical_source_id = CAST(source_id AS TEXT))
+                AND id NOT IN (SELECT question_id FROM data_error_questions)
             """)
             total_questions = cursor.fetchone()[0]
 
@@ -2824,13 +2881,14 @@ class DatabaseService:
                 JOIN questions q ON t.question_id = q.id
                 WHERE (q.is_oncology IS NULL OR q.is_oncology = 1)
                 AND (q.canonical_source_id IS NULL OR q.canonical_source_id = CAST(q.source_id AS TEXT))
+                AND q.id NOT IN (SELECT question_id FROM data_error_questions)
             """)
             tagged_questions = cursor.fetchone()[0]
 
             cursor.execute("SELECT COUNT(DISTINCT activity_name) FROM question_activities")
             total_activities = cursor.fetchone()[0]
 
-            # Count questions needing review (flagged for review, excluding non-oncology, duplicates, and user-edited)
+            # Count questions needing review (flagged for review, excluding non-oncology, duplicates, data errors, and user-edited)
             # Note: User-edited questions (edited_by_user=1) should never be in review queue
             cursor.execute("""
                 SELECT COUNT(*) FROM tags t
@@ -2839,6 +2897,7 @@ class DatabaseService:
                 AND ((t.edited_by_user IS NULL OR t.edited_by_user = 0) OR (t.review_flags IS NOT NULL AND t.review_flags != '[]'))
                 AND (q.is_oncology IS NULL OR q.is_oncology = 1)
                 AND (q.canonical_source_id IS NULL OR q.canonical_source_id = CAST(q.source_id AS TEXT))
+                AND q.id NOT IN (SELECT question_id FROM data_error_questions)
             """)
             questions_need_review = cursor.fetchone()[0]
 
@@ -2850,12 +2909,17 @@ class DatabaseService:
             """)
             duplicate_questions = cursor.fetchone()[0]
 
+            # Count data error questions
+            cursor.execute("SELECT COUNT(*) FROM data_error_questions")
+            data_error_questions = cursor.fetchone()[0]
+
             return {
                 "total_questions": total_questions,
                 "tagged_questions": tagged_questions,
                 "total_activities": total_activities,
                 "questions_need_review": questions_need_review,
-                "duplicate_questions": duplicate_questions
+                "duplicate_questions": duplicate_questions,
+                "data_error_questions": data_error_questions
             }
 
     # ============== Novel Entity Operations ==============
