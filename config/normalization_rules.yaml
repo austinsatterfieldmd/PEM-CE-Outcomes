@@ -98,18 +98,29 @@ treatment_aliases:
   taxotere: docetaxel
   nab-pac: nab-paclitaxel
   abraxane: nab-paclitaxel
-  Allogeneic stem cell transplantation: ASCT
-  allogeneic stem cell transplantation: ASCT
-  Autologous stem cell transplantation: ASCT
-  autologous stem cell transplantation: ASCT
-  Autologous stem cell transplant: ASCT
-  autologous stem cell transplant: ASCT
-  stem cell transplant: ASCT
-  stem cell transplantation: ASCT
-  HSCT: HSCT
+  # Allogeneic transplant variants → Allo-HSCT
+  Allogeneic stem cell transplantation: Allo-HSCT
+  allogeneic stem cell transplantation: Allo-HSCT
+  Allogeneic stem cell transplant: Allo-HSCT
+  allogeneic stem cell transplant: Allo-HSCT
   Allogeneic HSCT: Allo-HSCT
   allogeneic HSCT: Allo-HSCT
   allo-HSCT: Allo-HSCT
+  alloHSCT: Allo-HSCT
+  allo-SCT: Allo-HSCT
+  # Autologous transplant variants → Auto-HSCT
+  Autologous stem cell transplantation: Auto-HSCT
+  autologous stem cell transplantation: Auto-HSCT
+  Autologous stem cell transplant: Auto-HSCT
+  autologous stem cell transplant: Auto-HSCT
+  ASCT: Auto-HSCT
+  autoHSCT: Auto-HSCT
+  auto-HSCT: Auto-HSCT
+  auto-SCT: Auto-HSCT
+  # Generic transplant (keep as HSCT - ambiguous)
+  stem cell transplant: HSCT
+  stem cell transplantation: HSCT
+  HSCT: HSCT
 biomarker_aliases:
   EGFR+: EGFR mutation
   EGFR-positive: EGFR mutation

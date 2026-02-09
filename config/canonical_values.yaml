@@ -612,6 +612,11 @@ verified_values:
   - Bruising
   - Weight loss
   - Pancytopenia
+  - Hypotension
+  - Myalgia
+  - Headache
+  - Rash
+  - Chest tightness
   treatment:
   - Idecabtagene vicleucel
   - Ciltacabtagene autoleucel
@@ -628,7 +633,7 @@ verified_values:
   - Selinexor
   - Belantamab mafodotin
   - Mezigdomide
-  - ASCT
+  - Auto-HSCT
   - Acalabrutinib
   - Ibrutinib
   - Brexucabtagene autoleucel
@@ -659,6 +664,14 @@ verified_values:
   - Zanubrutinib
   - Inotuzumab ozogamicin
   - Calaspargase pegol
+  - DA-EPOCH-R
+  - Duvelisib
+  - Nemtabrutinib
+  - NX-2127
+  - Allo-HSCT
+  - Azacitidine
+  - Decitabine
+  - Parsaclisib
   biomarker:
   - del(17p)
   - MRD
@@ -693,6 +706,10 @@ verified_values:
   - C481S mutation
   - MRD negativity
   - Minimal residual disease (MRD)
+  - TAL1
+  - KMT2A rearrangement
+  - ASXL1
+  - RUNX1
   drug_class:
   - CAR-T therapy
   - Bispecific antibody
@@ -708,6 +725,9 @@ verified_values:
   - tyrosine kinase inhibitor
   - Asparaginase
   - BTK inhibitor
+  - Immune checkpoint inhibitor
+  - BTK degrader
+  - HMA
   disease_type:
   - High-risk
   - Blastoid
@@ -728,6 +748,11 @@ verified_values:
   - Ph+
   - Ph-like
   - Pleomorphic
+  - Triple-hit
+  - Standard-risk
+  - T-ALL
+  - CMML-0
+  - MZL
   prior_therapy:
   - Prior anti-CD38
   - Prior PI
@@ -754,6 +779,7 @@ verified_values:
   - Pegaspargase
   - Prior ADC
   - Prior ibrutinib
+  - Prior non-covalent BTKi
   toxicity_type:
   - Infections
   - VTE
@@ -774,6 +800,9 @@ verified_values:
   - Hypersensitivity
   - Bleeding
   - Neurologic toxicity
+  - Diarrhea
+  - Infusion reaction
+  - Thrombosis
   trial:
   - IsKia
   - UNITY-NHL
@@ -799,6 +828,14 @@ verified_values:
   - ALPINE
   - TOWER
   - ELIANA
+  - EPCORE NHL-1
+  - First-MIND
+  - GLOW
+  - BELLWAVE-010
+  - AMPLIFY
+  - ROCCA
+  - CITADEL-204
+  - MAGNOLIA
   efficacy_endpoint:
   - MRD negativity rate
   - Overall response rate (ORR)
@@ -811,12 +848,17 @@ verified_values:
   - Event-free survival (EFS)
   - Complete remission rate (CR)
   - Relapse-free survival (RFS)
+  - MRD negativity
+  - ORR
+  - Duration of response (DoR)
   toxicity_organ:
   - Hepatic
   - Cardiac
   - Neurologic
   - Renal
   - Hematologic
+  - Gastrointestinal
+  - Vascular
   metastatic_site:
   - Mediastinum
   - Bone
