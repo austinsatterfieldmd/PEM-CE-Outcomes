@@ -176,8 +176,10 @@ When topic is "AE management" or "Safety profile" and the question mentions a dr
 |-----------|-------------|
 | `"CMV PCR"` | Viral load monitoring discussed |
 | `"CMV serostatus"` | Donor/recipient serostatus (D+/R-, R+, etc.) |
-| `"UL97 mutation"` | Ganciclovir resistance testing |
-| `"UL54 mutation"` | Broad antiviral resistance |
+
+**DO NOT put in biomarker:**
+- **Resistance mutations** (UL97, UL54, UL56) → Use `resistance_mechanism` instead
+- These are antiviral resistance mechanisms, not diagnostic biomarkers
 
 **Serostatus patterns:**
 - D+/R- = Highest risk (seronegative recipient, seropositive donor)
@@ -234,6 +236,7 @@ Examples: "SOLSTICE", letermovir prophylaxis trials
 |-------|---------|
 | `"UL97 mutation"` | Ganciclovir resistance |
 | `"UL54 mutation"` | Cross-resistance to multiple agents |
+| `"UL56 mutation"` | Letermovir resistance |
 | `"Ganciclovir-resistant"` | Phenotypic resistance |
 
 ---
@@ -263,6 +266,8 @@ Examples: "SOLSTICE", letermovir prophylaxis trials
 | `"Transplant recipient"` | Post-transplant setting |
 | `"Immunocompromised"` | HIV, immunosuppressive therapy |
 | `"High-risk CMV"` | D+/R- or R+ serostatus |
+| `"Elderly"` | Patient age ≥ 75 years stated in stem |
+| `"Transitional"` | Patient age 65-74, reduced tolerance considerations |
 | `"Pediatric"` | Pediatric transplant |
 
 ### 40. performance_status
@@ -336,6 +341,7 @@ Values: "Superior", "Non-inferior", "Improved", "Statistically significant"
 **Tag when evidence level is discussed**
 
 Values: "Phase 3 RCT", "Phase 2", "Real-world evidence", "Retrospective"
+**Tag from CORRECT answer context only.** Do not infer evidence type from distractors.
 
 ---
 
@@ -372,7 +378,16 @@ Values: "Phase 3 RCT", "Phase 2", "Real-world evidence", "Retrospective"
 
 ### answer_length_pattern Criteria (CRITICAL - Common Error)
 
-**CRITICAL RULE:** If `distractor_homogeneity` = "Homogeneous", then `answer_length_pattern` is almost always "Uniform".
+**DEFAULT: If `distractor_homogeneity` = "Homogeneous", ALWAYS tag `answer_length_pattern` = "Uniform".**
+
+Override to "Variable" or "Correct longest/shortest" ONLY when the length difference is EGREGIOUS — e.g., one answer is a single word and another is a full sentence with additional clinical detail.
+
+Do NOT tag "Variable" just because:
+- One option has a few extra words
+- Compound answers are longer ("Both A and B" vs "A only")
+- Drug name lengths differ
+
+**When in doubt with Homogeneous distractors → tag "Uniform".**
 
 Tag "Variable" with Homogeneous distractors ONLY when one answer contains **additional clinical/educational content** the others lack - NOT when length differs due to:
 - Grammatical phrasing ("The drug ganciclovir" vs "Ganciclovir")

@@ -166,7 +166,7 @@ CML classification uses:
 
 **INFERENCE:**
 - T315I mutation mentioned -> treatment_1: Ponatinib and/or Asciminib
-- biomarker_1: "T315I mutation"
+- resistance_mechanism: "T315I mutation" (NOT biomarker — resistance mutations go in resistance_mechanism only)
 
 ---
 
@@ -219,10 +219,12 @@ When topic is "AE management" or "Safety profile" and the question mentions a dr
 | Biomarker | Clinical Significance |
 |-----------|----------------------|
 | **BCR-ABL1** | Defining translocation (Ph chromosome) |
-| **T315I mutation** | Gatekeeper mutation - limits TKI options |
-| **Other ABL1 mutations** | F317L, Y253H, E255K/V, etc. - affect TKI choice |
 | **Ph chromosome** | Philadelphia chromosome, t(9;22) |
 | **Additional chromosomal abnormalities (ACAs)** | May indicate higher risk |
+
+**DO NOT put in biomarker:**
+- **Resistance mutations** (T315I, F317L, Y253H, E255K/V, etc.) → Use `resistance_mechanism` instead
+- These are TKI resistance mechanisms, not diagnostic biomarkers
 
 **Molecular response levels (use in efficacy_endpoint, not biomarker):**
 - MMR (MR3) = BCR-ABL1 < 0.1%
@@ -415,6 +417,8 @@ Specific adverse events discussed.
 ### 29. evidence_type
 **Valid values:** `"Phase 1"`, `"Phase 1/2"`, `"Phase 2"`, `"Phase 2/3"`, `"Phase 3"`, `"Real-world evidence"`, `"Retrospective study"`, `"Meta-analysis"`, `"Guideline recommendation"`
 
+**Tag from CORRECT answer context only.** Do not infer evidence type from distractors.
+
 ---
 
 ## Group H: Question Format/Quality (13 fields)
@@ -441,7 +445,16 @@ Specific adverse events discussed.
 
 ### answer_length_pattern Criteria (CRITICAL - Common Error)
 
-**CRITICAL RULE:** If `distractor_homogeneity` = "Homogeneous", then `answer_length_pattern` is almost always "Uniform".
+**DEFAULT: If `distractor_homogeneity` = "Homogeneous", ALWAYS tag `answer_length_pattern` = "Uniform".**
+
+Override to "Variable" or "Correct longest/shortest" ONLY when the length difference is EGREGIOUS — e.g., one answer is a single word and another is a full sentence with additional clinical detail.
+
+Do NOT tag "Variable" just because:
+- One option has a few extra words
+- Compound answers are longer ("Both A and B" vs "A only")
+- Drug name lengths differ
+
+**When in doubt with Homogeneous distractors → tag "Uniform".**
 
 Tag "Variable" with Homogeneous distractors ONLY when one answer contains **additional clinical/educational content** the others lack.
 
@@ -474,7 +487,7 @@ Tag "Variable" with Homogeneous distractors ONLY when one answer contains **addi
 | Newly diagnosed CML-CP | -> treatment_line: "1L", disease_type_1: "Chronic phase" |
 | After imatinib failure | -> treatment_line: "2L", prior_therapy_1: "Prior imatinib" |
 | After 2+ prior TKIs | -> treatment_line: "3L" |
-| T315I mutation | -> biomarker_1: "T315I mutation", treatment: Ponatinib or Asciminib |
+| T315I mutation | -> resistance_mechanism: "T315I mutation", treatment: Ponatinib or Asciminib |
 | Cardiovascular disease + TKI selection | -> Avoid nilotinib, ponatinib |
 | Lung disease + TKI selection | -> Avoid dasatinib |
 | IBD + TKI selection | -> Avoid bosutinib |
@@ -513,7 +526,7 @@ Respond with ONLY a JSON object containing all 70 fields. Use `null` for fields 
     "treatment_1": "Asciminib",
     "treatment_2": null,
     ...
-    "biomarker_1": "T315I mutation",
+    "biomarker_1": null,
     "drug_class_1": "STAMP inhibitor",
     "drug_target_1": "BCR-ABL1 myristoyl pocket",
     "prior_therapy_1": "Prior imatinib",
@@ -541,7 +554,7 @@ Respond with ONLY a JSON object containing all 70 fields. Use `null` for fields 
     "treatment_line": "2L",
     "treatment_1": "Ponatinib",
     "treatment_2": "Asciminib",
-    "biomarker_1": "T315I mutation",
+    "biomarker_1": null,
     "prior_therapy_1": "Prior TKI",
     "drug_class_1": "Third-generation TKI",
     "drug_class_2": "STAMP inhibitor",
@@ -552,7 +565,7 @@ Respond with ONLY a JSON object containing all 70 fields. Use `null` for fields 
 **Rationale:**
 - T315I mutation -> Only ponatinib and asciminib are active
 - Relapsed after frontline -> 2L, prior_therapy_1: "Prior TKI"
-- T315I goes in biomarker AND disease_type_2 AND resistance_mechanism
+- T315I goes in resistance_mechanism AND disease_type_2 (NOT biomarker — resistance mutations are not biomarkers)
 
 ### Example 2: ASCEMBL Trial Efficacy
 
@@ -635,7 +648,7 @@ Respond with ONLY a JSON object containing all 70 fields. Use `null` for fields 
 3. **Valid JSON** - Proper formatting
 4. **One topic only** - Topic is required; never null
 5. **Boolean flaw fields** - Use `true` or `false` (not strings, not null)
-6. **T315I in multiple fields** - biomarker, disease_type_2, AND resistance_mechanism
+6. **T315I in resistance_mechanism AND disease_type_2** - NOT biomarker (resistance mutations are not biomarkers)
 7. **Comorbidities affect TKI choice** - Tag relevant comorbidities
 8. **Treatment line is numeric** - 1L, 2L, 3L, 4L+
 9. **Tag from correct answer** - Not distractors

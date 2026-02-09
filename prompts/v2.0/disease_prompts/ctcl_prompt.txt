@@ -267,6 +267,7 @@ Values: "NCCN", "ESMO", "EORTC"
 
 ### 55. evidence_type
 Values: "Phase 3 RCT", "Phase 2", "Real-world evidence"
+**Tag from CORRECT answer context only.** Do not infer evidence type from distractors.
 
 ---
 
@@ -290,7 +291,16 @@ Values: "Phase 3 RCT", "Phase 2", "Real-world evidence"
 ### 61. answer_length_pattern
 **Values:** "Uniform", "Variable", "Correct longest", "Correct shortest"
 
-**CRITICAL RULE:** If `distractor_homogeneity` = "Homogeneous", then `answer_length_pattern` is almost always "Uniform".
+**DEFAULT: If `distractor_homogeneity` = "Homogeneous", ALWAYS tag `answer_length_pattern` = "Uniform".**
+
+Override to "Variable" or "Correct longest/shortest" ONLY when the length difference is EGREGIOUS — e.g., one answer is a single word and another is a full sentence with additional clinical detail.
+
+Do NOT tag "Variable" just because:
+- One option has a few extra words
+- Compound answers are longer ("Both A and B" vs "A only")
+- Drug name lengths differ
+
+**When in doubt with Homogeneous distractors → tag "Uniform".**
 
 ### 62. distractor_homogeneity
 **"Homogeneous"** = All options are the SAME TYPE (all drugs, all actions)

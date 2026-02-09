@@ -403,6 +403,8 @@ Specific adverse events discussed.
 ### 29. evidence_type
 **Valid values:** `"Phase 1"`, `"Phase 1/2"`, `"Phase 2"`, `"Phase 2/3"`, `"Phase 3"`, `"Real-world evidence"`, `"Retrospective study"`, `"Meta-analysis"`, `"Guideline recommendation"`
 
+**Tag from CORRECT answer context only.** Do not infer evidence type from distractors.
+
 ---
 
 ## Group H: Question Format/Quality (13 fields)
@@ -429,7 +431,16 @@ Specific adverse events discussed.
 
 ### answer_length_pattern Criteria (CRITICAL - Common Error)
 
-**CRITICAL RULE:** If `distractor_homogeneity` = "Homogeneous", then `answer_length_pattern` is almost always "Uniform".
+**DEFAULT: If `distractor_homogeneity` = "Homogeneous", ALWAYS tag `answer_length_pattern` = "Uniform".**
+
+Override to "Variable" or "Correct longest/shortest" ONLY when the length difference is EGREGIOUS — e.g., one answer is a single word and another is a full sentence with additional clinical detail.
+
+Do NOT tag "Variable" just because:
+- One option has a few extra words
+- Compound answers are longer ("Both A and B" vs "A only")
+- Drug name lengths differ
+
+**When in doubt with Homogeneous distractors → tag "Uniform".**
 
 **"Uniform"** = All options are CONCEPTUALLY similar in complexity
 

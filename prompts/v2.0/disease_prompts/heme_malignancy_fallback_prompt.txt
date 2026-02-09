@@ -137,10 +137,10 @@ When topic is "AE management" or "Safety profile" and the question mentions a dr
 | `"MRD"` | Measurable residual disease |
 | `"NGS"` | Next-generation sequencing for MRD |
 | `"Flow cytometry"` | MRD detection method |
-| `"C481S"` | BTK resistance mutation |
-| `"CD19"` | CAR-T/bispecific target |
-| `"CD20"` | Bispecific target |
-| `"BCMA"` | Myeloma CAR-T/bispecific target |
+
+**DO NOT put in biomarker:**
+- **Resistance mutations** (C481S, etc.) → Use `resistance_mechanism` instead
+- **Drug targets** (CD19, CD20, BCMA) → Use `drug_target` instead
 
 ### 17-21. trial_1 through trial_5
 **Tag specific trial names when mentioned**
@@ -318,6 +318,7 @@ Values: "NCCN", "ASCO", "ASTCT", "CIBMTR", "FACT-JACIE"
 **Tag when evidence level is discussed**
 
 Values: "Phase 3 RCT", "Phase 2", "Real-world evidence", "Registry data"
+**Tag from CORRECT answer context only.** Do not infer evidence type from distractors.
 
 ---
 
@@ -355,6 +356,17 @@ Apply this test:
 ### 61. answer_length_pattern
 **Values:** "Uniform", "Variable", "Correct longest"
 - Use "Correct longest" ONLY when correct answer is SUBSTANTIALLY longer (>50%)
+
+**DEFAULT: If `distractor_homogeneity` = "Homogeneous", ALWAYS tag `answer_length_pattern` = "Uniform".**
+
+Override to "Variable" or "Correct longest/shortest" ONLY when the length difference is EGREGIOUS — e.g., one answer is a single word and another is a full sentence with additional clinical detail.
+
+Do NOT tag "Variable" just because:
+- One option has a few extra words
+- Compound answers are longer ("Both A and B" vs "A only")
+- Drug name lengths differ
+
+**When in doubt with Homogeneous distractors → tag "Uniform".**
 
 ### 62. distractor_homogeneity
 **Values:** "Homogeneous", "Heterogeneous"
@@ -396,7 +408,7 @@ Only tag treatments, biomarkers, toxicities, and other clinical entities from th
 | When to give tocilizumab | topic: "AE management", treatment_1: "Tocilizumab", toxicity_type: "CRS" |
 | ICANS assessment (dysgraphia) | toxicity_type: "ICANS", symptom: "Dysgraphia" |
 | Pirtobrutinib mechanism | treatment_1: "Pirtobrutinib", drug_class: "Non-covalent BTK inhibitor" |
-| C481S resistance | biomarker: "C481S", resistance_mechanism: "C481S" |
+| C481S resistance | resistance_mechanism: "C481S" (NOT biomarker) |
 | MRD detection methods | topic: "Biomarker testing", biomarker: "MRD" + "NGS" or "Flow cytometry" |
 | Outpatient CAR-T | topic: "Multidisciplinary care" |
 | VOD/SOS post-transplant | toxicity_type: "VOD/SOS", toxicity_organ: "Hepatic" |
