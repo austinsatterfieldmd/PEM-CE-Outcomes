@@ -20,17 +20,9 @@ excluded_questions:
     activity: "Differentiating Secondary Immunodeficiencies to Improve Patient Outcomes"
     notes: "CMV infection / secondary immunodeficiency testing - not MM-specific"
 
-  - source_id: "2280"
-    reason: "multispecialty_sids"
-    excluded_date: "2026-01-29"
-    activity: "Medical Crossfire: Which Patients with Hematologic Malignancies are at Risk for SID"
-    notes: "Hypogammaglobulinemia prevalence question - not MM treatment-specific"
-
-  - source_id: "7385"
-    reason: "multispecialty_sids"
-    excluded_date: "2026-01-29"
-    activity: "Medical Crossfire: Which Patients with Hematologic Malignancies are at Risk for SID"
-    notes: "67-year-old woman pre-HSCT immunodeficiency question - not MM treatment-specific"
+  # NOTE: QGD 2280 and 7385 removed from exclusion list 2026-02-08
+  # User decided to keep SID questions in both oncology dashboard AND multispecialty question bank
+  # These are now in data/raw/multispecialty_questions.xlsx as well
 
   - source_id: "4001"
     reason: "not_oncology"
