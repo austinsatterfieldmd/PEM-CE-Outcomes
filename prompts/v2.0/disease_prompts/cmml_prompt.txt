@@ -33,6 +33,8 @@ When the correct answer references options by letter/number (e.g., "B or C"):
 
 ## CMML Drug Landscape
 
+**NOTE:** This table lists COMMON drugs for reference. It is NOT exhaustive. If a question mentions a drug, drug class, or mechanism not listed here, STILL tag it using the appropriate fields (treatment_1-5, drug_class_1-3, drug_target_1-3). Always tag what the question discusses, even if not in this table.
+
 ### Hypomethylating Agents (Mainstay)
 | Drug | Notes |
 |------|-------|

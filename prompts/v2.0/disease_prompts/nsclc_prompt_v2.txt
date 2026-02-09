@@ -809,7 +809,16 @@ Examples by disease (see disease-specific module for details):
 - Question mentions "previously treated with X"
 - Prior therapy influences current treatment choice
 
-**Examples:** `"Prior CDK4/6 inhibitor"`, `"Prior platinum"`, `"Prior immunotherapy"`, `"Prior trastuzumab"`
+**CRITICAL: Prefer drug CLASS over specific drug names.**
+- Use generic class: `"Prior anti-CD20"`, `"Prior BTK inhibitor"`, `"Prior checkpoint inhibitor"`
+- NOT specific drug: `"Prior rituximab"`, `"Prior ibrutinib"`, `"Prior pembrolizumab"`
+
+**Only use specific drug names when:**
+- The drug is unique in its indication (only drug in that class for this disease)
+- The question specifically discusses that drug's unique properties
+- Example: `"Prior osimertinib"` is appropriate (unique 1L EGFR TKI in NSCLC)
+
+**Examples:** `"Prior CDK4/6 inhibitor"`, `"Prior platinum"`, `"Prior immunotherapy"`, `"Prior EGFR TKI"`
 
 ### 29. resistance_mechanism
 **OPTIONAL** - Specific resistance mechanism mentioned.

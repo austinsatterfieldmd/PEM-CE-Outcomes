@@ -33,6 +33,8 @@ When the correct answer references options by letter/number (e.g., "B or C"):
 
 ## BPDCN Drug Landscape
 
+**NOTE:** This table lists COMMON drugs for reference. It is NOT exhaustive. If a question mentions a drug, drug class, or mechanism not listed here, STILL tag it using the appropriate fields (treatment_1-5, drug_class_1-3, drug_target_1-3). Always tag what the question discusses, even if not in this table.
+
 ### Targeted Therapy
 | Drug | Target | Notes |
 |------|--------|-------|
@@ -173,7 +175,18 @@ When topic is "AE management" or "Safety profile" and the question mentions a dr
 
 ### 28-30. prior_therapy_1 through prior_therapy_3
 **Tag when prior treatment is specified:**
-- `"Prior tagraxofusp"` - After tagraxofusp failure
+
+**CRITICAL: Prefer drug CLASS over specific drug names.**
+- Use generic class: `"Prior anti-CD20"`, `"Prior BTK inhibitor"`, `"Prior checkpoint inhibitor"`
+- NOT specific drug: `"Prior rituximab"`, `"Prior ibrutinib"`, `"Prior pembrolizumab"`
+
+**Only use specific drug names when:**
+- The drug is unique in its indication (only drug in that class for this disease)
+- The question specifically discusses that drug's unique properties
+- Example: `"Prior osimertinib"` is appropriate (unique 1L EGFR TKI in NSCLC)
+
+**Examples:**
+- `"Prior tagraxofusp"` - After tagraxofusp failure (unique drug, specific name OK)
 - `"Prior chemotherapy"` - After AML/ALL-like induction failure
 - `"Prior allogeneic transplant"` - Post-allo relapse
 
@@ -198,10 +211,13 @@ BPDCN sites of involvement (not "metastatic" per se):
 - `"Lymphadenopathy"`
 
 ### 38-39. special_population_1, special_population_2
-| Value | Context |
-|-------|---------|
-| `"Elderly"` | Median age at diagnosis ~65-70 |
-| `"Pediatric"` | Rare pediatric cases |
+| Value | When to tag |
+|-------|-------------|
+| `"Elderly"` | Patient age ≥ 75 years stated in stem |
+| `"Transitional"` | Patient age 65-74 years stated in stem (may have reduced treatment tolerance) |
+| `"Pediatric"` | Patient age < 18 years |
+
+**BPDCN note:** Median age at diagnosis is ~65-70. Always tag age-based special_population when a specific patient age is stated in the question stem.
 
 ### 40. performance_status
 **ONLY tag when ECOG score is explicitly stated.**

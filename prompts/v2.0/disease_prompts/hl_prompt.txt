@@ -106,6 +106,8 @@ You must assign values for all 70 tag fields (disease_state is already determine
 
 ## HL DRUG LANDSCAPE (CRITICAL)
 
+**NOTE:** This table lists COMMON drugs for reference. It is NOT exhaustive. If a question mentions a drug, drug class, or mechanism not listed here, STILL tag it using the appropriate fields (treatment_1-5, drug_class_1-3, drug_target_1-3). Always tag what the question discusses, even if not in this table.
+
 ### Antibody-Drug Conjugate (ADC)
 | Drug | Status | Context | Key Trial |
 |------|--------|---------|-----------|
@@ -263,6 +265,16 @@ When topic is "AE management" or "Safety profile" and the question mentions a dr
 - `"PD-1"` - Pembrolizumab, nivolumab
 
 ### 17. prior_therapy_1 through prior_therapy_3
+
+**CRITICAL: Prefer drug CLASS over specific drug names.**
+- Use generic class: `"Prior anti-CD20"`, `"Prior BTK inhibitor"`, `"Prior checkpoint inhibitor"`
+- NOT specific drug: `"Prior rituximab"`, `"Prior ibrutinib"`, `"Prior pembrolizumab"`
+
+**Only use specific drug names when:**
+- The drug is unique in its indication (only drug in that class for this disease)
+- The question specifically discusses that drug's unique properties
+- Example: `"Prior osimertinib"` is appropriate (unique 1L EGFR TKI in NSCLC)
+
 **Canonical values:**
 - `"Prior ABVD"` - After ABVD failure
 - `"Prior BV+AVD"` - After BV+AVD failure

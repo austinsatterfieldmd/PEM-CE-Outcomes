@@ -126,6 +126,8 @@ CML classification uses:
 
 ## CML DRUG LANDSCAPE (CRITICAL)
 
+**NOTE:** This table lists COMMON drugs for reference. It is NOT exhaustive. If a question mentions a drug, drug class, or mechanism not listed here, STILL tag it using the appropriate fields (treatment_1-5, drug_class_1-3, drug_target_1-3). Always tag what the question discusses, even if not in this table.
+
 ### First-Generation TKI
 | Drug | Context | Key Toxicities |
 |------|---------|----------------|

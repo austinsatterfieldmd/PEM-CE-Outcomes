@@ -675,6 +675,8 @@ verified_values:
   - Hydroxyurea
   - Ropeginterferon alfa-2b
   - Ganciclovir
+  - Maribavir
+  - Letermovir
   biomarker:
   - del(17p)
   - MRD
@@ -720,6 +722,7 @@ verified_values:
   - JAK2-negative
   - CD117
   - CMV PCR
+  - CMV serostatus
   drug_class:
   - CAR-T therapy
   - Bispecific antibody
@@ -742,6 +745,9 @@ verified_values:
   - Cytoreductive agent
   - Interferon
   - Antiviral
+  - UL97 kinase inhibitor
+  - DNA polymerase inhibitor
+  - CMV terminase inhibitor
   disease_type:
   - High-risk
   - Blastoid
@@ -773,6 +779,8 @@ verified_values:
   - High-risk ET
   - CMV reactivation
   - Allogeneic HSCT
+  - CMV disease
+  - CMV prophylaxis
   prior_therapy:
   - Prior anti-CD38
   - Prior PI
@@ -861,6 +869,7 @@ verified_values:
   - MAGNOLIA
   - FLAIR
   - SURPASS ET
+  - SOLSTICE
   efficacy_endpoint:
   - MRD negativity rate
   - Overall response rate (ORR)
@@ -877,6 +886,7 @@ verified_values:
   - ORR
   - Duration of response (DoR)
   - Clinical response rate
+  - CMV viremia clearance
   toxicity_organ:
   - Hepatic
   - Cardiac

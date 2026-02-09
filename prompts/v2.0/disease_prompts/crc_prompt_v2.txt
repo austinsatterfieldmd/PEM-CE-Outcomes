@@ -277,7 +277,7 @@ Tumor sidedness is clinically relevant in CRC and should be tagged as a biomarke
     "drug_target_2": "EGFR",
     "drug_target_3": null,
     "prior_therapy_1": "Prior FOLFOX",
-    "prior_therapy_2": "Prior bevacizumab",
+    "prior_therapy_2": "Prior anti-VEGF",
     "prior_therapy_3": null,
     "resistance_mechanism": null,
     "metastatic_site_1": null,
@@ -807,7 +807,16 @@ Examples by disease (see disease-specific module for details):
 - Question mentions "previously treated with X"
 - Prior therapy influences current treatment choice
 
-**Examples:** `"Prior CDK4/6 inhibitor"`, `"Prior platinum"`, `"Prior immunotherapy"`, `"Prior trastuzumab"`
+**CRITICAL: Prefer drug CLASS over specific drug names.**
+- Use generic class: `"Prior anti-CD20"`, `"Prior BTK inhibitor"`, `"Prior checkpoint inhibitor"`
+- NOT specific drug: `"Prior rituximab"`, `"Prior ibrutinib"`, `"Prior pembrolizumab"`
+
+**Only use specific drug names when:**
+- The drug is unique in its indication (only drug in that class for this disease)
+- The question specifically discusses that drug's unique properties
+- Example: `"Prior osimertinib"` is appropriate (unique 1L EGFR TKI in NSCLC)
+
+**Examples:** `"Prior CDK4/6 inhibitor"`, `"Prior platinum"`, `"Prior immunotherapy"`, `"Prior anti-VEGF"`
 
 ### 29. resistance_mechanism
 **OPTIONAL** - Specific resistance mechanism mentioned.

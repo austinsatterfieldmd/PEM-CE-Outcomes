@@ -350,8 +350,12 @@ Q: "Patient completes CLL14 regimen but has MRD positivity at 10^-4. What is the
 | Venetoclax + obinutuzumab in TN CLL | CLL14 | AbbVie/Genentech |
 | Venetoclax + rituximab in R/R CLL | MURANO | AbbVie/Genentech |
 | Pirtobrutinib in BTKi-pretreated CLL | BRUIN | Lilly |
+| Pirtobrutinib + venetoclax in R/R CLL | BRUIN CLL-322 | Lilly |
+| Nemtabrutinib in BTKi-pretreated CLL | BELLWAVE-001 | MSD |
 | Ibrutinib + venetoclax in TN CLL | GLOW, CAPTIVATE | Various |
 | FCR long-term outcomes | CLL8, FCR300 | GCLLSG |
+
+**Trial inference rule:** If a question describes a specific drug combination + line + disease context that strongly matches a known trial, tag the trial name even if not explicitly mentioned. This table is not exhaustive — use clinical knowledge to infer trials for newer agents and combinations.
 
 ---
 
@@ -423,6 +427,9 @@ Q: "Patient completes CLL14 regimen but has MRD positivity at 10^-4. What is the
 - `"Hypertension"` - BTKi can worsen
 - `"Renal insufficiency"` - TLS risk, dose adjustments
 - `"Recurrent infections"` - Hypogammaglobulinemia
+- `"Peptic ulcer disease"` - GI bleeding risk with BTKi
+- `"GERD"` - PPI interaction with BTKi; may favor 2nd-gen BTKi or venetoclax
+- `"GI bleeding history"` - Increased bleeding risk with BTKi
 
 ---
 

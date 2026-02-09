@@ -32,6 +32,8 @@ When the correct answer references options by letter/number (e.g., "B or C"):
 
 ## MZL Drug Landscape
 
+**NOTE:** This table lists COMMON drugs for reference. It is NOT exhaustive. If a question mentions a drug, drug class, or mechanism not listed here, STILL tag it using the appropriate fields (treatment_1-5, drug_class_1-3, drug_target_1-3). Always tag what the question discusses, even if not in this table.
+
 ### Frontline Treatment
 | Setting | Treatment |
 |---------|-----------|
@@ -39,13 +41,24 @@ When the correct answer references options by letter/number (e.g., "B or C"):
 | Advanced/Symptomatic | Rituximab ± chemotherapy |
 
 ### Systemic Options
-| Drug/Regimen | Context |
-|--------------|---------|
-| **Rituximab** | Single-agent or combination |
-| **Bendamustine + Rituximab (BR)** | Common combination |
-| **Lenalidomide + Rituximab (R2)** | Alternative option |
-| **Zanubrutinib** | FDA approved for MZL (MAGNOLIA) |
-| **Ibrutinib** | BTK inhibitor option |
+| Drug/Regimen | Class | Context |
+|--------------|-------|---------|
+| **Rituximab** | Monoclonal antibody | Single-agent or combination |
+| **Bendamustine + Rituximab (BR)** | Alkylating agent + mAb | Common combination |
+| **Lenalidomide + Rituximab (R2)** | IMiD + mAb | Alternative option |
+| **Zanubrutinib** | BTK inhibitor | FDA approved for MZL (MAGNOLIA) |
+| **Ibrutinib** | BTK inhibitor | Approved for MZL |
+
+### R/R and Novel Agents
+| Drug/Regimen | Class | Context |
+|--------------|-------|---------|
+| **Parsaclisib** | PI3K inhibitor | Investigational (CITADEL-204) |
+| **Copanlisib** | PI3K inhibitor | FDA approved for R/R FL (also studied in MZL) |
+| **Idelalisib** | PI3K inhibitor | Approved for R/R FL/CLL |
+| **Duvelisib** | PI3K inhibitor | Approved for R/R FL/CLL |
+| **Axicabtagene ciloleucel** | CAR-T therapy | Approved for R/R iNHL including MZL (ZUMA-5) |
+| **Lisocabtagene maraleucel** | CAR-T therapy | Approved for R/R iNHL |
+| **Mosunetuzumab** | Bispecific antibody | Approved for R/R FL (also studied in MZL) |
 
 ### Special Situations
 - **H. pylori+ gastric MALT:** Antibiotic eradication first
@@ -175,12 +188,18 @@ When topic is "AE management" or "Safety profile" and the question mentions a dr
 | BTK inhibitor | Zanubrutinib, Ibrutinib |
 | IMiD | Lenalidomide |
 | Alkylating agent | Bendamustine |
+| PI3K inhibitor | Parsaclisib, Copanlisib, Idelalisib, Duvelisib |
+| CAR-T therapy | Axicabtagene ciloleucel, Lisocabtagene maraleucel |
+| Bispecific antibody | Mosunetuzumab |
 
 ### 25-27. drug_target_1 through drug_target_3
 | Target | Drugs |
 |--------|-------|
-| CD20 | Rituximab |
+| CD20 | Rituximab, Mosunetuzumab |
 | BTK | Zanubrutinib, Ibrutinib |
+| PI3Kδ | Parsaclisib, Idelalisib, Duvelisib |
+| PI3Kα/δ | Copanlisib |
+| CD19 | Axicabtagene ciloleucel, Lisocabtagene maraleucel |
 
 ### 28-30. prior_therapy_1 through prior_therapy_3
 **PREFER CLASS over specific drug:**

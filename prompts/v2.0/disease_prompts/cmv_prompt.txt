@@ -40,6 +40,8 @@ CMV is a major complication in:
 
 ## CMV Drug Landscape
 
+**NOTE:** This table lists COMMON drugs for reference. It is NOT exhaustive. If a question mentions a drug, drug class, or mechanism not listed here, STILL tag it using the appropriate fields (treatment_1-5, drug_class_1-3, drug_target_1-3). Always tag what the question discusses, even if not in this table.
+
 ### Primary Prophylaxis Agents
 
 | Drug | Context | Notes |
@@ -111,12 +113,17 @@ You must assign values for all 70 tag fields (disease_state is already determine
 | `"CMV reactivation"` | Viremia detected, preemptive therapy |
 | `"CMV disease"` | Active symptomatic infection (pneumonitis, colitis, retinitis) |
 
-**disease_type_2: Transplant Context**
+**disease_type_2: Transplant Context (the SETTING where CMV occurred)**
 | Value | Triggers |
 |-------|----------|
 | `"Allogeneic HSCT"` | Allo-HSCT, stem cell transplant recipient |
 | `"Solid organ transplant"` | Kidney, liver, heart, lung transplant |
 | `"CAR-T therapy"` | Post-CAR-T immunosuppression |
+
+**WARNING:** disease_type refers to the transplant SETTING, not the transplant modality itself.
+- CORRECT: `disease_type_2: "Allogeneic HSCT"` (CMV occurred in the allo-HSCT setting)
+- WRONG: `disease_type_2: "ASCT"` (ASCT is a treatment for another disease, not a CMV context — autologous transplant has low CMV risk)
+- If the question mentions a patient is "post-ASCT" as background, do NOT tag ASCT as disease_type
 
 ### 5. treatment_line
 **CRITICAL: CMV Treatment Lines**
@@ -207,7 +214,16 @@ Examples: "SOLSTICE", letermovir prophylaxis trials
 ### 28-30. prior_therapy_1 through prior_therapy_3
 **Tag when prior CMV treatment is mentioned**
 
-Examples:
+**CRITICAL: Prefer drug CLASS over specific drug names.**
+- Use generic class: `"Prior anti-CD20"`, `"Prior BTK inhibitor"`, `"Prior checkpoint inhibitor"`
+- NOT specific drug: `"Prior rituximab"`, `"Prior ibrutinib"`, `"Prior pembrolizumab"`
+
+**Only use specific drug names when:**
+- The drug is unique in its indication (only drug in that class for this disease)
+- The question specifically discusses that drug's unique properties
+- Example: `"Prior osimertinib"` is appropriate (unique 1L EGFR TKI in NSCLC)
+
+**Examples:**
 - "Prior ganciclovir" - After ganciclovir failure
 - "Ganciclovir-refractory" - Failed ganciclovir
 
