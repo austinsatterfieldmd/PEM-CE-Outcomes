@@ -18,7 +18,7 @@ export interface FieldConfig {
 const STRICT_DROPDOWN_FIELDS = new Set([
   // topic - allow custom values (new educational themes may emerge)
   'disease_stage',  // Must match staging conventions
-  'treatment_line',  // Must match line conventions
+  // treatment_line - allow custom values (disease-specific lines like "1L cytoreduction")
   'age_group',
   'performance_status',
   'fitness_status',
