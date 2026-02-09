@@ -184,6 +184,18 @@ biomarker_aliases:
   PD-L1 high: PD-L1 high expression
   PD-L1>=50%: PD-L1 TPS >=50%
   PD-L1>=1%: PD-L1 TPS >=1%
+  MRD negativity: MRD negative
+  MRD-negativity: MRD negative
+  MRD-negative: MRD negative
+  MRD neg: MRD negative
+  minimal residual disease negative: MRD negative
+  MRD positivity: MRD positive
+  MRD-positivity: MRD positive
+  MRD-positive: MRD positive
+  MRD pos: MRD positive
+  minimal residual disease positive: MRD positive
+  Minimal residual disease (MRD): MRD
+  minimal residual disease: MRD
 trial_aliases:
   KEYNOTE 024: KEYNOTE-024
   KEYNOTE024: KEYNOTE-024
@@ -336,10 +348,8 @@ efficacy_endpoint_aliases:
   time to response: TTR (Time to response)
   pathologic complete response: pCR (Pathologic complete response)
   pathological complete response: pCR (Pathologic complete response)
-  MRD negative: MRD negativity
-  MRD-negative: MRD negativity
-  MRD neg: MRD negativity
-  minimal residual disease negative: MRD negativity
+  MRD negativity rate: MRD negativity rate
+  MRD-negative CR: MRD-negative CR
 treatment_line_aliases:
   first-line: 1L
   first line: 1L
