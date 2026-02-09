@@ -189,6 +189,7 @@ Usually null unless specifically discussed.
 - `"CNS"` - PCNSL or secondary CNS involvement
 
 ### 35-37. symptom_1 through symptom_3
+**CRITICAL: Only tag symptoms explicitly stated in the question stem.** Do NOT infer symptoms from the disease context alone (e.g., do NOT tag "Bleeding" just because MDS can cause bleeding if bleeding is not mentioned in the stem).
 **Lymphoma symptoms:**
 - `"B symptoms"` - Fever, night sweats, weight loss
 - `"Lymphadenopathy"`

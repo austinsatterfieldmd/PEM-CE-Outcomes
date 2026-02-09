@@ -217,6 +217,7 @@ Usually null for MZL unless specifically discussed.
 Usually null for MZL (lymphoma, not solid tumor).
 
 ### 35-37. symptom_1 through symptom_3
+**CRITICAL: Only tag symptoms explicitly stated in the question stem.** Do NOT infer symptoms from the disease context alone (e.g., do NOT tag "Bleeding" just because MDS can cause bleeding if bleeding is not mentioned in the stem).
 **MZL symptoms:**
 - `"Splenomegaly"` - Splenic MZL
 - `"GI symptoms"` - Gastric MALT

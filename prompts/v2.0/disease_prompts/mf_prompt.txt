@@ -331,6 +331,8 @@ When topic is "AE management" or "Safety profile" and the question mentions a dr
 ### 14. comorbidity_1 through comorbidity_3
 **OPTIONAL** - Comorbidities affecting treatment.
 
+**CRITICAL: Only tag comorbidities explicitly stated in the question stem.** Comorbidities are medical conditions SEPARATE from the primary disease. Do NOT infer comorbidities from age, disease stage, or treatment history alone.
+
 **Common MF-relevant comorbidities:**
 - `"Severe thrombocytopenia"` - Affects JAK inhibitor choice (pacritinib)
 - `"Anemia"` - Affects JAK inhibitor choice (momelotinib)
@@ -394,6 +396,8 @@ If resistance is discussed.
 ### 20. symptom_1 through symptom_3
 Clinical symptoms if question focuses on symptom management.
 **Examples:** `"Splenomegaly"`, `"Fatigue"`, `"Night sweats"`, `"Weight loss"`, `"Bone pain"`, `"Pruritus"`, `"Early satiety"`, `"Abdominal pain"`
+
+**CRITICAL: Only tag symptoms explicitly stated in the question stem.** Do NOT infer symptoms from the disease context alone (e.g., do NOT tag "Bleeding" just because MDS can cause bleeding if bleeding is not mentioned in the stem).
 
 **Constitutional symptoms (B symptoms):**
 - Night sweats, fever, weight loss > 10%

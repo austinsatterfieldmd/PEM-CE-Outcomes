@@ -506,6 +506,8 @@ Use this value ONLY when the question involves patient eligibility context, NOT 
 ### 14. comorbidity_1 through comorbidity_3
 **OPTIONAL** - Patient comorbidities that affect treatment decisions.
 
+**CRITICAL: Only tag comorbidities explicitly stated in the question stem.** Comorbidities are medical conditions SEPARATE from the primary disease. Do NOT infer comorbidities from age, disease stage, or treatment history alone.
+
 **MULTI-VALUE FIELD:** Use `comorbidity_1`, `comorbidity_2`, etc. for multiple comorbidities (up to 3). Use `null` for unused slots.
 
 **Common MM-relevant comorbidities:**
@@ -596,6 +598,8 @@ For extramedullary disease (plasmacytomas, CNS involvement), use `disease_specif
 
 ### 20. symptom_1 through symptom_3
 Clinical symptoms if question focuses on symptom management.
+
+**CRITICAL: Only tag symptoms explicitly stated in the question stem.** Do NOT infer symptoms from the disease context alone (e.g., do NOT tag "Bleeding" just because MDS can cause bleeding if bleeding is not mentioned in the stem).
 **MM examples:** `"Bone pain"`, `"Lytic lesions"`, `"Renal insufficiency"`, `"Hypercalcemia"`, `"Anemia"`, `"Fatigue"`, `"Neuropathy"`.
 
 ### 21. performance_status

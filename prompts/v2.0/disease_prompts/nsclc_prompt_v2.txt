@@ -674,6 +674,8 @@ You must assign values for all 66 fields below. Use `null` for fields that are n
 
 ---
 
+**CRITICAL: Only tag comorbidities explicitly stated in the question stem.** Comorbidities are medical conditions SEPARATE from the primary disease. Do NOT infer comorbidities from age, disease stage, or treatment history alone.
+
 ## Core Classification (4 fields)
 
 ### 1. topic
@@ -839,6 +841,7 @@ Examples by disease (see disease-specific module for details):
 `"Brain metastases"`, `"CNS metastases"`, `"Leptomeningeal disease"`, `"Bone metastases"`, `"Liver metastases"`, `"Lung metastases"`, `"Lymph node metastases"`, `"Peritoneal carcinomatosis"`, `"Pleural effusion"`, `"Ascites"`, `"Oligometastatic disease"`
 
 ### 33-35. symptom_1 through symptom_3
+**CRITICAL: Only tag symptoms explicitly stated in the question stem.** Do NOT infer symptoms from the disease context alone (e.g., do NOT tag "Bleeding" just because MDS can cause bleeding if bleeding is not mentioned in the stem).
 **OPTIONAL** - Clinical symptoms mentioned in vignette.
 
 **Common values (use these when applicable, but may use other values if confident):**

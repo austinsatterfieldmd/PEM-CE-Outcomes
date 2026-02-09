@@ -349,6 +349,10 @@ When topic is "AE management" or "Safety profile" and the question mentions a dr
 
 ### 14. comorbidity_1 through comorbidity_3
 **OPTIONAL**
+
+**CRITICAL: Only tag comorbidities explicitly stated in the question stem.** Comorbidities are medical conditions SEPARATE from the primary disease. Do NOT infer comorbidities from age, disease stage, or treatment history alone.
+
+**CRITICAL: Only tag symptoms explicitly stated in the question stem.** Do NOT infer symptoms from the disease context alone (e.g., do NOT tag "Bleeding" just because MDS can cause bleeding if bleeding is not mentioned in the stem).
 - `"Thrombocytopenia"` - May affect treatment choice
 - `"Infection history"` - Immunosuppression consideration
 - `"Atrial fibrillation"` - May affect ibrutinib use

@@ -421,6 +421,8 @@ Note: In DLBCL, very high Ki-67 (>80%) often correlates with MYC-driven biology.
 ### 14. comorbidity_1 through comorbidity_3
 **OPTIONAL** - Comorbidities affecting treatment.
 
+**CRITICAL: Only tag comorbidities explicitly stated in the question stem.** Comorbidities are medical conditions SEPARATE from the primary disease. Do NOT infer comorbidities from age, disease stage, or treatment history alone.
+
 **Common DLBCL-relevant comorbidities:**
 - `"Heart failure"` - Limits anthracycline use
 - `"Reduced LVEF"` - Cardiac monitoring needed
@@ -508,6 +510,8 @@ Site-specific involvement if relevant.
 ### 20. symptom_1 through symptom_3
 Clinical symptoms if question focuses on symptom management.
 **Examples:** `"B symptoms"`, `"Fatigue"`, `"Lymphadenopathy"`, `"Superior vena cava syndrome"`
+
+**CRITICAL: Only tag symptoms explicitly stated in the question stem.** Do NOT infer symptoms from the disease context alone (e.g., do NOT tag "Bleeding" just because MDS can cause bleeding if bleeding is not mentioned in the stem).
 
 ### 21. performance_status
 **ONLY tag when ECOG score is explicitly stated.**

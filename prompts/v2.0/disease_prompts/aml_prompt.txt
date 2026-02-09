@@ -411,6 +411,8 @@ Q: "Patient achieves MRD negativity after consolidation. What does this predict?
 ### 14. comorbidity_1 through comorbidity_3
 **OPTIONAL** - Comorbidities affecting treatment.
 
+**CRITICAL: Only tag comorbidities explicitly stated in the question stem.** Comorbidities are medical conditions SEPARATE from the primary disease. Do NOT infer comorbidities from age, disease stage, or treatment history alone.
+
 **Common AML-relevant comorbidities:**
 - `"Cardiac disease"` - Affects anthracycline use
 - `"Renal impairment"` - Dose adjustments needed
@@ -489,6 +491,8 @@ If resistance is discussed.
 ### 20. symptom_1 through symptom_3
 Clinical symptoms if question focuses on symptom management.
 **Examples:** `"Fatigue"`, `"Bleeding"`, `"Infection"`, `"Bone pain"`, `"Gingival hyperplasia"`
+
+**CRITICAL: Only tag symptoms explicitly stated in the question stem.** Do NOT infer symptoms from the disease context alone (e.g., do NOT tag "Bleeding" just because MDS can cause bleeding if bleeding is not mentioned in the stem).
 
 ### 21. performance_status
 **ONLY tag when ECOG score is explicitly stated.**
