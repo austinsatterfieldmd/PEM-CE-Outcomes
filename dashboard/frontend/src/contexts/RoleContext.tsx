@@ -57,7 +57,7 @@ export function RoleProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!isSupabaseMode) return
 
-    const unsubscribe = onAuthStateChange((event, session) => {
+    const unsubscribe = onAuthStateChange((event, _session) => {
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
         console.log('[RoleContext] Auth state changed:', event, '— re-fetching role')
         // Small delay to ensure session is fully established
