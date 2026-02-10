@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { Search, Filter, ChevronDown, X, BarChart3, Database, ClipboardCheck, Download, ArrowUpDown, SlidersHorizontal, Zap } from 'lucide-react'
+import { Search, Filter, ChevronDown, X, BarChart3, Database, ClipboardCheck, Download, ArrowUpDown, SlidersHorizontal, Zap, Settings } from 'lucide-react'
 import { QuestionTable } from './components/QuestionTable'
 import { FilterPanel } from './components/FilterPanel'
 import { ColumnPickerModal } from './components/ColumnPickerModal'
@@ -10,16 +10,18 @@ import { StatsCards } from './components/StatsCards'
 import ReportBuilder from './components/ReportBuilder'
 import ReviewTab from './components/ReviewTab'
 import QSuiteTab from './components/QSuiteTab'
+import UserRoleManager from './components/UserRoleManager'
 import { UserMenu } from './components/AuthProvider'
 import { ExportEditsButton } from './components/ExportEditsButton'
 import AuthCallback from './components/AuthCallback'
-import { searchQuestions, getFilterOptions, getDynamicFilterOptions, getStats, exportQuestions, exportQuestionsFull } from './services/api'
+import { searchQuestions, getFilterOptions, getDynamicFilterOptions, getStats, exportQuestions, exportQuestionsFull } from './services/apiRouter'
 import type { Question, FilterOptions, SearchFilters, Stats } from './types'
 import { loadUserDefinedValues } from './config/userDefinedValues'
 import { checkVercelMode } from './services/localEdits'
+import { useRole } from './contexts/RoleContext'
 import perLogoWhite from './assets/per-logo-white.png'
 
-type TabView = 'explorer' | 'reports' | 'review' | 'qsuite'
+type TabView = 'explorer' | 'reports' | 'review' | 'qsuite' | 'settings'
 
 // Helper to get URL search params
 const getUrlQuestionId = (): number | null => {
@@ -35,7 +37,7 @@ const getInitialTab = (): TabView => {
     return 'explorer'
   }
   const hash = window.location.hash.replace('#', '')
-  if (hash === 'reports' || hash === 'explorer' || hash === 'review' || hash === 'qsuite') {
+  if (hash === 'reports' || hash === 'explorer' || hash === 'review' || hash === 'qsuite' || hash === 'settings') {
     return hash as TabView
   }
   // Support legacy hash routes by mapping to review
@@ -46,6 +48,8 @@ const getInitialTab = (): TabView => {
 }
 
 function App() {
+  const { isAdmin } = useRole()
+
   // Tab state - initialize from URL hash
   const [activeTab, setActiveTab] = useState<TabView>(getInitialTab)
 
@@ -249,7 +253,7 @@ function App() {
 
       const csvRows = [
         headers.join(','),
-        ...result.questions.map(q => [
+        ...result.questions.map((q: any) => [
           q.id,
           `"${(q.question_stem || '').replace(/"/g, '""')}"`,
           `"${(q.correct_answer || '').replace(/"/g, '""')}"`,
@@ -359,7 +363,7 @@ function App() {
 
       const csvRows = [
         headers.join(','),
-        ...result.questions.map(q => [
+        ...result.questions.map((q: any) => [
           q.id, escapeCSV(q.source_file), escapeCSV(q.question_stem), escapeCSV(q.correct_answer), escapeCSV(q.incorrect_answers),
           // Core
           escapeCSV(q.topic), escapeCSV(q.disease_state), escapeCSV(q.disease_type_1), escapeCSV(q.disease_type_2), escapeCSV(q.disease_stage), escapeCSV(q.treatment_line),
@@ -498,6 +502,19 @@ function App() {
                 <Zap className="w-4 h-4" />
                 Q-Suite
               </button>
+              {isAdmin && (
+                <button
+                  onClick={() => setActiveTab('settings')}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                    activeTab === 'settings'
+                      ? 'bg-white text-primary-500 shadow-lg'
+                      : 'text-white/80 hover:text-white hover:bg-white/10'
+                  }`}
+                >
+                  <Settings className="w-4 h-4" />
+                  Settings
+                </button>
+              )}
             </div>
 
             {/* Export Edits (Vercel Mode) + User Menu */}
@@ -763,6 +780,9 @@ function App() {
         ) : activeTab === 'qsuite' ? (
           /* Q-Suite Tab */
           <QSuiteTab />
+        ) : activeTab === 'settings' ? (
+          /* Settings Tab (admin only) */
+          <UserRoleManager />
         ) : (
           /* Review Tab with sub-tabs */
           <ReviewTab

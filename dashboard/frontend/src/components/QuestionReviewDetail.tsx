@@ -1,9 +1,10 @@
 import { useEffect, useState, memo, useMemo } from 'react'
 import { X, Check, AlertCircle, Tag, Activity, FileText, TrendingUp, Pencil, Save, XCircle, AlertTriangle, CheckCircle, ChevronDown, ChevronRight, HelpCircle, Database } from 'lucide-react'
-import { getQuestionDetail, updateQuestionTags, updateOncologyStatus, markDataError } from '../services/api'
+import { getQuestionDetail, updateQuestionTags, updateOncologyStatus, markDataError } from '../services/apiRouter'
 import type { QuestionDetailData } from '../types'
 import { FIELD_GROUPS } from '../types'
 import { useAuth } from './AuthProvider'
+import { useRole } from '../contexts/RoleContext'
 import { FieldGuidanceModal } from './FieldGuidanceModal'
 import { DropdownSelect, DropdownWithOther, AutocompleteInput } from './inputs'
 import { getFieldConfig, getFieldSuggestions } from '../config/canonicalValues'
@@ -263,7 +264,9 @@ interface EditableTags {
 }
 
 export function QuestionReviewDetail({ questionId, onClose, onReviewComplete }: QuestionReviewDetailProps) {
-  const { isAdmin } = useAuth()
+  const { isAdmin: authIsAdmin } = useAuth()
+  const { isAdmin: roleIsAdmin } = useRole()
+  const isAdmin = roleIsAdmin || authIsAdmin
   const [data, setData] = useState<QuestionDetailData | null>(null)
   const [loading, setLoading] = useState(true)
   const [selectedSegment, setSelectedSegment] = useState<string>('overall')

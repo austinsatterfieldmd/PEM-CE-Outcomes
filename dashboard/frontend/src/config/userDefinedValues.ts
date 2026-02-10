@@ -11,7 +11,7 @@
  *   3. Call detectCustomValues(editedTags, originalTags) to find new custom values
  */
 
-import { getUserDefinedValues } from '../services/api'
+import { getUserDefinedValues } from '../services/apiRouter'
 import { FIELD_GUIDANCE } from './fieldGuidance'
 
 // In-memory cache of user-defined values
