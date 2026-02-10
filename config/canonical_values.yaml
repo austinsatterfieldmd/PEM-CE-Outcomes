@@ -612,6 +612,9 @@ verified_values:
   - Skin lesions
   - Palpitations
   - CMV viremia
+  - Iron overload
+  - Bone pain
+  - Pruritus
   treatment:
   - Idecabtagene vicleucel
   - Ciltacabtagene autoleucel
@@ -677,6 +680,12 @@ verified_values:
   - Ganciclovir
   - Maribavir
   - Letermovir
+  - Ivosidenib
+  - Decitabine/cedazuridine
+  - Allogeneic stem cell transplantation
+  - Navtemadlin
+  - Odronextamab
+  - Pivekimab sunirine
   biomarker:
   - del(17p)
   - MRD
@@ -723,6 +732,12 @@ verified_values:
   - CD117
   - CMV PCR
   - CMV serostatus
+  - IDH1 mutated
+  - SF3B1 mutated
+  - ASXL1 mutated
+  - RUNX1 mutated
+  - ctDNA
+  - ctDNA positivity
   drug_class:
   - CAR-T therapy
   - Bispecific antibody
@@ -748,6 +763,9 @@ verified_values:
   - UL97 kinase inhibitor
   - DNA polymerase inhibitor
   - CMV terminase inhibitor
+  - IDH1 inhibitor
+  - Hypomethylating agent (HMA)
+  - MDM2 inhibitor
   disease_type:
   - High-risk
   - Blastoid
@@ -781,6 +799,9 @@ verified_values:
   - Allogeneic HSCT
   - CMV disease
   - CMV prophylaxis
+  - Higher-risk MDS
+  - Extranodal MZL
+  - MALT lymphoma
   prior_therapy:
   - Prior anti-CD38
   - Prior PI
@@ -810,6 +831,7 @@ verified_values:
   - Prior non-covalent BTKi
   - Prior R-CVP
   - Preemptive therapy
+  - Prior HMA
   toxicity_type:
   - Infections
   - VTE
@@ -904,6 +926,7 @@ verified_values:
   - GI tract
   - Blood
   - Skin
+  - CNS metastases
 normalization_rules:
   treatment_line:
     1L: Newly diagnosed

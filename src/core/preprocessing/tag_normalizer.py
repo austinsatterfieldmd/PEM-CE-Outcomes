@@ -46,6 +46,18 @@ NORMALIZABLE_FIELDS = [
     "disease_specific_factor", "treatment_line", "performance_status",
 ]
 
+# Fields where first letter should always be capitalized (drug names, clinical terms)
+PROPER_CASE_FIELDS = {
+    "treatment_1", "treatment_2", "treatment_3", "treatment_4", "treatment_5",
+    "prior_therapy_1", "prior_therapy_2", "prior_therapy_3",
+    "drug_class_1", "drug_class_2", "drug_class_3",
+    "toxicity_type_1", "toxicity_type_2", "toxicity_type_3",
+    "toxicity_type_4", "toxicity_type_5",
+    "symptom_1", "symptom_2", "symptom_3",
+    "metastatic_site_1", "metastatic_site_2", "metastatic_site_3",
+    "disease_specific_factor",
+}
+
 
 class TagNormalizer:
     """Normalizes tag values using alias mappings and canonical values."""
@@ -228,6 +240,25 @@ class TagNormalizer:
 
         return new_value_fields
 
+    @staticmethod
+    def _ensure_proper_case(value: str) -> str:
+        """Capitalize first letter of a value if it starts lowercase.
+
+        Handles drug names (navtemadlin → Navtemadlin) while preserving:
+        - Already capitalized values (Venetoclax → Venetoclax)
+        - Abbreviations/special patterns (t(9;22), dMMR, PD-L1)
+        - "Prior" prefixed values (Prior BTKi → Prior BTKi)
+        """
+        if not value or not value[0].islower():
+            return value
+        # Don't capitalize if starts with known lowercase patterns
+        # like "t(9;22)", "del(17p)", etc.
+        if value[0] == 't' and len(value) > 1 and value[1] == '(':
+            return value
+        if value.startswith("del(") or value.startswith("inv("):
+            return value
+        return value[0].upper() + value[1:]
+
     def normalize_tags(self, tags: Dict[str, Any]) -> Dict[str, Any]:
         """Normalize all tag values in a tags dict.
 
@@ -244,6 +275,9 @@ class TagNormalizer:
         for field in NORMALIZABLE_FIELDS:
             if field in normalized and normalized[field]:
                 normalized[field] = self.normalize_value(normalized[field])
+                # Apply proper-case fallback for drug names and clinical terms
+                if field in PROPER_CASE_FIELDS and isinstance(normalized[field], str):
+                    normalized[field] = self._ensure_proper_case(normalized[field])
 
         return normalized
 
