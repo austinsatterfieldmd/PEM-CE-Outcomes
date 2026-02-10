@@ -239,15 +239,19 @@ export function QuestionTable({ questions, loading, onSelect, selectedId, showWo
 
               {/* Performance */}
               <div className="col-span-2 mt-3 md:mt-0">
-                {question.pre_score != null ? (
+                {question.pre_score != null || question.post_score != null ? (
                   <div className="space-y-0.5">
                     <div className="flex items-center gap-2 text-xs">
-                      <span className="text-slate-500">
-                        Pre: <span className="font-medium text-slate-700">{question.pre_score?.toFixed(1)}%</span>
-                      </span>
-                      <span className="text-slate-500">
-                        Post: <span className="font-medium text-slate-700">{question.post_score?.toFixed(1)}%</span>
-                      </span>
+                      {question.pre_score != null && (
+                        <span className="text-slate-500">
+                          Pre: <span className="font-medium text-slate-700">{question.pre_score?.toFixed(1)}%</span>
+                        </span>
+                      )}
+                      {question.post_score != null && (
+                        <span className="text-slate-500">
+                          Post: <span className="font-medium text-slate-700">{question.post_score?.toFixed(1)}%</span>
+                        </span>
+                      )}
                     </div>
                     {renderKnowledgeGain(question.knowledge_gain)}
                   </div>

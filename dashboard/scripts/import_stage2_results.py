@@ -517,7 +517,7 @@ def import_stage2_clear(db: DatabaseService, results: list) -> dict:
 
             activities = result.get('activities', '')
             if activities:
-                for activity_name in activities.split(', '):
+                for activity_name in activities.split('; '):
                     if activity_name.strip():
                         db.insert_activity(db_question_id, activity_name.strip())
 

@@ -256,6 +256,23 @@ export async function getQuestionDetail(id: number): Promise<QuestionDetailData>
   if (!Array.isArray(result.performance)) result.performance = []
   if (!Array.isArray(result.activities)) result.activities = []
 
+  // If RPC returned no activities, fetch from question_activities table directly
+  // (RPC only pulls from demographic_performance which may not be populated)
+  if (result.activities.length === 0) {
+    const { data: qaData } = await supabase
+      .from('question_activities')
+      .select('activity_name, activities!inner(activity_date, quarter)')
+      .eq('question_id', id)
+    if (qaData && qaData.length > 0) {
+      result.activities = qaData.map((qa: any) => ({
+        activity_name: qa.activity_name,
+        act_date: qa.activities?.activity_date || null,
+        quarter: qa.activities?.quarter || null,
+        performance: []
+      }))
+    }
+  }
+
   // Transform activities: RPC returns objects {quarter, act_date, performance, activity_name}
   // but component expects activity_details (objects) + activities (plain strings)
   if (Array.isArray(result.activities) && result.activities.length > 0 && typeof result.activities[0] === 'object') {
