@@ -3,6 +3,8 @@ import { FileText, Calendar, AlertCircle, CloudOff } from 'lucide-react'
 import type { Stats } from '../types'
 import { getPendingEditCount, exportPendingEdits, checkVercelMode } from '../services/localEdits'
 
+const isSupabase = import.meta.env.VITE_USE_SUPABASE === 'true'
+
 interface StatsCardsProps {
   stats: Stats
   onNeedsReviewClick?: () => void
@@ -13,6 +15,9 @@ export function StatsCards({ stats, onNeedsReviewClick }: StatsCardsProps) {
   const [isVercelMode, setIsVercelMode] = useState(false)
 
   useEffect(() => {
+    // Supabase mode = full read/write, no local edits needed
+    if (isSupabase) return
+
     checkVercelMode().then(setIsVercelMode)
     setPendingEdits(getPendingEditCount())
 
