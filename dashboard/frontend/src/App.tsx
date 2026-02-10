@@ -75,7 +75,7 @@ function App() {
   
   // Search & filter state
   const [searchQuery, setSearchQuery] = useState('')
-  const [filters, setFilters] = useState<SearchFilters>({})
+  const [filters, setFilters] = useState<SearchFilters>({ has_performance_data: true })
   const [reviewFlagFilter, setReviewFlagFilter] = useState<string | null>(null)
   const [reviewSourceFileFilter, setReviewSourceFileFilter] = useState<string | null>(null)
   const [reviewSearchQuery, setReviewSearchQuery] = useState('')
