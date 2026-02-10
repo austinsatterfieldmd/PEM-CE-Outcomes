@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS questions (
     incorrect_answers TEXT,                         -- JSON array of incorrect answer strings
     source_file TEXT,
     canonical_source_id TEXT,                       -- For dedup: points to canonical question's source_id
+    is_oncology BOOLEAN DEFAULT TRUE,               -- Stage 1 classification result
     created_at TIMESTAMPTZ DEFAULT now()
 );
 
