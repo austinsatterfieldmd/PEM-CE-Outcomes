@@ -13,7 +13,7 @@ import QSuiteTab from './components/QSuiteTab'
 import UserRoleManager from './components/UserRoleManager'
 import { UserMenu } from './components/AuthProvider'
 import { ExportEditsButton } from './components/ExportEditsButton'
-import { searchQuestions, getFilterOptions, getDynamicFilterOptions, getStats, exportQuestions, exportQuestionsFull } from './services/apiRouter'
+import { searchQuestions, getFilterOptions, getDynamicFilterOptions, getStats, exportQuestionsFull } from './services/apiRouter'
 import type { Question, FilterOptions, SearchFilters, Stats } from './types'
 import { loadUserDefinedValues } from './config/userDefinedValues'
 import { checkVercelMode } from './services/localEdits'
@@ -219,8 +219,8 @@ function App() {
       setLoading(true)
       console.log('Starting export with filters:', filters)
 
-      // Use the export endpoint which returns all matching questions with full data including activities
-      const result = await exportQuestions(filters)
+      // Use full export with all 70 tag fields + performance + activities
+      const result = await exportQuestionsFull(filters)
 
       console.log('Total questions fetched:', result.total)
 
@@ -229,48 +229,108 @@ function App() {
         return
       }
 
-      // Convert to CSV format with all tags and activities
+      const escapeCSV = (val: string | number | boolean | null | undefined) => {
+        if (val === null || val === undefined) return ''
+        if (typeof val === 'boolean') return val ? 'TRUE' : 'FALSE'
+        const str = String(val)
+        return `"${str.replace(/"/g, '""')}"`
+      }
+
+      // CSV headers - all 70 fields + metadata
       const headers = [
-        'ID',
-        'Question',
-        'Correct Answer',
-        'Incorrect Answers',
-        'Topic',
-        'Disease State',
-        'Disease Type',
-        'Disease Stage',
-        'Treatment',
-        'Treatment Line',
-        'Biomarker',
-        'Trial',
-        'Pre-Test Score',
-        'Post-Test Score',
-        'Knowledge Gain',
-        'Sample Size',
-        'Activities'
+        'ID', 'Source File', 'Question', 'Correct Answer', 'Incorrect Answers',
+        // Core Classification
+        'Topic', 'Disease State 1', 'Disease State 2', 'Disease Type 1', 'Disease Type 2', 'Disease Stage', 'Treatment Line',
+        // Multi-value Fields
+        'Treatment 1', 'Treatment 2', 'Treatment 3', 'Treatment 4', 'Treatment 5',
+        'Biomarker 1', 'Biomarker 2', 'Biomarker 3', 'Biomarker 4', 'Biomarker 5',
+        'Trial 1', 'Trial 2', 'Trial 3', 'Trial 4', 'Trial 5',
+        // Patient Characteristics
+        'Treatment Eligibility', 'Age Group', 'Organ Dysfunction', 'Fitness Status', 'Disease Specific Factor',
+        'Comorbidity 1', 'Comorbidity 2', 'Comorbidity 3',
+        // Treatment Metadata
+        'Drug Class 1', 'Drug Class 2', 'Drug Class 3',
+        'Drug Target 1', 'Drug Target 2', 'Drug Target 3',
+        'Prior Therapy 1', 'Prior Therapy 2', 'Prior Therapy 3', 'Resistance Mechanism',
+        // Clinical Context
+        'Metastatic Site 1', 'Metastatic Site 2', 'Metastatic Site 3',
+        'Symptom 1', 'Symptom 2', 'Symptom 3', 'Performance Status',
+        'Special Population 1', 'Special Population 2',
+        // Safety/Toxicity
+        'Toxicity Type 1', 'Toxicity Type 2', 'Toxicity Type 3', 'Toxicity Type 4', 'Toxicity Type 5',
+        'Toxicity Organ', 'Toxicity Grade',
+        // Efficacy/Outcomes
+        'Efficacy Endpoint 1', 'Efficacy Endpoint 2', 'Efficacy Endpoint 3', 'Outcome Context', 'Clinical Benefit',
+        // Evidence/Guidelines
+        'Guideline Source 1', 'Guideline Source 2', 'Evidence Type',
+        // Question Format/Quality
+        'CME Outcome Level', 'Data Response Type', 'Stem Type', 'Lead-in Type', 'Answer Format',
+        'Answer Length Pattern', 'Distractor Homogeneity',
+        'Flaw: Absolute Terms', 'Flaw: Grammatical Cue', 'Flaw: Implausible Distractor',
+        'Flaw: Clang Association', 'Flaw: Convergence Vulnerability', 'Flaw: Double Negative',
+        // Computed
+        'Answer Option Count', 'Correct Answer Position',
+        // Review metadata
+        'Tag Status', 'Agreement Level', 'Needs Review', 'Review Reason',
+        // Performance
+        'Pre-Test Score', 'Post-Test Score', 'Knowledge Gain', 'Sample Size', 'Activities'
       ]
 
       const csvRows = [
         headers.join(','),
-        ...result.questions.map((q: any) => [
-          q.id,
-          `"${(q.question_stem || '').replace(/"/g, '""')}"`,
-          `"${(q.correct_answer || '').replace(/"/g, '""')}"`,
-          `"${(q.incorrect_answers || '').replace(/"/g, '""')}"`,
-          `"${(q.topic || '').replace(/"/g, '""')}"`,
-          `"${(q.disease_state || '').replace(/"/g, '""')}"`,
-          `"${(q.disease_type || '').replace(/"/g, '""')}"`,
-          `"${(q.disease_stage || '').replace(/"/g, '""')}"`,
-          `"${(q.treatment || '').replace(/"/g, '""')}"`,
-          `"${(q.treatment_line || '').replace(/"/g, '""')}"`,
-          `"${(q.biomarker || '').replace(/"/g, '""')}"`,
-          `"${(q.trial || '').replace(/"/g, '""')}"`,
-          q.pre_score !== null ? q.pre_score.toFixed(1) + '%' : '',
-          q.post_score !== null ? q.post_score.toFixed(1) + '%' : '',
-          q.knowledge_gain !== null ? (q.knowledge_gain > 0 ? '+' : '') + q.knowledge_gain.toFixed(1) + '%' : '',
-          q.sample_size || '',
-          `"${(q.activities || '').replace(/"/g, '""')}"`
-        ].join(','))
+        ...result.questions.map((q: any) => {
+          const qn = q.questions || {} // nested question data from tags join
+          return [
+            qn.source_id || q.question_id,
+            escapeCSV(qn.source_file),
+            escapeCSV(qn.question_stem),
+            escapeCSV(qn.correct_answer),
+            escapeCSV(qn.incorrect_answers),
+            // Core
+            escapeCSV(q.topic),
+            escapeCSV(q.disease_state_1 || q.disease_state),
+            escapeCSV(q.disease_state_2),
+            escapeCSV(q.disease_type_1), escapeCSV(q.disease_type_2),
+            escapeCSV(q.disease_stage), escapeCSV(q.treatment_line),
+            // Multi-value
+            escapeCSV(q.treatment_1), escapeCSV(q.treatment_2), escapeCSV(q.treatment_3), escapeCSV(q.treatment_4), escapeCSV(q.treatment_5),
+            escapeCSV(q.biomarker_1), escapeCSV(q.biomarker_2), escapeCSV(q.biomarker_3), escapeCSV(q.biomarker_4), escapeCSV(q.biomarker_5),
+            escapeCSV(q.trial_1), escapeCSV(q.trial_2), escapeCSV(q.trial_3), escapeCSV(q.trial_4), escapeCSV(q.trial_5),
+            // Patient Characteristics
+            escapeCSV(q.treatment_eligibility), escapeCSV(q.age_group), escapeCSV(q.organ_dysfunction), escapeCSV(q.fitness_status), escapeCSV(q.disease_specific_factor),
+            escapeCSV(q.comorbidity_1), escapeCSV(q.comorbidity_2), escapeCSV(q.comorbidity_3),
+            // Treatment Metadata
+            escapeCSV(q.drug_class_1), escapeCSV(q.drug_class_2), escapeCSV(q.drug_class_3),
+            escapeCSV(q.drug_target_1), escapeCSV(q.drug_target_2), escapeCSV(q.drug_target_3),
+            escapeCSV(q.prior_therapy_1), escapeCSV(q.prior_therapy_2), escapeCSV(q.prior_therapy_3), escapeCSV(q.resistance_mechanism),
+            // Clinical Context
+            escapeCSV(q.metastatic_site_1), escapeCSV(q.metastatic_site_2), escapeCSV(q.metastatic_site_3),
+            escapeCSV(q.symptom_1), escapeCSV(q.symptom_2), escapeCSV(q.symptom_3), escapeCSV(q.performance_status),
+            escapeCSV(q.special_population_1), escapeCSV(q.special_population_2),
+            // Safety/Toxicity
+            escapeCSV(q.toxicity_type_1), escapeCSV(q.toxicity_type_2), escapeCSV(q.toxicity_type_3), escapeCSV(q.toxicity_type_4), escapeCSV(q.toxicity_type_5),
+            escapeCSV(q.toxicity_organ), escapeCSV(q.toxicity_grade),
+            // Efficacy/Outcomes
+            escapeCSV(q.efficacy_endpoint_1), escapeCSV(q.efficacy_endpoint_2), escapeCSV(q.efficacy_endpoint_3), escapeCSV(q.outcome_context), escapeCSV(q.clinical_benefit),
+            // Evidence/Guidelines
+            escapeCSV(q.guideline_source_1), escapeCSV(q.guideline_source_2), escapeCSV(q.evidence_type),
+            // Question Format/Quality
+            escapeCSV(q.cme_outcome_level), escapeCSV(q.data_response_type), escapeCSV(q.stem_type), escapeCSV(q.lead_in_type), escapeCSV(q.answer_format),
+            escapeCSV(q.answer_length_pattern), escapeCSV(q.distractor_homogeneity),
+            escapeCSV(q.flaw_absolute_terms), escapeCSV(q.flaw_grammatical_cue), escapeCSV(q.flaw_implausible_distractor),
+            escapeCSV(q.flaw_clang_association), escapeCSV(q.flaw_convergence_vulnerability), escapeCSV(q.flaw_double_negative),
+            // Computed
+            q.answer_option_count || '', escapeCSV(q.correct_answer_position),
+            // Review metadata
+            escapeCSV(q.tag_status), escapeCSV(q.agreement_level), q.needs_review ? 'TRUE' : 'FALSE', escapeCSV(q.review_reason),
+            // Performance
+            q.pre_score !== null && q.pre_score !== undefined ? q.pre_score.toFixed(1) + '%' : '',
+            q.post_score !== null && q.post_score !== undefined ? q.post_score.toFixed(1) + '%' : '',
+            q.knowledge_gain !== null && q.knowledge_gain !== undefined ? (q.knowledge_gain > 0 ? '+' : '') + q.knowledge_gain.toFixed(1) + '%' : '',
+            q.sample_size || '',
+            escapeCSV(q.activities_list)
+          ].join(',')
+        })
       ]
 
       console.log('Generated CSV rows:', csvRows.length)

@@ -710,12 +710,48 @@ export async function exportQuestionsFull(filters: SearchFilters): Promise<{ que
 
   const { data: fullData, error } = await supabase
     .from('tags')
-    .select('*, questions!inner(id, source_id, question_stem, correct_answer, incorrect_answers)')
+    .select('*, questions!inner(id, source_id, source_file, question_stem, correct_answer, incorrect_answers)')
     .in('question_id', questionIds)
 
   if (error) throw new Error(`Full export failed: ${error.message}`)
 
-  return { questions: fullData || [], total: fullData?.length || 0 }
+  // Build a lookup of performance and activities from search results
+  const perfLookup: Record<number, any> = {}
+  for (const q of searchResult.questions) {
+    perfLookup[q.id] = {
+      pre_score: q.pre_score,
+      post_score: q.post_score,
+      knowledge_gain: q.knowledge_gain,
+      sample_size: q.sample_size,
+      activity_count: q.activity_count
+    }
+  }
+
+  // Fetch activity names for all exported questions
+  const actLookup: Record<number, string[]> = {}
+  const batchSize = 500
+  for (let i = 0; i < questionIds.length; i += batchSize) {
+    const batch = questionIds.slice(i, i + batchSize)
+    const { data: qaData } = await supabase
+      .from('question_activities')
+      .select('question_id, activity_name')
+      .in('question_id', batch)
+    if (qaData) {
+      for (const row of qaData) {
+        if (!actLookup[row.question_id]) actLookup[row.question_id] = []
+        actLookup[row.question_id].push(row.activity_name)
+      }
+    }
+  }
+
+  // Merge performance and activities into full data
+  const merged = (fullData || []).map((row: any) => ({
+    ...row,
+    ...(perfLookup[row.question_id] || {}),
+    activities_list: (actLookup[row.question_id] || []).join('; ')
+  }))
+
+  return { questions: merged, total: merged.length }
 }
 
 // ============================================================
