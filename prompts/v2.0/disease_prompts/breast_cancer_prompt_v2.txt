@@ -10,6 +10,33 @@ This question has been classified as being about **Breast Cancer**. Your task is
 
 ---
 
+## ⚠️ CRITICAL: Non-Oncology Question Detection
+
+**BEFORE tagging, verify this is truly an ONCOLOGY question.** Questions that MENTION breast cancer may actually be about a different specialty.
+
+### Secondary Immunodeficiency (SID) Questions — Flag as NON-ONCOLOGY
+
+Patients with hematologic malignancies and cancer often develop secondary immunodeficiency. Questions about **managing infections or diagnosing immunodeficiency** belong to **Infectious Disease/Immunology**, NOT oncology.
+
+**Red flags that suggest NON-ONCOLOGY (SID):**
+1. Activity name contains "SID", "Secondary Immunodeficiency", or "Immunodeficiency"
+2. Patient has breast cancer BUT the question asks about:
+   - Infection diagnosis/management (CMV, PJP, fungal, etc.)
+   - Immunoglobulin replacement therapy
+   - Vaccination in immunocompromised patients
+   - Tests to diagnose immunodeficiency (not cancer)
+3. Answer choices focus on immunology/infectious disease concepts, NOT cancer treatment
+
+**If you detect this pattern:**
+- Tag `topic: "Non-oncology - SID"` to flag for manual review
+- The question will be removed from the oncology dataset and reclassified
+
+**True oncology questions in infection context:**
+- "How should you modify treatment during active infection?" → ONCOLOGY (about breast cancer treatment modification)
+- "Which breast cancer treatment has highest infection risk?" → ONCOLOGY (about drug safety)
+
+---
+
 # Breast Cancer Disease Module
 
 This question has been classified as **Breast cancer**. Apply the following disease-specific rules in addition to the universal rules.
@@ -727,7 +754,32 @@ Examples by disease (see disease-specific module for details):
 - Immunotherapies (checkpoint inhibitors, CAR-T, bispecifics)
 - Novel agents in clinical trials
 
+
+### treatment_1-5: Critical Tagging Rules
+
+**Rule 1: Subject vs Comparator**
+Tag ONLY the drug that is the SUBJECT of the teaching point, not comparators.
+
+EXAMPLE:
+Q: "Which AE differentiates Drug A from Drug B and Drug C?"
+A: "Specific toxicity"
+✓ treatment_1: Drug A (subject being differentiated)
+✗ DO NOT TAG: Drug B, Drug C (just comparators)
+
+**Rule 2: Treatment as Clinical Context**
+Tag treatments when they provide CONTEXT for interpreting a clinical finding.
+
+**Rule 3: Drug Class → Specific Approved Drugs**
+When the correct answer is a drug CLASS, you MUST tag all approved specific drugs.
+Use the disease-specific drug table above to map class → individual drugs.
+
 ### 10-14. biomarker_1 through biomarker_5
+
+**DO NOT put in biomarker:**
+- **HER2 status when already in disease_type** → If disease_type is "HER2+", don't also tag biomarker "HER2" (redundant). Exception: questions specifically about biomarker TESTING
+- **Drug targets** → Use `drug_target` instead (e.g., PD-L1 as drug target vs PD-L1 as biomarker for treatment selection)
+- **Resistance mutations** → Use `resistance_mechanism` instead
+
 **OPTIONAL** - Tag when clinically relevant AND not redundant with disease_type.
 
 **REDUNDANCY RULE:** If biomarker is already captured in disease_type, use null
@@ -881,6 +933,8 @@ Use null when topic is NOT "Clinical efficacy" AND no endpoint is explicitly nam
 **OPTIONAL** - Nature of the clinical benefit.
 
 **Valid values:**
+
+**CRITICAL**: Only tag clinical_benefit from the CORRECT answer. If a distractor says "Drug X showed superior PFS" but it's the WRONG answer, do NOT tag clinical_benefit. Exception: Compound questions where multiple options contribute to the answer.
 `"Statistically significant"`, `"Clinically meaningful"`, `"Non-inferior"`, `"Superior"`, `"Trend toward benefit"`, `"No significant difference"`, `"Hazard ratio"`, `"Absolute benefit"`, `"Relative risk reduction"`
 
 ---
@@ -917,6 +971,12 @@ This section evaluates both the educational level AND the structural quality of 
 **Valid values:**
 - `"3 - Knowledge"` - Question tests recall/recognition of information
 - `"4 - Competence"` - Question tests application of knowledge to a clinical scenario
+
+**CRITICAL RULE:** If the clinical vignette is NOT REQUIRED to answer the question, it's **Level 3 (Knowledge)**, not Level 4.
+
+**Test:** Could someone answer this question correctly WITHOUT reading the patient details?
+- YES → `"3 - Knowledge"` (the vignette is just context/decoration)
+- NO → `"4 - Competence"` (must apply knowledge to the specific patient)
 
 **How to determine:**
 - **Level 3 (Knowledge):** "What is the mechanism of action of X?", "Which biomarker predicts response to Y?"

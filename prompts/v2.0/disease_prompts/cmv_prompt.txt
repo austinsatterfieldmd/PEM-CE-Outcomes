@@ -7,6 +7,33 @@ This question has been classified as being about **CMV infection/reactivation**.
 
 ---
 
+## ⚠️ CRITICAL: Non-Oncology Question Detection
+
+**BEFORE tagging, verify this is truly an ONCOLOGY question.** Questions that MENTION CMV may actually be about a different specialty.
+
+### Secondary Immunodeficiency (SID) Questions — Flag as NON-ONCOLOGY
+
+Patients with hematologic malignancies and cancer often develop secondary immunodeficiency. Questions about **managing infections or diagnosing immunodeficiency** belong to **Infectious Disease/Immunology**, NOT oncology.
+
+**Red flags that suggest NON-ONCOLOGY (SID):**
+1. Activity name contains "SID", "Secondary Immunodeficiency", or "Immunodeficiency"
+2. Patient has CMV BUT the question asks about:
+   - Infection diagnosis/management (CMV, PJP, fungal, etc.)
+   - Immunoglobulin replacement therapy
+   - Vaccination in immunocompromised patients
+   - Tests to diagnose immunodeficiency (not cancer)
+3. Answer choices focus on immunology/infectious disease concepts, NOT cancer treatment
+
+**If you detect this pattern:**
+- Tag `topic: "Non-oncology - SID"` to flag for manual review
+- The question will be removed from the oncology dataset and reclassified
+
+**True oncology questions in infection context:**
+- "How should you modify treatment during active infection?" → ONCOLOGY (about CMV treatment modification)
+- "Which CMV treatment has highest infection risk?" → ONCOLOGY (about drug safety)
+
+---
+
 ## CRITICAL: Compound Answer Handling
 
 When the correct answer references options by letter/number (e.g., "B or C", "A and C", "Options 1 and 3"):
@@ -169,6 +196,25 @@ When topic is "AE management" or "Safety profile" and the question mentions a dr
 - Example: "Antiviral-associated myelosuppression in CMV" → tag specific antivirals known for myelosuppression
 - The causative drug class is clinically relevant — funders need to know WHICH specific drugs are associated with the AE
 
+
+### treatment_1-5: Critical Tagging Rules
+
+**Rule 1: Subject vs Comparator**
+Tag ONLY the drug that is the SUBJECT of the teaching point, not comparators.
+
+EXAMPLE:
+Q: "Which AE differentiates Drug A from Drug B and Drug C?"
+A: "Specific toxicity"
+✓ treatment_1: Drug A (subject being differentiated)
+✗ DO NOT TAG: Drug B, Drug C (just comparators)
+
+**Rule 2: Treatment as Clinical Context**
+Tag treatments when they provide CONTEXT for interpreting a clinical finding.
+
+**Rule 3: Drug Class → Specific Approved Drugs**
+When the correct answer is a drug CLASS, you MUST tag all approved specific drugs.
+Use the disease-specific drug table above to map class → individual drugs.
+
 ### 12-16. biomarker_1 through biomarker_5
 **CMV-relevant biomarkers**
 
@@ -271,6 +317,33 @@ Examples: "SOLSTICE", letermovir prophylaxis trials
 | `"Transitional"` | Patient age 65-74, reduced tolerance considerations |
 | `"Pediatric"` | Pediatric transplant |
 
+
+### disease_specific_factor
+**OPTIONAL** - CMV-specific factors.
+
+**Valid values:**
+- `"Post-transplant"` - CMV in transplant setting (SOT or allo-HSCT)
+- `"CMV reactivation"` - Viral reactivation vs primary infection
+- `"CMV disease"` - End-organ disease (pneumonitis, colitis, retinitis)
+- `"Prophylaxis setting"` - Primary or secondary prophylaxis context
+- `"Preemptive therapy"` - Treatment triggered by viral load monitoring
+
+
+### comorbidity_1 through comorbidity_3
+**OPTIONAL** - Comorbidities affecting treatment decisions.
+
+**CRITICAL: Only tag comorbidities explicitly stated in the question stem.** Comorbidities are medical conditions SEPARATE from the primary disease. Do NOT infer comorbidities from age, disease stage, or treatment history alone.
+
+**Common comorbidities (any disease):**
+- `"Atrial fibrillation"` - Affects BTKi selection, anticoagulation
+- `"Renal insufficiency"` - Affects drug dosing, eligibility
+- `"Hepatic impairment"` - Affects drug metabolism, hepatotoxic drug avoidance
+- `"Diabetes"` - Steroid considerations
+- `"Hypertension"` - Cardiovascular drug interactions
+- `"Heart failure"` - Anthracycline contraindication, cardiac risk drugs
+- `"Prior malignancy"` - Second primary cancer history
+- `"Autoimmune disease"` - Immunotherapy considerations
+
 ### 40. performance_status
 **Usually null for CMV** - May tag if underlying disease context.
 
@@ -323,6 +396,8 @@ Values: "Primary endpoint", "Secondary endpoint", "Subgroup analysis"
 **Tag when outcomes are characterized**
 
 Values: "Superior", "Non-inferior", "Improved", "Statistically significant"
+
+**CRITICAL**: Only tag clinical_benefit from the CORRECT answer. If a distractor mentions superior outcomes but it's the WRONG answer, do NOT tag clinical_benefit.
 
 ---
 
@@ -540,3 +615,52 @@ Return a JSON object with all 70 fields. Use `null` for fields that don't apply.
   "correct_answer_position": "C"
 }
 ```
+
+---
+
+## Examples
+
+### Example 1: CMV Prophylaxis Selection
+
+**Question:** "A 55-year-old CMV-seropositive patient is 30 days post allogeneic stem cell transplant. Which antiviral is most appropriate for CMV prophylaxis?"
+
+**Answer:** "Letermovir"
+
+```json
+{
+    "topic": "Treatment selection",
+    "disease_stage": null,
+    "treatment_line": "Prophylaxis",
+    "treatment_1": "Letermovir",
+    "drug_class_1": "CMV terminase inhibitor",
+    "disease_specific_factor": "Post-transplant",
+    "cme_outcome_level": "4 - Competence",
+    ...
+}
+```
+**Rationale:**
+- Treatment selection: choosing which drug to use for this patient
+- Letermovir is the fundable drug (correct answer)
+- Post-transplant context is a disease_specific_factor
+
+### Example 2: CMV Resistance Mechanism
+
+**Question:** "A transplant patient on ganciclovir for CMV viremia shows rising viral load despite 3 weeks of therapy. Resistance testing reveals a UL97 mutation. What is the most appropriate next step?"
+
+**Answer:** "Switch to foscarnet"
+
+```json
+{
+    "topic": "Treatment selection",
+    "treatment_1": "Foscarnet",
+    "resistance_mechanism": "UL97 mutation",
+    "biomarker_1": "CMV viral load",
+    "disease_specific_factor": "Post-transplant",
+    "cme_outcome_level": "4 - Competence",
+    ...
+}
+```
+**Rationale:**
+- UL97 mutation goes in resistance_mechanism (NOT biomarker)
+- Rising viral load context → biomarker_1
+- Foscarnet is the treatment switch (correct answer)

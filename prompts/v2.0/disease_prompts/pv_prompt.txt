@@ -7,6 +7,33 @@ This question has been classified as being about **Polycythemia vera (PV)**. You
 
 ---
 
+## ⚠️ CRITICAL: Non-Oncology Question Detection
+
+**BEFORE tagging, verify this is truly an ONCOLOGY question.** Questions that MENTION PV may actually be about a different specialty.
+
+### Secondary Immunodeficiency (SID) Questions — Flag as NON-ONCOLOGY
+
+Patients with hematologic malignancies and cancer often develop secondary immunodeficiency. Questions about **managing infections or diagnosing immunodeficiency** belong to **Infectious Disease/Immunology**, NOT oncology.
+
+**Red flags that suggest NON-ONCOLOGY (SID):**
+1. Activity name contains "SID", "Secondary Immunodeficiency", or "Immunodeficiency"
+2. Patient has PV BUT the question asks about:
+   - Infection diagnosis/management (CMV, PJP, fungal, etc.)
+   - Immunoglobulin replacement therapy
+   - Vaccination in immunocompromised patients
+   - Tests to diagnose immunodeficiency (not cancer)
+3. Answer choices focus on immunology/infectious disease concepts, NOT cancer treatment
+
+**If you detect this pattern:**
+- Tag `topic: "Non-oncology - SID"` to flag for manual review
+- The question will be removed from the oncology dataset and reclassified
+
+**True oncology questions in infection context:**
+- "How should you modify treatment during active infection?" → ONCOLOGY (about PV treatment modification)
+- "Which PV treatment has highest infection risk?" → ONCOLOGY (about drug safety)
+
+---
+
 ## CRITICAL: Compound Answer Handling
 
 When the correct answer references options by letter/number (e.g., "B or C", "A and C", "Options 1 and 3"):
@@ -202,6 +229,11 @@ When topic is "AE management" or "Safety profile" and the question mentions a dr
 ---
 
 ### 7. biomarker_1 through biomarker_5 (up to 5 biomarkers)
+
+**DO NOT put in biomarker:**
+- **Drug targets** → Use `drug_target` instead
+- **JAK2 V617F when already in disease_type** → Only put in biomarker if TESTING is the focus
+
 **OPTIONAL** - Can be null. Tag when clinically relevant.
 
 **Key PV Biomarkers:**
@@ -395,6 +427,8 @@ Specific adverse events discussed.
 
 ### 27. clinical_benefit
 **Valid values:** `"Statistically significant"`, `"Superior"`, `"Non-inferior"`, `"Clinically meaningful"`
+
+**CRITICAL**: Only tag clinical_benefit from the CORRECT answer. If a distractor says "Drug X showed superior PFS" but it's the WRONG answer, do NOT tag clinical_benefit. Exception: Compound questions where multiple options contribute to the answer.
 
 ---
 

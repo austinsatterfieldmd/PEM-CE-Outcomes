@@ -15,6 +15,33 @@ This question has been classified as **"Heme malignancies"** (generic) - meaning
 
 ---
 
+## ⚠️ CRITICAL: Non-Oncology Question Detection
+
+**BEFORE tagging, verify this is truly an ONCOLOGY question.** Questions that MENTION this disease may actually be about a different specialty.
+
+### Secondary Immunodeficiency (SID) Questions — Flag as NON-ONCOLOGY
+
+Patients with hematologic malignancies and cancer often develop secondary immunodeficiency. Questions about **managing infections or diagnosing immunodeficiency** belong to **Infectious Disease/Immunology**, NOT oncology.
+
+**Red flags that suggest NON-ONCOLOGY (SID):**
+1. Activity name contains "SID", "Secondary Immunodeficiency", or "Immunodeficiency"
+2. Patient has this disease BUT the question asks about:
+   - Infection diagnosis/management (CMV, PJP, fungal, etc.)
+   - Immunoglobulin replacement therapy
+   - Vaccination in immunocompromised patients
+   - Tests to diagnose immunodeficiency (not cancer)
+3. Answer choices focus on immunology/infectious disease concepts, NOT cancer treatment
+
+**If you detect this pattern:**
+- Tag `topic: "Non-oncology - SID"` to flag for manual review
+- The question will be removed from the oncology dataset and reclassified
+
+**True oncology questions in infection context:**
+- "How should you modify treatment during active infection?" → ONCOLOGY (about this disease treatment modification)
+- "Which this disease treatment has highest infection risk?" → ONCOLOGY (about drug safety)
+
+---
+
 ## CRITICAL: Compound Answer Handling
 
 When the correct answer references options by letter/number (e.g., "B or C", "A and C"):
@@ -129,6 +156,24 @@ When topic is "AE management" or "Safety profile" and the question mentions a dr
 - Example: "BTKi-associated atrial fibrillation management" → tag all approved BTKi drugs for this disease
 - The causative drug class is clinically relevant — funders need to know WHICH specific drugs are associated with the AE
 
+### treatment_1-5: Critical Tagging Rules
+
+**Rule 1: Subject vs Comparator**
+Tag ONLY the drug that is the SUBJECT of the teaching point, not comparators.
+
+EXAMPLE:
+Q: "Which AE differentiates Drug A from Drug B and Drug C?"
+A: "Specific toxicity"
+✓ treatment_1: Drug A (subject being differentiated)
+✗ DO NOT TAG: Drug B, Drug C (just comparators)
+
+**Rule 2: Treatment as Clinical Context**
+Tag treatments when they provide CONTEXT for interpreting a clinical finding.
+
+**Rule 3: Drug Class → Specific Approved Drugs**
+When the correct answer is a drug CLASS, you MUST tag all approved specific drugs.
+Use the disease-specific drug table above to map class → individual drugs.
+
 ### 12-16. biomarker_1 through biomarker_5
 **Tag relevant biomarkers**
 
@@ -240,6 +285,31 @@ May use:
 | `"High tumor burden"` | CRS risk factor |
 | `"Rural"` | Access disparities |
 
+
+### disease_specific_factor
+**OPTIONAL** - Disease-specific factors relevant to this hematologic malignancy.
+
+Use this field for disease-specific clinical features that don't fit other fields:
+- Transformation events (e.g., Richter transformation, blast phase)
+- Disease-specific classification features
+- Unique clinical presentations
+
+
+### comorbidity_1 through comorbidity_3
+**OPTIONAL** - Comorbidities affecting treatment decisions.
+
+**CRITICAL: Only tag comorbidities explicitly stated in the question stem.** Comorbidities are medical conditions SEPARATE from the primary disease. Do NOT infer comorbidities from age, disease stage, or treatment history alone.
+
+**Common comorbidities (any disease):**
+- `"Atrial fibrillation"` - Affects BTKi selection, anticoagulation
+- `"Renal insufficiency"` - Affects drug dosing, eligibility
+- `"Hepatic impairment"` - Affects drug metabolism, hepatotoxic drug avoidance
+- `"Diabetes"` - Steroid considerations
+- `"Hypertension"` - Cardiovascular drug interactions
+- `"Heart failure"` - Anthracycline contraindication, cardiac risk drugs
+- `"Prior malignancy"` - Second primary cancer history
+- `"Autoimmune disease"` - Immunotherapy considerations
+
 ### 40. performance_status
 **Tag when explicitly mentioned**
 
@@ -306,6 +376,8 @@ Values: "Primary endpoint", "Secondary endpoint", "Real-world data"
 
 Values: "Superior", "Improved", "Durable responses"
 
+**CRITICAL**: Only tag clinical_benefit from the CORRECT answer. If a distractor mentions superior outcomes but it's the WRONG answer, do NOT tag clinical_benefit.
+
 ---
 
 ## Group F: Evidence/Guidelines (3 fields)
@@ -327,6 +399,12 @@ Values: "Phase 3 RCT", "Phase 2", "Real-world evidence", "Registry data"
 
 ### 56. cme_outcome_level
 **Values:** `"3 - Knowledge"` or `"4 - Competence"`
+
+**CRITICAL RULE:** If the clinical vignette is NOT REQUIRED to answer the question, it's **Level 3 (Knowledge)**, not Level 4.
+
+**Test:** Could someone answer this question correctly WITHOUT reading the patient details?
+- YES → `"3 - Knowledge"` (the vignette is just context/decoration)
+- NO → `"4 - Competence"` (must apply knowledge to the specific patient)
 
 Apply this test:
 1. **Can someone answer correctly using ONLY memory/recall?**
@@ -496,3 +574,51 @@ Return a JSON object with all 70 fields. Use `null` for fields that don't apply.
   "correct_answer_position": "C"
 }
 ```
+
+---
+
+## Examples
+
+### Example 1: CAR-T CRS Management
+
+**Question:** "A patient with relapsed DLBCL develops fever, hypotension, and hypoxia 3 days after CAR-T infusion. What is the most appropriate first-line management?"
+
+**Answer:** "Tocilizumab"
+
+```json
+{
+    "topic": "AE management",
+    "disease_stage": null,
+    "treatment_1": "Tocilizumab",
+    "drug_class_1": "IL-6R inhibitor",
+    "toxicity_type_1": "CRS",
+    "cme_outcome_level": "4 - Competence",
+    ...
+}
+```
+**Rationale:**
+- CRS is the topic (AE already occurring, needs intervention)
+- Tocilizumab is the correct answer (treatment)
+- Tag the specific supportive care drug, not the CAR-T product causing CRS
+
+### Example 2: Bispecific Antibody Safety Profile
+
+**Question:** "Which of the following is the most common adverse event associated with bispecific T-cell engager therapy in hematologic malignancies?"
+
+**Answer:** "Cytokine release syndrome"
+
+```json
+{
+    "topic": "Safety profile",
+    "treatment_1": "Blinatumomab",
+    "treatment_2": "Mosunetuzumab",
+    "drug_class_1": "Bispecific antibody",
+    "toxicity_type_1": "CRS",
+    "cme_outcome_level": "3 - Knowledge",
+    ...
+}
+```
+**Rationale:**
+- Safety profile (knowing WHAT AEs to expect, not managing one)
+- Drug class expansion: "bispecific T-cell engager" → expand to approved products
+- Level 3: No patient details needed to answer this knowledge question

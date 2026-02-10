@@ -219,6 +219,34 @@ Key test: What is the educational focus?
 - **Use proper case for drug names** (e.g., "Daratumumab", not "DARATUMUMAB") - Use "Daratumumab" not "daratumumab", "Bortezomib" not "bortezomib"
 - **TAG TREATMENTS FROM THE CORRECT ANSWER** - If the correct answer contains specific drug names, TAG THEM. Example: Q: "Which treatment for this R/R MM patient?" A: "Isatuximab plus carfilzomib and dexamethasone" → treatment_1: "Isatuximab", treatment_2: "Carfilzomib". The drugs in the correct answer ARE the treatments being discussed.
 
+### treatment_1-5: Critical Tagging Rules
+
+**Rule 1: Subject vs Comparator**
+Tag ONLY the drug that is the SUBJECT of the teaching point, not comparators.
+
+EXAMPLE:
+Q: "Which AE differentiates Drug A from Drug B and Drug C?"
+A: "Specific toxicity"
+✓ treatment_1: Drug A (subject being differentiated)
+✗ DO NOT TAG: Drug B, Drug C (just comparators)
+
+**Rule 2: Treatment as Clinical Context**
+Tag treatments when they provide CONTEXT for interpreting a clinical finding.
+
+EXAMPLE:
+Q: "Patient on Drug X develops a specific toxicity. What is the most likely cause?"
+✓ treatment_1: Drug X
+WHY: The toxicity interpretation depends on knowing the treatment regimen.
+
+**Rule 3: Drug Class → Specific Approved Drugs**
+When the correct answer is a drug CLASS, you MUST tag all approved specific drugs.
+Use the disease-specific drug table above to map class → individual drugs.
+
+**Rule 4: Drug Class Expansion for AE Management and Safety Profile**
+When topic is "AE management" or "Safety profile" and the question mentions a drug CLASS (not a specific drug), infer and tag all approved specific drugs for that class in this disease using the drug class table above.
+- Use disease context and STARTDATE to determine which specific drugs were approved
+- The causative drug class is clinically relevant — funders need to know WHICH specific drugs are associated with the AE
+
 **Fundable therapies (EXAMPLES - not exhaustive):**
 The lists below are representative examples. Tag any targeted therapy, immunotherapy, CAR-T, ADC, bispecific, or novel agent of pharmaceutical interest, even if not listed here.
 
@@ -658,6 +686,8 @@ Trial/study context for efficacy data.
 ### 27. clinical_benefit
 Characterization of benefit.
 **Valid values:** `"Statistically significant"`, `"Clinically meaningful"`, `"Non-inferior"`, `"Superior"`, `"Trend toward benefit"`, `"No significant difference"`, `"Hazard ratio"`, `"Absolute benefit"`, `"Relative risk reduction"`
+
+**CRITICAL**: Only tag clinical_benefit from the CORRECT answer. If a distractor says "Drug X showed superior PFS" but it's the WRONG answer, do NOT tag clinical_benefit. Exception: Compound questions where multiple options contribute to the answer.
 
 ---
 

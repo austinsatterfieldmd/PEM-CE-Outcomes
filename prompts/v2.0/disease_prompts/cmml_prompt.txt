@@ -7,6 +7,33 @@ This question has been classified as being about **Chronic myelomonocytic leukem
 
 ---
 
+## ⚠️ CRITICAL: Non-Oncology Question Detection
+
+**BEFORE tagging, verify this is truly an ONCOLOGY question.** Questions that MENTION CMML may actually be about a different specialty.
+
+### Secondary Immunodeficiency (SID) Questions — Flag as NON-ONCOLOGY
+
+Patients with hematologic malignancies and cancer often develop secondary immunodeficiency. Questions about **managing infections or diagnosing immunodeficiency** belong to **Infectious Disease/Immunology**, NOT oncology.
+
+**Red flags that suggest NON-ONCOLOGY (SID):**
+1. Activity name contains "SID", "Secondary Immunodeficiency", or "Immunodeficiency"
+2. Patient has CMML BUT the question asks about:
+   - Infection diagnosis/management (CMV, PJP, fungal, etc.)
+   - Immunoglobulin replacement therapy
+   - Vaccination in immunocompromised patients
+   - Tests to diagnose immunodeficiency (not cancer)
+3. Answer choices focus on immunology/infectious disease concepts, NOT cancer treatment
+
+**If you detect this pattern:**
+- Tag `topic: "Non-oncology - SID"` to flag for manual review
+- The question will be removed from the oncology dataset and reclassified
+
+**True oncology questions in infection context:**
+- "How should you modify treatment during active infection?" → ONCOLOGY (about CMML treatment modification)
+- "Which CMML treatment has highest infection risk?" → ONCOLOGY (about drug safety)
+
+---
+
 ## CRITICAL: Compound Answer Handling
 
 When the correct answer references options by letter/number (e.g., "B or C"):
@@ -140,6 +167,11 @@ When answer is a drug CLASS, tag all approved specific drugs.
 - Hydroxyurea, Ruxolitinib
 
 ### 12-16. biomarker_1 through biomarker_5
+
+**DO NOT put in biomarker:**
+- **Drug targets** → Use `drug_target` instead
+- **Resistance mutations** → Use `resistance_mechanism` instead
+
 | Biomarker | Context |
 |-----------|---------|
 | `"TET2"` | Common, may predict HMA response |
@@ -200,6 +232,32 @@ Usually null for CMML (hematologic malignancy).
 | Value | Context |
 |-------|---------|
 | `"Elderly"` | Most CMML patients are older |
+
+
+### disease_specific_factor
+**OPTIONAL** - CMML-specific factors.
+
+**Valid values:**
+- `"Proliferative CMML"` - WBC >13,000/µL (CMML-MP)
+- `"Dysplastic CMML"` - WBC ≤13,000/µL (CMML-MD)
+- `"CMML-0/1/2"` - WHO blast categories
+- `"Splenomegaly"` - Symptomatic spleen enlargement
+
+
+### comorbidity_1 through comorbidity_3
+**OPTIONAL** - Comorbidities affecting treatment decisions.
+
+**CRITICAL: Only tag comorbidities explicitly stated in the question stem.** Comorbidities are medical conditions SEPARATE from the primary disease. Do NOT infer comorbidities from age, disease stage, or treatment history alone.
+
+**Common comorbidities (any disease):**
+- `"Atrial fibrillation"` - Affects BTKi selection, anticoagulation
+- `"Renal insufficiency"` - Affects drug dosing, eligibility
+- `"Hepatic impairment"` - Affects drug metabolism, hepatotoxic drug avoidance
+- `"Diabetes"` - Steroid considerations
+- `"Hypertension"` - Cardiovascular drug interactions
+- `"Heart failure"` - Anthracycline contraindication, cardiac risk drugs
+- `"Prior malignancy"` - Second primary cancer history
+- `"Autoimmune disease"` - Immunotherapy considerations
 
 ### 40. performance_status
 **ONLY tag when ECOG score is explicitly stated.**
