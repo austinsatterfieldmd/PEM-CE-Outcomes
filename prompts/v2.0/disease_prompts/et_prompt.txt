@@ -245,7 +245,6 @@ When topic is "AE management" or "Safety profile" and the question mentions a dr
 
 **Valid values:**
 - `"Pediatric"` - Under 18 years (extremely rare in ET)
-- `"AYA"` - Adolescent/Young Adult, 15-39 years (rare in ET)
 - `"Young"` - Adults under 65 years
 - `"Transitional"` - 65-75 years
 - `"Elderly"` - 75 years or older

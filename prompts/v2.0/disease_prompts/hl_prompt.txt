@@ -254,12 +254,11 @@ When topic is "AE management" or "Safety profile" and the question mentions a dr
 
 **Valid values:**
 - `"Pediatric"` - Under 18 years
-- `"AYA"` - Adolescent/Young Adult, 15-39 years (common HL population)
 - `"Young"` - Adults under 65 years (typical HL population, transplant-eligible)
 - `"Transitional"` - 65-75 years
 - `"Elderly"` - 75 years or older (may not tolerate intensive chemo/transplant)
 
-**CRITICAL:** When a patient age is stated in the question stem, you MUST tag age_group. This is one of the most commonly missed fields. A "28-year-old" = AYA. A "45-year-old" = Young. A "70-year-old" = Transitional. A "78-year-old" = Elderly.
+**CRITICAL:** When a patient age is stated in the question stem, you MUST tag age_group. This is one of the most commonly missed fields. A "45-year-old" = Young. A "70-year-old" = Transitional. A "78-year-old" = Elderly.
 
 ### 11. organ_dysfunction
 **OPTIONAL**

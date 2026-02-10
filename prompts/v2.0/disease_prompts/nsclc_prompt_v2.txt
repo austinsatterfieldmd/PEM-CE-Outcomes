@@ -903,7 +903,7 @@ Use the disease-specific drug table above to map class → individual drugs.
 **OPTIONAL** - Special patient populations mentioned.
 
 **Valid values:**
-`"Pediatric"` (<18 years), `"AYA"` (15-39, adolescent/young adult), `"Young"` (adults <65), `"Transitional"` (65-75), `"Elderly"` (75+), `"Pregnant"`, `"Organ dysfunction - Renal"`, `"Organ dysfunction - Hepatic"`, `"Organ dysfunction - Cardiac"`, `"Poor performance status (ECOG >=2)"`, `"Frail"`, `"Transplant-eligible"`, `"Transplant-ineligible"`, `"CAR-T eligible"`, `"High-risk cytogenetics"`, `"Standard-risk cytogenetics"`, `"Autoimmune disease"`
+`"Pediatric"` (<18 years), `"Young"` (adults <65), `"Transitional"` (65-75), `"Elderly"` (75+), `"Pregnant"`, `"Organ dysfunction - Renal"`, `"Organ dysfunction - Hepatic"`, `"Organ dysfunction - Cardiac"`, `"Poor performance status (ECOG >=2)"`, `"Frail"`, `"Transplant-eligible"`, `"Transplant-ineligible"`, `"CAR-T eligible"`, `"High-risk cytogenetics"`, `"Standard-risk cytogenetics"`, `"Autoimmune disease"`
 
 **Note:** For CNS involvement, use `metastatic_site`: "Brain metastases" or "Leptomeningeal disease" instead.
 
@@ -913,7 +913,6 @@ Use the disease-specific drug table above to map class → individual drugs.
 
 **Valid values:**
 - `"Pediatric"` - Under 18 years
-- `"AYA"` - Adolescent/Young Adult, 15-39 years
 - `"Young"` - Adults under 65 years
 - `"Transitional"` - 65-75 years
 - `"Elderly"` - 75 years or older

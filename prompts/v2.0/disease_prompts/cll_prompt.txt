@@ -382,7 +382,6 @@ Q: "Patient completes CLL14 regimen but has MRD positivity at 10^-4. What is the
 
 **Valid values:**
 - `"Pediatric"` - Under 18 years (extremely rare in CLL)
-- `"AYA"` - Adolescent/Young Adult, 15-39 years (rare in CLL)
 - `"Young"` - Adults under 65 years
 - `"Transitional"` - 65-75 years
 - `"Elderly"` - 75 years or older

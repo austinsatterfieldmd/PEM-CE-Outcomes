@@ -470,7 +470,6 @@ Use this value ONLY when the question involves patient eligibility context, NOT 
 
 **Valid values:**
 - `"Pediatric"` - Under 18 years (rare in MM)
-- `"AYA"` - Adolescent/Young Adult, 15-39 years (specific to certain diseases like ALL)
 - `"Young"` - Adults under 65 years
 - `"Transitional"` - 65-75 years (transitional fitness, may or may not be transplant-eligible)
 - `"Elderly"` - 75 years or older

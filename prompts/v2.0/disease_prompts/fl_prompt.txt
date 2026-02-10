@@ -342,7 +342,6 @@ EZH2 mutation status is important for tazemetostat selection. Tag when:
 
 **Valid values:**
 - `"Pediatric"` - Under 18 years (rare in FL)
-- `"AYA"` - Adolescent/Young Adult, 15-39 years
 - `"Young"` - Adults under 65 years
 - `"Transitional"` - 65-75 years
 - `"Elderly"` - 75 years or older

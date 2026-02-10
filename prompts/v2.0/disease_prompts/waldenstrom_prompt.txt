@@ -288,7 +288,6 @@ Usually null for WM (lymphoma, not solid tumor).
 
 **Valid values:**
 - `"Pediatric"` - Under 18 years
-- `"AYA"` - Adolescent/Young Adult, 15-39 years
 - `"Young"` - Adults under 65 years
 - `"Transitional"` - 65-75 years
 - `"Elderly"` - 75 years or older

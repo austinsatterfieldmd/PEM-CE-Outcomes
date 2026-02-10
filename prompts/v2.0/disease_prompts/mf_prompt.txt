@@ -317,7 +317,6 @@ When topic is "AE management" or "Safety profile" and the question mentions a dr
 
 **Valid values:**
 - `"Pediatric"` - Under 18 years (extremely rare in MF)
-- `"AYA"` - Adolescent/Young Adult, 15-39 years (rare in MF)
 - `"Young"` - Adults under 65 years (may be transplant candidates)
 - `"Transitional"` - 65-75 years (may or may not tolerate transplant)
 - `"Elderly"` - 75 years or older (typically not transplant candidates)

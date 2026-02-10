@@ -290,7 +290,6 @@ When topic is "AE management" or "Safety profile" and the question mentions a dr
 
 **Valid values:**
 - `"Pediatric"` - Under 18 years
-- `"AYA"` - Adolescent/Young Adult, 15-39 years
 - `"Young"` - Adults under 65 years (may prioritize TFR potential)
 - `"Transitional"` - 65-75 years
 - `"Elderly"` - 75 years or older (may affect cardiovascular risk assessment)

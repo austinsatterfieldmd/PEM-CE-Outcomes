@@ -369,7 +369,6 @@ When topic is "AE management" or "Safety profile" and the question mentions a dr
 
 **Valid values:**
 - `"Pediatric"` - Under 18 years (rare in MDS)
-- `"AYA"` - Adolescent/Young Adult, 15-39 years (rare in MDS)
 - `"Young"` - Adults under 65 years (unusual for MDS, may be transplant candidates)
 - `"Transitional"` - 65-75 years (may or may not tolerate intensive therapy)
 - `"Elderly"` - 75 years or older (typical MDS population)

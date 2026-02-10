@@ -375,7 +375,6 @@ TP53 mutation/del(17p) in MCL indicates aggressive disease with poor response to
 
 **Valid values:**
 - `"Pediatric"` - Under 18 years (extremely rare in MCL)
-- `"AYA"` - Adolescent/Young Adult, 15-39 years (rare)
 - `"Young"` - Adults under 65 years (often ASCT-eligible)
 - `"Transitional"` - 65-75 years
 - `"Elderly"` - 75 years or older
