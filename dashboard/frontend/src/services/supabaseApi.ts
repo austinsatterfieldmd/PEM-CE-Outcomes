@@ -364,12 +364,20 @@ export async function updateQuestionTags(
   }
 
   // Update tags
-  const { error: tagError } = await supabase
+  console.log('[TagUpdate] question_id:', questionId, 'fields:', Object.keys(tagUpdate))
+  const { data: updatedRows, error: tagError } = await supabase
     .from('tags')
     .update(tagUpdate)
     .eq('question_id', questionId)
+    .select('question_id, needs_review, edited_by_user, tag_status, disease_state, topic')
 
   if (tagError) throw new Error(`Tag update failed: ${tagError.message}`)
+  console.log('[TagUpdate] Result:', updatedRows)
+
+  if (!updatedRows || updatedRows.length === 0) {
+    console.error('[TagUpdate] Update returned 0 rows — RLS may be blocking the write')
+    throw new Error('Tag update failed: no rows affected. Check that your role has write access.')
+  }
 
   // Update question stem if provided
   if (questionStem) {
@@ -387,20 +395,33 @@ export async function updateQuestionTags(
 export async function flagQuestion(id: number, reasons: string[]): Promise<{ savedLocally: boolean }> {
   const supabase = getSupabaseClient()
 
-  const { error } = await supabase
+  const updatePayload = {
+    needs_review: true,
+    review_reason: reasons.join('|'),
+    flagged_at: new Date().toISOString(),
+    // Reset edited_by_user so question appears in review queue
+    // (review queue excludes edited_by_user=TRUE unless review_flags set)
+    edited_by_user: false,
+    tag_status: 'majority'
+  }
+
+  console.log('[Flag] Flagging question_id:', id, 'payload:', updatePayload)
+
+  const { data, error } = await supabase
     .from('tags')
-    .update({
-      needs_review: true,
-      review_reason: reasons.join('|'),
-      flagged_at: new Date().toISOString(),
-      // Reset edited_by_user so question appears in review queue
-      // (review queue excludes edited_by_user=TRUE unless review_flags set)
-      edited_by_user: false,
-      tag_status: 'majority'
-    })
+    .update(updatePayload)
     .eq('question_id', id)
+    .select('question_id, needs_review, edited_by_user, tag_status, review_reason')
+
+  console.log('[Flag] Result — data:', data, 'error:', error)
 
   if (error) throw new Error(`Flag failed: ${error.message}`)
+
+  if (!data || data.length === 0) {
+    console.error('[Flag] Update returned 0 rows — RLS may be blocking the write')
+    throw new Error('Flag update failed: no rows affected. Check that your role has write access.')
+  }
+
   return { savedLocally: false }
 }
 
