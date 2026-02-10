@@ -404,34 +404,40 @@ BEGIN
     WHERE p.question_id = p_question_id;
 
     -- Get activities with per-activity performance
-    SELECT json_agg(act ORDER BY act_date DESC NULLS LAST) INTO v_activities
+    -- Use subquery without DISTINCT on JSON (PG can't compare JSON for equality)
+    SELECT json_agg(act_row ORDER BY act_row->>'act_date' DESC NULLS LAST) INTO v_activities
     FROM (
-        SELECT DISTINCT
-            a.activity_name as activity_name,
-            a.activity_date as act_date,
-            a.quarter as quarter,
-            (SELECT json_agg(json_build_object(
-                'segment', CASE dp.specialty
-                    WHEN 'MedicalOncology' THEN 'medical_oncologist'
-                    WHEN 'SurgicalOncology' THEN 'surgical_oncologist'
-                    WHEN 'RadiationOncology' THEN 'radiation_oncologist'
-                    WHEN 'NP/PA' THEN 'app'
-                    WHEN 'CommunityOncology' THEN 'community'
-                    WHEN 'AcademicOncology' THEN 'academic'
-                    WHEN 'NursingOncology' THEN 'nursing'
-                    ELSE LOWER(dp.specialty)
-                END,
-                'pre_score', dp.pre_score,
-                'post_score', dp.post_score,
-                'n_respondents', dp.n_respondents
-            ))
-            FROM demographic_performance dp
-            WHERE dp.question_id = p_question_id AND dp.activity_id = a.id
-            ) as performance
-        FROM demographic_performance dp2
-        JOIN activities a ON dp2.activity_id = a.id
-        WHERE dp2.question_id = p_question_id
-    ) act;
+        SELECT json_build_object(
+            'activity_name', a.activity_name,
+            'act_date', a.activity_date,
+            'quarter', a.quarter,
+            'performance', (
+                SELECT json_agg(json_build_object(
+                    'segment', CASE dp.specialty
+                        WHEN 'MedicalOncology' THEN 'medical_oncologist'
+                        WHEN 'SurgicalOncology' THEN 'surgical_oncologist'
+                        WHEN 'RadiationOncology' THEN 'radiation_oncologist'
+                        WHEN 'NP/PA' THEN 'app'
+                        WHEN 'CommunityOncology' THEN 'community'
+                        WHEN 'AcademicOncology' THEN 'academic'
+                        WHEN 'NursingOncology' THEN 'nursing'
+                        ELSE LOWER(dp.specialty)
+                    END,
+                    'pre_score', dp.pre_score,
+                    'post_score', dp.post_score,
+                    'n_respondents', dp.n_respondents
+                ))
+                FROM demographic_performance dp
+                WHERE dp.question_id = p_question_id AND dp.activity_id = a.id
+            )
+        ) as act_row
+        FROM (
+            SELECT DISTINCT a2.id, a2.activity_name, a2.activity_date, a2.quarter
+            FROM demographic_performance dp2
+            JOIN activities a2 ON dp2.activity_id = a2.id
+            WHERE dp2.question_id = p_question_id
+        ) a
+    ) sub;
 
     -- Merge into final result
     RETURN v_question::JSONB || jsonb_build_object(
