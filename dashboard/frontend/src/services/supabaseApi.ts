@@ -305,7 +305,8 @@ export async function updateQuestionTags(
   // Build update object for tags table
   const tagUpdate: Record<string, any> = {}
   const tagFields = [
-    'topic', 'disease_state', 'disease_stage', 'disease_type_1', 'disease_type_2',
+    'topic', 'disease_state', 'disease_state_1', 'disease_state_2',
+    'disease_stage', 'disease_type_1', 'disease_type_2',
     'treatment_line', 'treatment_1', 'treatment_2', 'treatment_3', 'treatment_4', 'treatment_5',
     'biomarker_1', 'biomarker_2', 'biomarker_3', 'biomarker_4', 'biomarker_5',
     'trial_1', 'trial_2', 'trial_3', 'trial_4', 'trial_5',
@@ -333,6 +334,21 @@ export async function updateQuestionTags(
     if (field in tags) {
       tagUpdate[field] = tags[field]
     }
+  }
+
+  // Sync legacy fields with numbered fields so search results stay current
+  // (search_questions RPC returns t.disease_state, t.treatment, t.biomarker, t.trial)
+  if ('disease_state_1' in tags) {
+    tagUpdate.disease_state = tags.disease_state_1 || null
+  }
+  if ('treatment_1' in tags) {
+    tagUpdate.treatment = tags.treatment_1 || null
+  }
+  if ('biomarker_1' in tags) {
+    tagUpdate.biomarker = tags.biomarker_1 || null
+  }
+  if ('trial_1' in tags) {
+    tagUpdate.trial = tags.trial_1 || null
   }
 
   if (markAsReviewed) {
@@ -376,7 +392,11 @@ export async function flagQuestion(id: number, reasons: string[]): Promise<{ sav
     .update({
       needs_review: true,
       review_reason: reasons.join('|'),
-      flagged_at: new Date().toISOString()
+      flagged_at: new Date().toISOString(),
+      // Reset edited_by_user so question appears in review queue
+      // (review queue excludes edited_by_user=TRUE unless review_flags set)
+      edited_by_user: false,
+      tag_status: 'majority'
     })
     .eq('question_id', id)
 
