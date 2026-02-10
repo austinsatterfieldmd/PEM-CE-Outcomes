@@ -114,15 +114,29 @@ def clean_row(row: dict, table_name: str) -> dict:
 
     - Remove 'id' for SERIAL tables (let Postgres auto-assign)
     - Convert SQLite booleans (0/1) to Python booleans
-    - Handle None vs empty string
+    - Remove columns that don't exist in the target PostgreSQL table
     """
     cleaned = {}
     # Tables where we want to preserve the original ID for FK references
-    preserve_id_tables = {"questions"}
+    # (other tables reference these via foreign keys)
+    preserve_id_tables = {"questions", "activities", "novel_entities", "tag_proposals"}
+
+    # Columns in SQLite but NOT in the PostgreSQL target table
+    skip_columns = {
+        "questions": {"qcore_score", "qcore_grade", "qcore_breakdown", "qcore_scored_at"},
+        "tags": {"qpulse_score", "qpulse_grade", "qpulse_breakdown", "qpulse_scored_at"},
+        "question_activities": {"pre_score", "post_score", "pre_n", "post_n", "activity_id"},
+        "demographic_performance": {"pre_n", "post_n", "activity_id"},
+    }
+    table_skip = skip_columns.get(table_name, set())
 
     for key, value in row.items():
         # Skip auto-increment id for most tables
         if key == "id" and table_name not in preserve_id_tables:
+            continue
+
+        # Skip columns that don't exist in the PostgreSQL target
+        if key in table_skip:
             continue
 
         # For questions table, keep id to maintain FK relationships
@@ -132,7 +146,8 @@ def clean_row(row: dict, table_name: str) -> dict:
         if key in ("needs_review", "edited_by_user", "is_canonical",
                     "flaw_absolute_terms", "flaw_grammatical_cue",
                     "flaw_implausible_distractor", "flaw_clang_association",
-                    "flaw_convergence_vulnerability", "flaw_double_negative"):
+                    "flaw_convergence_vulnerability", "flaw_double_negative",
+                    "is_oncology"):
             if value is not None:
                 value = bool(value)
 
@@ -141,7 +156,14 @@ def clean_row(row: dict, table_name: str) -> dict:
     return cleaned
 
 
-def migrate_table(supabase, conn: sqlite3.Connection, table_name: str, dry_run: bool = False):
+def get_valid_question_ids(conn: sqlite3.Connection) -> set:
+    """Get all valid question IDs from SQLite."""
+    cursor = conn.execute("SELECT id FROM questions")
+    return {row["id"] for row in cursor.fetchall()}
+
+
+def migrate_table(supabase, conn: sqlite3.Connection, table_name: str, dry_run: bool = False,
+                  valid_question_ids: set = None):
     """Migrate a single table from SQLite to Supabase."""
     rows = read_table(conn, table_name)
 
@@ -156,6 +178,20 @@ def migrate_table(supabase, conn: sqlite3.Connection, table_name: str, dry_run: 
 
     # Clean rows for PostgreSQL
     cleaned_rows = [clean_row(row, table_name) for row in rows]
+
+    # Validate FK references — null out any that point to non-existent questions
+    fk_validate_tables = {
+        "duplicate_clusters": "canonical_question_id",
+        "cluster_members": "question_id",
+        "tag_proposal_candidates": "question_id",
+        "duplicate_decisions": "question_id_1",
+    }
+    if valid_question_ids and table_name in fk_validate_tables:
+        fk_col = fk_validate_tables[table_name]
+        for row in cleaned_rows:
+            if row.get(fk_col) and row[fk_col] not in valid_question_ids:
+                logger.warning(f"    Nullifying orphaned {fk_col}={row[fk_col]} in {table_name}")
+                row[fk_col] = None
 
     # Batch insert
     inserted = 0
@@ -242,13 +278,17 @@ def main():
         conn.close()
         return
 
+    # Get valid question IDs for FK validation
+    valid_question_ids = get_valid_question_ids(conn)
+
     # Migrate each table
     logger.info(f"\n=== MIGRATING {len(tables)} TABLES ===")
     total_rows = 0
 
     for table_name in tables:
         try:
-            count = migrate_table(supabase, conn, table_name, dry_run=args.dry_run)
+            count = migrate_table(supabase, conn, table_name, dry_run=args.dry_run,
+                                  valid_question_ids=valid_question_ids)
             total_rows += count
         except Exception as e:
             logger.error(f"Failed to migrate {table_name}: {e}")
