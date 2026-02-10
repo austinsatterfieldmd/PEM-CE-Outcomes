@@ -107,26 +107,33 @@ You must assign values for all 70 tag fields (disease_state is already determine
 **ALWAYS NULL for AML** - AML does not have a conventional staging system.
 
 Unlike solid tumors (TNM), AML is not staged. Disease classification uses:
-- ELN 2022 risk stratification -> `disease_type`
+- ELN 2022 risk stratification -> `disease_type_1`
 - Molecular features -> `biomarker`
-- Secondary vs de novo -> `disease_specific_factor`
+- De novo vs secondary vs therapy-related etiology -> `disease_type_2`
 
 **Always use `null` for this field in AML.**
 
 ### 3-4. disease_type_1, disease_type_2
-**OPTIONAL for AML** - Use for ELN risk category when explicitly stated.
+**OPTIONAL for AML**
 
-**ELN 2022 Risk Categories (use disease_type_1):**
+**disease_type_1 = ELN 2022 Risk Category (when explicitly stated):**
 - `"Favorable"` - t(8;21), inv(16), NPM1 without FLT3-ITD high, bZIP CEBPA
 - `"Intermediate"` - NPM1 + FLT3-ITD, wild-type NPM1 without adverse features
 - `"Adverse"` - TP53, RUNX1, ASXL1, complex karyotype, monosomal, del(5q), -7, KMT2Ar
+
+**disease_type_2 = AML etiology/subtype origin (when explicitly stated):**
+- `"De novo AML"` - Primary AML without prior hematologic disorder
+- `"Secondary AML"` - AML arising from prior MDS, MPN, or other hematologic disorder
+- `"Therapy-related AML"` (t-AML) - AML after prior chemotherapy/radiation
 
 **Note:** Specific genetic abnormalities (FLT3-ITD, NPM1, IDH1, IDH2, KMT2Ar) go in the **biomarker** fields, not disease_type.
 
 **Common patterns:**
 - "Favorable-risk AML" -> disease_type_1: "Favorable"
 - "Adverse-risk AML" -> disease_type_1: "Adverse"
-- Generic "AML" without risk stated -> disease_type_1: null
+- "Secondary AML after prior MDS" -> disease_type_2: "Secondary AML"
+- "Therapy-related AML after prior breast cancer chemotherapy" -> disease_type_2: "Therapy-related AML"
+- Generic "AML" without risk or etiology stated -> disease_type_1: null, disease_type_2: null
 
 ### 5. treatment_line
 **OPTIONAL** - Can be null, but try to infer. AML uses specific terminology.
@@ -428,12 +435,11 @@ Q: "Patient achieves MRD negativity after consolidation. What does this predict?
 **OPTIONAL** - AML-specific factors.
 
 **Valid values:**
-- `"De novo AML"` - Primary AML without prior hematologic disorder
-- `"Secondary AML"` - AML arising from prior MDS, MPN, or other hematologic disorder
-- `"Therapy-related AML"` (t-AML) - AML after prior chemotherapy/radiation
 - `"AML-MRC"` - AML with myelodysplasia-related changes
 - `"Extramedullary disease"` - Chloroma, myeloid sarcoma
 - `"CNS involvement"` - Leukemic CNS involvement
+
+**Do NOT use disease_specific_factor for etiology labels** (`"De novo AML"`, `"Secondary AML"`, `"Therapy-related AML"`). Those belong in `disease_type_2`.
 
 ### 14. comorbidity_1 through comorbidity_3
 **OPTIONAL** - Comorbidities affecting treatment.
