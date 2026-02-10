@@ -79,8 +79,17 @@ export async function searchQuestions(params: SearchFilters & {
   const result = data as any
   const page = params.page || 1
   const page_size = params.page_size || 20
+
+  // Compute knowledge_gain from pre/post scores (RPC doesn't return it)
+  const questions = (result.questions || []).map((q: any) => ({
+    ...q,
+    knowledge_gain: q.pre_score != null && q.post_score != null
+      ? parseFloat((q.post_score - q.pre_score).toFixed(1))
+      : null
+  }))
+
   return {
-    questions: result.questions || [],
+    questions,
     total: result.total || 0,
     page,
     page_size,
