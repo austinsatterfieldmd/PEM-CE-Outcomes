@@ -142,10 +142,85 @@ export async function getFilterOptions(): Promise<FilterOptions> {
   }
 }
 
-export async function getDynamicFilterOptions(_currentFilters: SearchFilters): Promise<FilterOptions> {
-  // For now, return same as static filter options
-  // Dynamic filtering can be added as a separate RPC function later
-  return getFilterOptions()
+export async function getDynamicFilterOptions(currentFilters: SearchFilters): Promise<FilterOptions> {
+  const supabase = getSupabaseClient()
+
+  // Check if any filters are active
+  const hasActiveFilters = Object.entries(currentFilters).some(([, v]) =>
+    v !== undefined && v !== null && (Array.isArray(v) ? v.length > 0 : true)
+  )
+
+  // If no filters active, use static options (faster)
+  if (!hasActiveFilters) {
+    return getFilterOptions()
+  }
+
+  const { data, error } = await supabase.rpc('get_dynamic_filter_options', {
+    p_topics: currentFilters.topics?.length ? currentFilters.topics : null,
+    p_disease_states: currentFilters.disease_states?.length ? currentFilters.disease_states : null,
+    p_disease_stages: currentFilters.disease_stages?.length ? currentFilters.disease_stages : null,
+    p_disease_types: currentFilters.disease_types?.length ? currentFilters.disease_types : null,
+    p_treatment_lines: currentFilters.treatment_lines?.length ? currentFilters.treatment_lines : null,
+    p_treatments: currentFilters.treatments?.length ? currentFilters.treatments : null,
+    p_biomarkers: currentFilters.biomarkers?.length ? currentFilters.biomarkers : null,
+    p_trials: currentFilters.trials?.length ? currentFilters.trials : null,
+    p_treatment_eligibilities: currentFilters.treatment_eligibilities?.length ? currentFilters.treatment_eligibilities : null,
+    p_age_groups: currentFilters.age_groups?.length ? currentFilters.age_groups : null,
+    p_fitness_statuses: currentFilters.fitness_statuses?.length ? currentFilters.fitness_statuses : null,
+    p_organ_dysfunctions: currentFilters.organ_dysfunctions?.length ? currentFilters.organ_dysfunctions : null,
+    p_advanced_filters: currentFilters.advanced_filters ? JSON.stringify(currentFilters.advanced_filters) : null
+  })
+
+  if (error) {
+    console.error('Dynamic filter options failed, falling back to static:', error.message)
+    return getFilterOptions()
+  }
+
+  const result = data as any
+  const transform = (arr: any[]) => (arr || []).map((item: any) => ({
+    value: item.value,
+    count: item.count || 0
+  }))
+
+  return {
+    topics: transform(result.topics),
+    disease_states: transform(result.disease_states),
+    disease_stages: transform(result.disease_stages),
+    disease_types: transform(result.disease_types),
+    treatment_lines: transform(result.treatment_lines),
+    treatments: transform(result.treatments),
+    biomarkers: transform(result.biomarkers),
+    trials: transform(result.trials),
+    source_files: transform(result.source_files),
+    treatment_eligibilities: transform(result.treatment_eligibilities),
+    age_groups: transform(result.age_groups || []),
+    fitness_statuses: transform(result.fitness_statuses || []),
+    organ_dysfunctions: transform(result.organ_dysfunctions || []),
+    // Fields not in dynamic RPC yet — return empty arrays
+    activities: [],
+    disease_specific_factors: [],
+    comorbidities: [],
+    drug_classes: [],
+    drug_targets: [],
+    prior_therapies: [],
+    resistance_mechanisms: [],
+    metastatic_sites: [],
+    symptoms: [],
+    performance_statuses: [],
+    toxicity_types: [],
+    toxicity_organs: [],
+    toxicity_grades: [],
+    efficacy_endpoints: [],
+    outcome_contexts: [],
+    clinical_benefits: [],
+    guideline_sources: [],
+    evidence_types: [],
+    cme_outcome_levels: [],
+    stem_types: [],
+    lead_in_types: [],
+    answer_formats: [],
+    distractor_homogeneities: []
+  }
 }
 
 export async function getQuestionDetail(id: number): Promise<QuestionDetailData> {
