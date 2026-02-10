@@ -11,7 +11,7 @@
 
 import { useState, useEffect } from 'react'
 import { X, Search, Layers, AlertCircle, Check, Star } from 'lucide-react'
-import { searchDuplicateCandidates, createDedupCluster, type DuplicateCandidate } from '../services/api'
+import { searchDuplicateCandidates, createDedupCluster, type DuplicateCandidate } from '../services/apiRouter'
 
 interface CreateDedupClusterModalProps {
   sourceQuestion: {

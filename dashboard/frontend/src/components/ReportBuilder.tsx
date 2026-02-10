@@ -26,7 +26,7 @@ import {
   getDynamicFilterOptions,
   getSegmentOptions,
   exportQuestionsForReport
-} from '../services/api'
+} from '../services/apiRouter'
 import type {
   TagGroupBy,
   AudienceSegment,

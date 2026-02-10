@@ -87,6 +87,11 @@ export const listUsersWithRoles = supabaseApi.listUsersWithRoles
 export const setUserRole = supabaseApi.setUserRole
 
 // ============================================================
+// Re-export types from api.ts so components can import from apiRouter
+// ============================================================
+export type { TagUpdatePayload, QuestionExport, ProposalCandidate, TagProposal, ProposalStats, DuplicateCandidate } from './api'
+
+// ============================================================
 // Re-export isSupabase flag for components that need to know
 // ============================================================
 export const isSupabaseMode = useSupabase

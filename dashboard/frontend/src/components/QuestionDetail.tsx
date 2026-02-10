@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 import { X, Check, AlertCircle, Tag, Activity, FileText, TrendingUp, Pencil, Save, XCircle, Flag, ChevronDown, ChevronRight, Info, RefreshCw, Layers } from 'lucide-react'
-import { getQuestionDetail, updateQuestionTags, flagQuestion } from '../services/api'
+import { getQuestionDetail, updateQuestionTags, flagQuestion } from '../services/apiRouter'
 import CreateProposalModal from './CreateProposalModal'
 import CreateDedupClusterModal from './CreateDedupClusterModal'
 import type { QuestionDetailData, PerformanceMetric } from '../types'
 import { FIELD_GROUPS } from '../types'
 import { useAuth } from './AuthProvider'
+import { useRole } from '../contexts/RoleContext'
 
 interface QuestionDetailProps {
   questionId: number
@@ -175,7 +176,10 @@ function initEditableTagsFromData(tags: any): EditableTags {
 }
 
 export function QuestionDetail({ questionId, onClose, onTagsUpdated }: QuestionDetailProps) {
-  const { isAdmin } = useAuth()
+  const { isAdmin: authIsAdmin } = useAuth()
+  const { canEdit, isAdmin: roleIsAdmin } = useRole()
+  // Use role-based access when available, fall back to auth-based
+  const isAdmin = roleIsAdmin || authIsAdmin
   const [data, setData] = useState<QuestionDetailData | null>(null)
   const [loading, setLoading] = useState(true)
   const [selectedSegment, setSelectedSegment] = useState<string>('overall')
@@ -765,7 +769,7 @@ export function QuestionDetail({ questionId, onClose, onTagsUpdated }: QuestionD
                     Question
                   </h3>
                   <div className="flex items-center gap-2">
-                    {!isEditingQuestion && !isEditing && (
+                    {canEdit && !isEditingQuestion && !isEditing && (
                       <>
                         <button
                           onClick={() => setShowRetaggingModal(true)}
@@ -1371,7 +1375,7 @@ export function QuestionDetail({ questionId, onClose, onTagsUpdated }: QuestionD
                       </div>
                     )}
                   </div>
-                  {isAdmin && !isEditing && !isEditingQuestion && (
+                  {canEdit && !isEditing && !isEditingQuestion && (
                     <button
                       onClick={startEdit}
                       className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
@@ -1917,7 +1921,7 @@ export function QuestionDetail({ questionId, onClose, onTagsUpdated }: QuestionD
                       {!data.tags.disease_state && !data.tags.topic && !data.tags.treatment_1 && (
                         <div className="text-center py-4 bg-slate-50 rounded-xl">
                           <p className="text-slate-400 text-sm">No tags assigned yet</p>
-                          {isAdmin && (
+                          {canEdit && (
                             <button
                               onClick={startEdit}
                               className="mt-2 text-sm text-primary-600 hover:text-primary-700 font-medium"

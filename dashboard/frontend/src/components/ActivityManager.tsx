@@ -10,7 +10,7 @@ import {
   AlertCircle,
   CheckCircle
 } from 'lucide-react'
-import { getActivities, updateActivity } from '../services/api'
+import { getActivities, updateActivity } from '../services/apiRouter'
 import type { Activity } from '../types'
 import { clsx } from 'clsx'
 

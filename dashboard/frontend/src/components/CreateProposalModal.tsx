@@ -11,7 +11,7 @@
 
 import { useState, useEffect } from 'react'
 import { X, Search, Tag, AlertCircle } from 'lucide-react'
-import { createProposal, type TagProposal } from '../services/api'
+import { createProposal, type TagProposal } from '../services/apiRouter'
 
 interface CreateProposalModalProps {
   onClose: () => void

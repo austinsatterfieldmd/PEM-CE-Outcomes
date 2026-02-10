@@ -18,7 +18,7 @@ import {
   abandonProposal,
   type TagProposal,
   type ProposalStats
-} from '../services/api'
+} from '../services/apiRouter'
 
 type StatusFilter = 'all' | 'pending' | 'reviewing' | 'ready_to_apply' | 'applied' | 'abandoned'
 

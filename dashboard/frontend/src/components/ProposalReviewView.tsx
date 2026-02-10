@@ -16,7 +16,7 @@ import {
   applyProposal,
   type TagProposal,
   type ProposalCandidate
-} from '../services/api'
+} from '../services/apiRouter'
 
 interface ProposalReviewViewProps {
   proposalId: number
