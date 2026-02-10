@@ -45,7 +45,8 @@ export function getSupabaseClient(): SupabaseClient {
         auth: {
           autoRefreshToken: true,
           persistSession: true,
-          detectSessionInUrl: true
+          detectSessionInUrl: false,
+          flowType: 'pkce'
         }
       }
     )
@@ -76,25 +77,34 @@ export async function signInWithSSO(): Promise<{ error: Error | null }> {
 
 /**
  * Handle the auth callback - exchange code for session
+ * Supabase PKCE flow puts the code in query params (?code=xxx)
+ * Also check hash fragments as fallback
  */
 export async function handleAuthCallback(): Promise<{ session: Session | null; error: Error | null }> {
   const supabase = getSupabaseClient()
 
-  // Get the code from URL params
+  // Get the code from URL query params (PKCE flow)
   const params = new URLSearchParams(window.location.search)
   const code = params.get('code')
 
-  if (!code) {
-    return { session: null, error: new Error('No authorization code in callback URL') }
+  if (code) {
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+    if (error) {
+      return { session: null, error: new Error(error.message) }
+    }
+    return { session: data.session, error: null }
   }
 
-  const { data, error } = await supabase.auth.exchangeCodeForSession(code)
-
+  // Fallback: check if session was already set (e.g., via hash fragment)
+  const { data: { session }, error } = await supabase.auth.getSession()
   if (error) {
     return { session: null, error: new Error(error.message) }
   }
+  if (session) {
+    return { session, error: null }
+  }
 
-  return { session: data.session, error: null }
+  return { session: null, error: new Error('No authorization code in callback URL') }
 }
 
 /**

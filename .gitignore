@@ -182,3 +182,5 @@ desktop.ini
 # ===========================================
 # Internal planning documents (not for repo)
 Retagging*.md
+.vercel
+.env*.local

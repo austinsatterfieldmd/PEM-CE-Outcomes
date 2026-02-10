@@ -1061,12 +1061,11 @@ function App() {
   )
 }
 
-// Wrap with Router for auth callback handling
+// Wrap with Router (auth callback is handled by AuthProvider in main.tsx)
 function AppWithRouter() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/*" element={<App />} />
       </Routes>
     </BrowserRouter>
