@@ -17,14 +17,14 @@ SELECT setval('novel_entities_id_seq', (SELECT COALESCE(MAX(id), 1) FROM novel_e
 SELECT setval('tag_proposals_id_seq', (SELECT COALESCE(MAX(id), 1) FROM tag_proposals));
 
 -- Tables where IDs were auto-assigned (reset just in case)
-SELECT setval('tags_id_seq', (SELECT COALESCE(MAX(id), 1) FROM tags));
+-- NOTE: tags has no id column (PK is question_id, no sequence)
 SELECT setval('performance_id_seq', (SELECT COALESCE(MAX(id), 1) FROM performance));
 SELECT setval('question_activities_id_seq', (SELECT COALESCE(MAX(id), 1) FROM question_activities));
 SELECT setval('demographic_performance_id_seq', (SELECT COALESCE(MAX(id), 1) FROM demographic_performance));
 SELECT setval('novel_entity_occurrences_id_seq', (SELECT COALESCE(MAX(id), 1) FROM novel_entity_occurrences));
 SELECT setval('user_defined_values_id_seq', (SELECT COALESCE(MAX(id), 1) FROM user_defined_values));
 SELECT setval('data_error_questions_id_seq', (SELECT COALESCE(MAX(id), 1) FROM data_error_questions));
-SELECT setval('duplicate_clusters_id_seq', (SELECT COALESCE(MAX(id), 1) FROM duplicate_clusters));
+SELECT setval('duplicate_clusters_cluster_id_seq', (SELECT COALESCE(MAX(cluster_id), 1) FROM duplicate_clusters));
 SELECT setval('cluster_members_id_seq', (SELECT COALESCE(MAX(id), 1) FROM cluster_members));
 SELECT setval('duplicate_decisions_id_seq', (SELECT COALESCE(MAX(id), 1) FROM duplicate_decisions));
 SELECT setval('tag_proposal_candidates_id_seq', (SELECT COALESCE(MAX(id), 1) FROM tag_proposal_candidates));
