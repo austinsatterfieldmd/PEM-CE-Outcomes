@@ -265,7 +265,7 @@ interface EditableTags {
 
 export function QuestionReviewDetail({ questionId, onClose, onReviewComplete }: QuestionReviewDetailProps) {
   const { isAdmin: authIsAdmin } = useAuth()
-  const { canEdit, isAdmin: roleIsAdmin } = useRole()
+  const { isAdmin: roleIsAdmin } = useRole()
   const isAdmin = roleIsAdmin || authIsAdmin
   const [data, setData] = useState<QuestionDetailData | null>(null)
   const [loading, setLoading] = useState(true)

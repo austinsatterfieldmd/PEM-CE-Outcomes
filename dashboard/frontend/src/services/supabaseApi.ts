@@ -26,12 +26,14 @@ import type {
   Activity,
   ReportStatsResponse
 } from '../types'
+import type { TagProposal, ProposalStats } from './api'
 
 // ============================================================
 // Search & Question Management
 // ============================================================
 
 export async function searchQuestions(params: SearchFilters & {
+  query?: string
   page?: number
   page_size?: number
   sort_by?: string
@@ -75,10 +77,14 @@ export async function searchQuestions(params: SearchFilters & {
   if (error) throw new Error(`Search failed: ${error.message}`)
 
   const result = data as any
+  const page = params.page || 1
+  const page_size = params.page_size || 20
   return {
     questions: result.questions || [],
     total: result.total || 0,
-    total_pages: Math.ceil((result.total || 0) / (params.page_size || 20))
+    page,
+    page_size,
+    total_pages: Math.ceil((result.total || 0) / page_size)
   }
 }
 
@@ -136,7 +142,7 @@ export async function getFilterOptions(): Promise<FilterOptions> {
   }
 }
 
-export async function getDynamicFilterOptions(currentFilters: SearchFilters): Promise<FilterOptions> {
+export async function getDynamicFilterOptions(_currentFilters: SearchFilters): Promise<FilterOptions> {
   // For now, return same as static filter options
   // Dynamic filtering can be added as a separate RPC function later
   return getFilterOptions()
@@ -176,7 +182,7 @@ export async function getStats(): Promise<Stats> {
 export async function updateQuestionTags(
   questionId: number,
   tags: Record<string, any>,
-  previousValues?: Record<string, any>
+  _previousValues?: Record<string, any>
 ): Promise<any> {
   const supabase = getSupabaseClient()
 
@@ -355,7 +361,7 @@ export async function aggregateByTag(
 
 export async function aggregateByTagWithSegments(
   groupBy: TagGroupBy,
-  segments: AudienceSegment[],
+  _segments: AudienceSegment[],
   filters: ReportFilters
 ): Promise<AggregatedReportResponse> {
   // Use the same aggregate_by_tag for now
@@ -391,12 +397,13 @@ export async function aggregateBySegment(
 }
 
 export async function getSegmentOptions(): Promise<SegmentOptions> {
+  const segmentNames = [
+    'overall', 'medical_oncologist', 'app', 'academic',
+    'community', 'surgical_oncologist', 'radiation_oncologist'
+  ]
   return {
-    segments: [
-      'overall', 'medical_oncologist', 'app', 'academic',
-      'community', 'surgical_oncologist', 'radiation_oncologist'
-    ]
-  } as SegmentOptions
+    segments: segmentNames.map(s => ({ segment: s, count: 0 }))
+  }
 }
 
 export async function getPerformanceTrends(
@@ -446,7 +453,7 @@ export async function getDemographicOptions(): Promise<DemographicOptions> {
 export async function getActivities(params: {
   quarter?: string
   has_date?: boolean
-}): Promise<Activity[]> {
+} = {}): Promise<{ activities: Activity[], total: number }> {
   const supabase = getSupabaseClient()
 
   let query = supabase
@@ -465,7 +472,8 @@ export async function getActivities(params: {
   const { data, error } = await query
 
   if (error) throw new Error(`Activities failed: ${error.message}`)
-  return (data || []) as Activity[]
+  const activities = (data || []) as Activity[]
+  return { activities, total: activities.length }
 }
 
 export async function updateActivity(activityName: string, data: {
@@ -543,27 +551,6 @@ export async function exportQuestionsFull(filters: SearchFilters): Promise<{ que
 // Tag Proposals
 // ============================================================
 
-interface ProposalStats {
-  pending: number
-  approved: number
-  rejected: number
-  total: number
-}
-
-interface TagProposal {
-  id: number
-  field_name: string
-  proposed_value: string
-  search_query: string
-  proposal_reason: string
-  status: string
-  match_count: number
-  approved_count: number
-  created_at: string
-  created_by: string
-  candidates?: any[]
-}
-
 export async function getProposalStats(): Promise<ProposalStats> {
   const supabase = getSupabaseClient()
 
@@ -573,12 +560,14 @@ export async function getProposalStats(): Promise<ProposalStats> {
 
   if (error) throw new Error(`Proposal stats failed: ${error.message}`)
 
-  const stats = { pending: 0, approved: 0, rejected: 0, total: 0 }
+  const stats: ProposalStats = {
+    total: 0, pending: 0, reviewing: 0,
+    ready_to_apply: 0, applied: 0, abandoned: 0
+  }
   for (const row of (data || [])) {
     stats.total++
-    if (row.status === 'pending') stats.pending++
-    else if (row.status === 'approved') stats.approved++
-    else if (row.status === 'rejected') stats.rejected++
+    const status = row.status as keyof Omit<ProposalStats, 'total'>
+    if (status in stats) (stats as any)[status]++
   }
   return stats
 }
@@ -641,20 +630,38 @@ export async function getProposal(proposalId: number): Promise<TagProposal> {
 
 export async function reviewProposalCandidates(
   proposalId: number,
-  decisions: { question_id: number; decision: string; notes?: string }[]
+  data: {
+    approved_ids: number[]
+    skipped_ids: number[]
+    reviewed_by?: string
+  }
 ): Promise<any> {
   const supabase = getSupabaseClient()
 
-  for (const dec of decisions) {
+  // Update approved candidates
+  for (const qid of data.approved_ids) {
     const { error } = await supabase
       .from('tag_proposal_candidates')
       .update({
-        decision: dec.decision,
-        decided_at: new Date().toISOString(),
-        notes: dec.notes || null
+        decision: 'approved',
+        decided_at: new Date().toISOString()
       })
       .eq('proposal_id', proposalId)
-      .eq('question_id', dec.question_id)
+      .eq('question_id', qid)
+
+    if (error) throw new Error(`Review candidate failed: ${error.message}`)
+  }
+
+  // Update skipped candidates
+  for (const qid of data.skipped_ids) {
+    const { error } = await supabase
+      .from('tag_proposal_candidates')
+      .update({
+        decision: 'skipped',
+        decided_at: new Date().toISOString()
+      })
+      .eq('proposal_id', proposalId)
+      .eq('question_id', qid)
 
     if (error) throw new Error(`Review candidate failed: ${error.message}`)
   }
@@ -664,7 +671,7 @@ export async function reviewProposalCandidates(
 
 export async function applyProposal(
   proposalId: number,
-  reviewedBy?: string
+  _reviewedBy?: string
 ): Promise<any> {
   const supabase = getSupabaseClient()
 
@@ -735,17 +742,19 @@ export async function searchDuplicateCandidates(
 }
 
 export async function createDedupCluster(clusterData: {
-  canonical_question_id: number
-  members: { question_id: number; similarity: number }[]
+  question_ids: number[]
   similarity_threshold?: number
+  canonical_question_id?: number
 }): Promise<any> {
   const supabase = getSupabaseClient()
+
+  const canonicalId = clusterData.canonical_question_id || clusterData.question_ids[0]
 
   // Create cluster
   const { data: cluster, error: clusterError } = await supabase
     .from('duplicate_clusters')
     .insert({
-      canonical_question_id: clusterData.canonical_question_id,
+      canonical_question_id: canonicalId,
       similarity_threshold: clusterData.similarity_threshold || 0.95
     })
     .select()
@@ -754,11 +763,11 @@ export async function createDedupCluster(clusterData: {
   if (clusterError) throw new Error(`Create cluster failed: ${clusterError.message}`)
 
   // Add members
-  const members = clusterData.members.map(m => ({
+  const members = clusterData.question_ids.map(qid => ({
     cluster_id: cluster.cluster_id,
-    question_id: m.question_id,
-    similarity_to_canonical: m.similarity,
-    is_canonical: m.question_id === clusterData.canonical_question_id
+    question_id: qid,
+    similarity_to_canonical: 1.0,
+    is_canonical: qid === canonicalId
   }))
 
   const { error: memberError } = await supabase

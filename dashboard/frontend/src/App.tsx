@@ -48,7 +48,7 @@ const getInitialTab = (): TabView => {
 }
 
 function App() {
-  const { isAdmin, canEdit } = useRole()
+  const { isAdmin } = useRole()
 
   // Tab state - initialize from URL hash
   const [activeTab, setActiveTab] = useState<TabView>(getInitialTab)
@@ -253,7 +253,7 @@ function App() {
 
       const csvRows = [
         headers.join(','),
-        ...result.questions.map(q => [
+        ...result.questions.map((q: any) => [
           q.id,
           `"${(q.question_stem || '').replace(/"/g, '""')}"`,
           `"${(q.correct_answer || '').replace(/"/g, '""')}"`,
@@ -363,7 +363,7 @@ function App() {
 
       const csvRows = [
         headers.join(','),
-        ...result.questions.map(q => [
+        ...result.questions.map((q: any) => [
           q.id, escapeCSV(q.source_file), escapeCSV(q.question_stem), escapeCSV(q.correct_answer), escapeCSV(q.incorrect_answers),
           // Core
           escapeCSV(q.topic), escapeCSV(q.disease_state), escapeCSV(q.disease_type_1), escapeCSV(q.disease_type_2), escapeCSV(q.disease_stage), escapeCSV(q.treatment_line),

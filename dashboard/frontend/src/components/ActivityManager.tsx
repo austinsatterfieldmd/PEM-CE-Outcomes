@@ -69,9 +69,9 @@ export default function ActivityManager({ onClose }: ActivityManagerProps) {
     
     try {
       await updateActivity(activity.activity_name, {
-        activity_date: editDate || null,
-        target_audience: editAudience || null,
-        description: editDescription || null
+        activity_date: editDate || undefined,
+        target_audience: editAudience || undefined,
+        description: editDescription || undefined
       })
       
       setSaveStatus({ id: activity.id, success: true, message: 'Saved successfully!' })
