@@ -247,6 +247,18 @@ export async function getQuestionDetail(id: number): Promise<QuestionDetailData>
   if (!Array.isArray(result.performance)) result.performance = []
   if (!Array.isArray(result.activities)) result.activities = []
 
+  // Transform activities: RPC returns objects {quarter, act_date, performance, activity_name}
+  // but component expects activity_details (objects) + activities (plain strings)
+  if (Array.isArray(result.activities) && result.activities.length > 0 && typeof result.activities[0] === 'object') {
+    result.activity_details = result.activities.map((a: any) => ({
+      activity_name: a.activity_name,
+      activity_date: a.act_date,
+      quarter: a.quarter,
+      performance: a.performance || []
+    }))
+    result.activities = result.activities.map((a: any) => a.activity_name || '')
+  }
+
   return result as QuestionDetailData
 }
 
@@ -876,36 +888,46 @@ export async function createDedupCluster(clusterData: {
 export async function getUserRole(): Promise<string> {
   const supabase = getSupabaseClient()
 
-  // Try RPC first
-  const { data, error } = await supabase.rpc('get_user_role')
-
-  if (!error && data) {
-    console.log('[Role] get_user_role RPC returned:', data)
-    return data as string
-  }
-
-  if (error) {
-    console.warn('[Role] RPC failed:', error.message)
-  }
-
-  // Fallback: query user_roles table directly using current session
+  // Primary: query user_roles table directly using client-side user ID
+  // This is more reliable than the RPC because auth.uid() in PostgreSQL
+  // can return NULL if the session JWT isn't properly propagated
   try {
     const { data: { user } } = await supabase.auth.getUser()
+    console.log('[Role] Current user:', user?.id, user?.email)
     if (user) {
-      const { data: roleData } = await supabase
+      const { data: roleData, error: roleError } = await supabase
         .from('user_roles')
         .select('role')
         .eq('user_id', user.id)
         .single()
+      if (roleError) {
+        console.warn('[Role] Direct query error:', roleError.message, roleError.code)
+      }
       if (roleData?.role) {
         console.log('[Role] Direct query returned:', roleData.role)
         return roleData.role
       }
+      console.warn('[Role] No role found for user_id:', user.id)
     }
-  } catch (fallbackError) {
-    console.warn('[Role] Fallback query failed:', fallbackError)
+  } catch (directError) {
+    console.warn('[Role] Direct query failed:', directError)
   }
 
+  // Fallback: try RPC (uses auth.uid() inside PostgreSQL)
+  try {
+    const { data, error } = await supabase.rpc('get_user_role')
+    if (!error && data) {
+      console.log('[Role] RPC fallback returned:', data)
+      return data as string
+    }
+    if (error) {
+      console.warn('[Role] RPC fallback failed:', error.message)
+    }
+  } catch (rpcError) {
+    console.warn('[Role] RPC exception:', rpcError)
+  }
+
+  console.warn('[Role] All methods failed, defaulting to read-only')
   return 'user' // Default to read-only
 }
 
