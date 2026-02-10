@@ -9,8 +9,9 @@
  * When Supabase is not enabled, defaults to 'admin' (local dev = full access).
  */
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
 import { getUserRole, isSupabaseMode } from '../services/apiRouter'
+import { onAuthStateChange } from '../services/supabase'
 
 type UserRole = 'admin' | 'ma' | 'user'
 
@@ -28,7 +29,7 @@ export function RoleProvider({ children }: { children: ReactNode }) {
   const [role, setRole] = useState<UserRole>(isSupabaseMode ? 'user' : 'admin')
   const [isLoading, setIsLoading] = useState(isSupabaseMode)
 
-  const fetchRole = async () => {
+  const fetchRole = useCallback(async () => {
     if (!isSupabaseMode) {
       // Local dev with FastAPI — default to admin (full access)
       setRole('admin')
@@ -38,18 +39,34 @@ export function RoleProvider({ children }: { children: ReactNode }) {
 
     try {
       const userRole = await getUserRole()
+      console.log('[RoleContext] Fetched role:', userRole)
       setRole((userRole as UserRole) || 'user')
     } catch (error) {
-      console.warn('Failed to fetch user role, defaulting to read-only:', error)
+      console.warn('[RoleContext] Failed to fetch user role, defaulting to read-only:', error)
       setRole('user')
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
     fetchRole()
-  }, [])
+  }, [fetchRole])
+
+  // Re-fetch role when auth state changes (e.g., after login)
+  useEffect(() => {
+    if (!isSupabaseMode) return
+
+    const unsubscribe = onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        console.log('[RoleContext] Auth state changed:', event, '— re-fetching role')
+        // Small delay to ensure session is fully established
+        setTimeout(() => fetchRole(), 500)
+      }
+    })
+
+    return () => unsubscribe()
+  }, [fetchRole])
 
   const value: RoleContextType = {
     role,

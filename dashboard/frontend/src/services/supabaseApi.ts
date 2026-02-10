@@ -232,7 +232,22 @@ export async function getQuestionDetail(id: number): Promise<QuestionDetailData>
   if (error) throw new Error(`Question detail failed: ${error.message}`)
   if (!data) throw new Error('Question not found')
 
-  return data as QuestionDetailData
+  const result = data as any
+
+  // incorrect_answers is stored as TEXT (JSON string) in PostgreSQL — parse it to array
+  if (typeof result.incorrect_answers === 'string') {
+    try {
+      result.incorrect_answers = JSON.parse(result.incorrect_answers)
+    } catch {
+      result.incorrect_answers = []
+    }
+  }
+
+  // Ensure performance and activities are always arrays
+  if (!Array.isArray(result.performance)) result.performance = []
+  if (!Array.isArray(result.activities)) result.activities = []
+
+  return result as QuestionDetailData
 }
 
 export async function getStats(): Promise<Stats> {
@@ -860,14 +875,38 @@ export async function createDedupCluster(clusterData: {
 
 export async function getUserRole(): Promise<string> {
   const supabase = getSupabaseClient()
+
+  // Try RPC first
   const { data, error } = await supabase.rpc('get_user_role')
 
-  if (error) {
-    console.warn('Failed to get user role:', error.message)
-    return 'user' // Default to read-only
+  if (!error && data) {
+    console.log('[Role] get_user_role RPC returned:', data)
+    return data as string
   }
 
-  return (data as string) || 'user'
+  if (error) {
+    console.warn('[Role] RPC failed:', error.message)
+  }
+
+  // Fallback: query user_roles table directly using current session
+  try {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) {
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .single()
+      if (roleData?.role) {
+        console.log('[Role] Direct query returned:', roleData.role)
+        return roleData.role
+      }
+    }
+  } catch (fallbackError) {
+    console.warn('[Role] Fallback query failed:', fallbackError)
+  }
+
+  return 'user' // Default to read-only
 }
 
 export async function listUsersWithRoles(): Promise<any[]> {
