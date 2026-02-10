@@ -365,17 +365,16 @@ When topic is "AE management" or "Safety profile" and the question mentions a dr
 - Question about allo-HSCT decision-making
 
 ### 10. age_group
-**CRITICAL for MDS** - MDS is predominantly a disease of older adults.
+**REQUIRED when patient age is stated** - Tag the age category whenever a specific age (e.g., "72-year-old") appears in the question stem.
 
 **Valid values:**
-- `"Young"` - Adults under 60 years (unusual for MDS, may be transplant candidates)
-- `"Transitional"` - 60-75 years (may or may not tolerate intensive therapy)
+- `"Pediatric"` - Under 18 years (rare in MDS)
+- `"AYA"` - Adolescent/Young Adult, 15-39 years (rare in MDS)
+- `"Young"` - Adults under 65 years (unusual for MDS, may be transplant candidates)
+- `"Transitional"` - 65-75 years (may or may not tolerate intensive therapy)
 - `"Elderly"` - 75 years or older (typical MDS population)
 
-**When to tag:**
-- Age explicitly stated
-- Trial with age-based eligibility
-- Transplant candidacy discussions
+**CRITICAL:** When a patient age is stated in the question stem, you MUST tag age_group. This is one of the most commonly missed fields. A "52-year-old" = Young. A "70-year-old" = Transitional. A "78-year-old" = Elderly.
 
 ### 11. organ_dysfunction
 **OPTIONAL** - Relevant organ impairment.

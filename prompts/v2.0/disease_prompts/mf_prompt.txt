@@ -313,17 +313,18 @@ When topic is "AE management" or "Safety profile" and the question mentions a dr
 - Younger patients with Int-2 or High-risk disease
 
 ### 10. age_group
-**CRITICAL for MF** - MF is predominantly a disease of older adults.
+**REQUIRED when patient age is stated** - Tag the age category whenever a specific age (e.g., "68-year-old") appears in the question stem.
 
 **Valid values:**
-- `"Young"` - Adults under 60 years (may be transplant candidates)
-- `"Transitional"` - 60-70 years (may or may not tolerate transplant)
-- `"Elderly"` - 70 years or older (typically not transplant candidates)
+- `"Pediatric"` - Under 18 years (extremely rare in MF)
+- `"AYA"` - Adolescent/Young Adult, 15-39 years (rare in MF)
+- `"Young"` - Adults under 65 years (may be transplant candidates)
+- `"Transitional"` - 65-75 years (may or may not tolerate transplant)
+- `"Elderly"` - 75 years or older (typically not transplant candidates)
 
-**When to tag:**
-- Age explicitly stated
-- Transplant candidacy discussions
-- DIPSS scoring (age >65 is a risk factor)
+**CRITICAL:** When a patient age is stated in the question stem, you MUST tag age_group. This is one of the most commonly missed fields. A "55-year-old" = Young. A "68-year-old" = Transitional. A "78-year-old" = Elderly.
+
+**Note:** Transplant eligibility is captured separately in `treatment_eligibility`, not in age_group. DIPSS age scoring (>65) is a disease-specific risk factor, not the same as the age_group classification.
 
 ### 11. organ_dysfunction
 **OPTIONAL** - Relevant organ impairment.

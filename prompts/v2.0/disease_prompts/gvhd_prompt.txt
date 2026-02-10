@@ -87,9 +87,17 @@ You must assign values for all 70 tag fields (disease_state is already determine
 | **Clinical efficacy** | Response rates, survival outcomes, clinical trial results, "key findings", **"what were the results of REACH2 trial"** |
 | **Prophylaxis** | GVHD prevention regimens, prophylaxis strategies, "to prevent GVHD" |
 
-**Topic Disambiguation - "Prophylaxis" vs "Treatment selection":**
-- "What is the best GVHD prophylaxis for matched unrelated donor?" -> **Prophylaxis**
-- "Patient developed chronic GVHD. What treatment do you recommend?" -> **Treatment selection**
+**Topic Disambiguation - "Prophylaxis" vs "Treatment selection" vs "Treatment indication":**
+- "What is the best GVHD prophylaxis for matched unrelated donor?" -> **Prophylaxis** (prevention strategy)
+- "Patient developed chronic GVHD. What treatment do you recommend?" -> **Treatment selection** (choosing treatment for established GVHD)
+- "Which patients should receive prophylaxis with PTCy?" -> **Treatment indication** (who is eligible for prophylaxis)
+
+**CRITICAL: Prophylaxis topic + treatment_line alignment:**
+- When topic is **Prophylaxis**, treatment_line should be `"Prophylaxis"` (NOT "1L")
+- Prophylaxis = preventing GVHD before it occurs (at/after transplant)
+- Treatment selection = treating GVHD that has already developed
+- A question about selecting a prophylaxis REGIMEN is topic: "Prophylaxis", treatment_line: "Prophylaxis"
+- A question about selecting treatment for ESTABLISHED GVHD is topic: "Treatment selection", treatment_line: "1L" or "2L" etc.
 
 **Topic Disambiguation - Safety profile vs AE management:**
 - **Safety profile** = knowing WHAT adverse events to expect (awareness, education, recognition)
@@ -146,16 +154,19 @@ You must assign values for all 70 tag fields (disease_state is already determine
 
 **Valid values:**
 - `"Prophylaxis"` - Prevention at time of transplant (NOT treatment of established GVHD)
+- `"Steroid-naive"` - GVHD diagnosed but NOT YET treated with steroids (pre-1L, treatment-naive)
 - `"1L"` - First-line treatment (usually steroids for treatment-naive GVHD)
 - `"2L"` - Second-line (first targeted therapy after steroid failure)
 - `"3L"` - Third-line
 - `"4L+"` - Fourth-line or later
 
-**CRITICAL DISTINCTION:**
-- **disease_type_2** = Disease STATUS (Treatment-naive vs Steroid-refractory)
-- **treatment_line** = Actual LINE COUNT (1L, 2L, 3L, 4L+)
+**CRITICAL: Avoid double-tagging between disease_type_2 and treatment_line.**
+- **disease_type_2** captures the disease STATUS (Treatment-naive vs Steroid-refractory)
+- **treatment_line** captures the actual LINE of therapy being discussed
+- Use `"Steroid-naive"` as treatment_line when the question is about a patient with newly diagnosed GVHD who has NOT yet started steroids. This avoids redundancy with disease_type_2: "Treatment-naive".
 
 **Mapping:**
+- Newly diagnosed GVHD, not yet treated -> disease_type_2: "Treatment-naive", treatment_line: "Steroid-naive"
 - Treatment-naive patient receiving steroids -> disease_type_2: "Treatment-naive", treatment_line: "1L"
 - Steroid-refractory patient receiving ruxolitinib -> disease_type_2: "Steroid-refractory", treatment_line: "2L"
 - Failed ruxolitinib, receiving belumosudil -> disease_type_2: "Steroid-refractory", treatment_line: "3L"
@@ -163,7 +174,8 @@ You must assign values for all 70 tag fields (disease_state is already determine
 
 **Triggers:**
 - "GVHD prophylaxis", "to prevent GVHD", "at time of transplant" -> treatment_line: "Prophylaxis"
-- "first-line", "initial treatment" (when GVHD develops) -> treatment_line: "1L"
+- "newly diagnosed GVHD", "treatment-naive GVHD", "before starting steroids" -> treatment_line: "Steroid-naive"
+- "first-line", "initial treatment", "starting steroids" (when GVHD develops) -> treatment_line: "1L"
 - "second-line", "after steroids" -> treatment_line: "2L"
 - "after 2 prior lines of systemic therapy" -> treatment_line: "3L"
 - "previously treated with steroids and ibrutinib" -> treatment_line: "3L"
@@ -342,15 +354,16 @@ When topic is "AE management" or "Safety profile" and the question mentions a dr
 - `"Transplant-ineligible"` - Cannot receive transplant
 
 ### 10. age_group
-**Valid values:**
-- `"Pediatric"` - Children/adolescents (iMAGINE trial population)
-- `"Young"` - Young adults
-- `"Transitional"` - Middle-aged
-- `"Elderly"` - Older adults (may affect transplant/therapy choice)
+**REQUIRED when patient age is stated** - Tag the age category whenever a specific age (e.g., "55-year-old") appears in the question stem.
 
-**When to tag:**
-- Age explicitly stated
-- Pediatric GVHD trials (iMAGINE, MODULAATE)
+**Valid values:**
+- `"Pediatric"` - Under 18 years (iMAGINE, MODULAATE trial populations)
+- `"AYA"` - Adolescent/Young Adult, 15-39 years
+- `"Young"` - Adults under 65 years
+- `"Transitional"` - 65-75 years
+- `"Elderly"` - 75 years or older
+
+**CRITICAL:** When a patient age is stated in the question stem, you MUST tag age_group. This is one of the most commonly missed fields. A "51-year-old" = Young. A "70-year-old" = Transitional. A "78-year-old" = Elderly.
 
 ### 11. organ_dysfunction
 **OPTIONAL** - Relevant in GVHD context.
