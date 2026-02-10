@@ -363,20 +363,22 @@ export async function updateQuestionTags(
     tagUpdate.review_notes = reviewNotes
   }
 
-  // Update tags
-  console.log('[TagUpdate] question_id:', questionId, 'fields:', Object.keys(tagUpdate))
-  const { data: updatedRows, error: tagError } = await supabase
-    .from('tags')
-    .update(tagUpdate)
-    .eq('question_id', questionId)
-    .select('question_id, needs_review, edited_by_user, tag_status, disease_state, topic')
+  // Update tags (only if there are fields to update)
+  if (Object.keys(tagUpdate).length > 0) {
+    console.log('[TagUpdate] question_id:', questionId, 'fields:', Object.keys(tagUpdate))
+    const { data: updatedRows, error: tagError } = await supabase
+      .from('tags')
+      .update(tagUpdate)
+      .eq('question_id', questionId)
+      .select('question_id, needs_review, edited_by_user, tag_status, disease_state, topic')
 
-  if (tagError) throw new Error(`Tag update failed: ${tagError.message}`)
-  console.log('[TagUpdate] Result:', updatedRows)
+    if (tagError) throw new Error(`Tag update failed: ${tagError.message}`)
+    console.log('[TagUpdate] Result:', updatedRows)
 
-  if (!updatedRows || updatedRows.length === 0) {
-    console.error('[TagUpdate] Update returned 0 rows — RLS may be blocking the write')
-    throw new Error('Tag update failed: no rows affected. Check that your role has write access.')
+    if (!updatedRows || updatedRows.length === 0) {
+      console.error('[TagUpdate] Update returned 0 rows — RLS may be blocking the write')
+      throw new Error('Tag update failed: no rows affected. Check that your role has write access.')
+    }
   }
 
   // Update question stem if provided
