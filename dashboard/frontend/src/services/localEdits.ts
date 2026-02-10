@@ -246,6 +246,12 @@ export async function checkVercelMode(): Promise<boolean> {
     return isVercelModeCache
   }
 
+  // Supabase mode = full read/write, not read-only
+  if (import.meta.env.VITE_USE_SUPABASE === 'true') {
+    isVercelModeCache = false
+    return false
+  }
+
   // If we have an external API URL configured, we're not in pure Vercel mode
   if (import.meta.env.VITE_API_URL) {
     isVercelModeCache = false

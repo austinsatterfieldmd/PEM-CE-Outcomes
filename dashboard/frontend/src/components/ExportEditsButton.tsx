@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react'
-import { CloudOff, Database } from 'lucide-react'
+import { CloudOff, Database, Cloud } from 'lucide-react'
 import { checkVercelMode } from '../services/localEdits'
+
+const isSupabase = import.meta.env.VITE_USE_SUPABASE === 'true'
 
 /**
  * Export Edits Button Component
  *
  * Displays connection status indicator in the header:
- * - "SQLite" badge (green) when connected to backend
- * - "Read-Only" badge (gray) when in Vercel/offline mode
+ * - "Supabase" badge (green) when using Supabase backend
+ * - "SQLite" badge (green) when connected to FastAPI backend
+ * - "Read-Only" badge (gray) when in Vercel/offline mode (no backend)
  */
 export function ExportEditsButton() {
   const [vercelMode, setVercelMode] = useState<boolean | null>(null)
@@ -21,20 +24,20 @@ export function ExportEditsButton() {
     return null
   }
 
-  // Connected to SQLite backend
+  // Connected to backend (Supabase or SQLite)
   if (!vercelMode) {
     return (
       <div
         className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-600/80 text-white rounded-lg text-xs cursor-help"
-        title="Connected to SQLite database. Changes are saved to the server."
+        title={isSupabase ? "Connected to Supabase PostgreSQL. Changes are saved to the cloud." : "Connected to SQLite database. Changes are saved to the server."}
       >
-        <Database className="w-3.5 h-3.5" />
-        <span className="hidden sm:inline">SQLite</span>
+        {isSupabase ? <Cloud className="w-3.5 h-3.5" /> : <Database className="w-3.5 h-3.5" />}
+        <span className="hidden sm:inline">{isSupabase ? 'Supabase' : 'SQLite'}</span>
       </div>
     )
   }
 
-  // Vercel/offline mode
+  // Vercel/offline mode (no backend at all)
   return (
     <div
       className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-600/50 text-slate-300 rounded-lg text-xs cursor-help"
