@@ -597,8 +597,7 @@ export async function getQuestionDetail(id: number): Promise<QuestionDetailData>
       flagged_at: question.flagged_at,
       agreement_level: question.agreement_level,
       tag_status: question.tag_status,
-      worst_case_agreement: question.worst_case_agreement,
-      review_notes: question.review_notes
+      worst_case_agreement: question.worst_case_agreement
     },
     performance,
     activities: [],
