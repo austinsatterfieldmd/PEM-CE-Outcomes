@@ -188,6 +188,11 @@ When topic is "AE management" or "Safety profile" and the question mentions a dr
 - Example: "Patient on a CAR-T therapy develops CRS" → tag all approved CAR-T products for this disease
 - Example: "BTKi-associated atrial fibrillation management" → tag all approved BTKi drugs for this disease
 - The causative drug class is clinically relevant — funders need to know WHICH specific drugs are associated with the AE
+**Rule 5: Do NOT Tag Supportive Care Drugs as Treatments**
+Tocilizumab, corticosteroids (dexamethasone for CRS), and other supportive care agents used to MANAGE adverse events should NOT be tagged in treatment_1-5 fields. These are AE management interventions, not the disease-directed therapies of interest to funders.
+- Example: "Patient develops Grade 2 CRS, treated with tocilizumab" -> Tag the causative therapy (CAR-T/bispecific) in treatment_1. Do NOT tag tocilizumab.
+- Exception: If the question is SPECIFICALLY about tocilizumab pharmacology or clinical data, then it may be tagged.
+- This applies to ALL CRS/ICANS management agents across CAR-T and bispecific antibody questions.
 
 ---
 
@@ -277,6 +282,19 @@ BPDCN sites of involvement (not "metastatic" per se):
 - `"Heart failure"` - Anthracycline contraindication, cardiac risk drugs
 - `"Prior malignancy"` - Second primary cancer history
 - `"Autoimmune disease"` - Immunotherapy considerations
+
+
+### age_group
+**REQUIRED when patient age is stated** - Tag the age category whenever a specific age (e.g., "68-year-old") appears in the question stem.
+
+**Valid values:**
+- `"Pediatric"` - Under 18 years
+- `"AYA"` - Adolescent/Young Adult, 15-39 years
+- `"Young"` - Adults under 65 years
+- `"Transitional"` - 65-75 years
+- `"Elderly"` - 75 years or older
+
+**CRITICAL:** When a patient age is stated in the question stem, you MUST tag age_group. This is one of the most commonly missed fields. A "52-year-old" = Young. A "72-year-old" = Transitional. A "78-year-old" = Elderly.
 
 ### 40. performance_status
 **ONLY tag when ECOG score is explicitly stated.**

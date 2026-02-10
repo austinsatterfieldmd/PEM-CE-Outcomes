@@ -907,6 +907,19 @@ Use the disease-specific drug table above to map class → individual drugs.
 
 **Note:** For CNS involvement, use `metastatic_site`: "Brain metastases" or "Leptomeningeal disease" instead.
 
+
+### age_group
+**REQUIRED when patient age is stated** - Tag the age category whenever a specific age (e.g., "68-year-old") appears in the question stem.
+
+**Valid values:**
+- `"Pediatric"` - Under 18 years
+- `"AYA"` - Adolescent/Young Adult, 15-39 years
+- `"Young"` - Adults under 65 years
+- `"Transitional"` - 65-75 years
+- `"Elderly"` - 75 years or older
+
+**CRITICAL:** When a patient age is stated in the question stem, you MUST tag age_group. A "52-year-old" = Young. A "72-year-old" = Transitional. A "78-year-old" = Elderly.
+
 ### 38. performance_status
 **OPTIONAL** - ECOG performance status if mentioned.
 

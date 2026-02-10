@@ -98,7 +98,6 @@ treatment_aliases:
   taxotere: docetaxel
   nab-pac: nab-paclitaxel
   abraxane: nab-paclitaxel
-  # Allogeneic transplant variants → Allo-HSCT
   Allogeneic stem cell transplantation: Allo-HSCT
   allogeneic stem cell transplantation: Allo-HSCT
   Allogeneic stem cell transplant: Allo-HSCT
@@ -108,7 +107,6 @@ treatment_aliases:
   allo-HSCT: Allo-HSCT
   alloHSCT: Allo-HSCT
   allo-SCT: Allo-HSCT
-  # Autologous transplant variants → Auto-HSCT
   Autologous stem cell transplantation: Auto-HSCT
   autologous stem cell transplantation: Auto-HSCT
   Autologous stem cell transplant: Auto-HSCT
@@ -117,7 +115,6 @@ treatment_aliases:
   autoHSCT: Auto-HSCT
   auto-HSCT: Auto-HSCT
   auto-SCT: Auto-HSCT
-  # Generic transplant (keep as HSCT - ambiguous)
   stem cell transplant: HSCT
   stem cell transplantation: HSCT
   HSCT: HSCT
@@ -304,15 +301,12 @@ drug_class_aliases:
   anti-CTLA4: Anti-CTLA-4
   PI: Proteasome inhibitor
   tyrosine kinase inhibitor: Tyrosine kinase inhibitor
-  # IMiD canonical form
   IMiD (Immunomodulatory drug): IMiD
   immunomodulatory drug: IMiD
   immunomodulatory agent: IMiD
-  # ADC canonical form
   ADC: Antibody-drug conjugate (ADC)
   antibody drug conjugate: Antibody-drug conjugate (ADC)
   Antibody-drug conjugate: Antibody-drug conjugate (ADC)
-  # Target-inclusive ADC → generic (target belongs in drug_target field)
   Anti-CD30 ADC: Antibody-drug conjugate (ADC)
   CD30-directed ADC: Antibody-drug conjugate (ADC)
   Anti-CD33 ADC: Antibody-drug conjugate (ADC)
@@ -321,7 +315,6 @@ drug_class_aliases:
   Trop-2-directed ADC: Antibody-drug conjugate (ADC)
   Nectin-4-directed ADC: Antibody-drug conjugate (ADC)
   BCMA-directed ADC: Antibody-drug conjugate (ADC)
-  # Target-inclusive antibody → generic
   Anti-CCR4 antibody: Monoclonal antibody
   Anti-CD20 antibody: Monoclonal antibody
   Anti-CD38 antibody: Monoclonal antibody
@@ -333,22 +326,18 @@ drug_class_aliases:
   Anti-PD-1 antibody: Immune checkpoint inhibitor
   Anti-PD-L1 antibody: Immune checkpoint inhibitor
   Anti-CTLA-4 antibody: Immune checkpoint inhibitor
-  # Target-inclusive CAR-T → generic
   BCMA-directed CAR-T: CAR-T therapy
   BCMA CAR-T: CAR-T therapy
   CD19-directed CAR-T: CAR-T therapy
   CD19 CAR-T: CAR-T therapy
   Allogeneic CAR-T therapy: CAR-T therapy
   Allogeneic CAR-T: CAR-T therapy
-  # Target-inclusive bispecific → generic
   BCMA bispecific: Bispecific antibody
   BCMA-directed bispecific: Bispecific antibody
   CD20 bispecific: Bispecific antibody
   CD20-directed bispecific: Bispecific antibody
-  # Other target-inclusive classes
   CD123-directed therapy: Targeted cytotoxin
   CD123-directed cytotoxin: Targeted cytotoxin
-  # Bispecific/CAR-T shorthand
   bispecific: Bispecific antibody
   BiTE: Bispecific antibody
   CAR T: CAR-T therapy
@@ -601,6 +590,14 @@ normalization_aliases:
   - Myelofibrosis
   - myelofibrosis
   - MYELOFIBROSIS
+  Navtemadlin:
+  - navtemadlin
+  Prior chemoimmunotherapy:
+  - Prior CIT
+  - Prior chemo-immunotherapy
+  - prior chemoimmunotherapy
+  - prior CIT
+  - CIT
 _metadata:
-  last_updated: '2026-02-07T16:00:00.000000'
-  total_aliases: 56
+  last_updated: '2026-02-09T19:33:40.866584'
+  total_aliases: 104

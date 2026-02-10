@@ -227,6 +227,12 @@ When topic is "AE management" or "Safety profile" and the question mentions a dr
 - Example: "BTKi-associated atrial fibrillation management" → tag all approved BTKi drugs for this disease
 - The causative drug class is clinically relevant — funders need to know WHICH specific drugs are associated with the AE
 
+**Rule 5: Do NOT Tag Supportive Care Drugs as Treatments**
+Tocilizumab, corticosteroids (dexamethasone for CRS), and other supportive care agents used to MANAGE adverse events should NOT be tagged in treatment_1-5 fields. These are AE management interventions, not the disease-directed therapies of interest to funders.
+- Example: "Patient on glofitamab develops Grade 2 CRS, treated with tocilizumab" → Tag glofitamab in treatment_1. Do NOT tag tocilizumab.
+- Exception: If the question is SPECIFICALLY about tocilizumab pharmacology, mechanism, or clinical trial data (rare), then it may be tagged.
+- This applies to ALL CRS/ICANS management agents across CAR-T and bispecific antibody questions.
+
 ---
 
 ## CAR-T PRODUCT DISAMBIGUATION (CRITICAL FOR FUNDERS)

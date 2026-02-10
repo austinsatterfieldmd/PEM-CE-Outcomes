@@ -246,6 +246,11 @@ Use the disease-specific drug table above to map class → individual drugs.
 When topic is "AE management" or "Safety profile" and the question mentions a drug CLASS (not a specific drug), infer and tag all approved specific drugs for that class in this disease using the drug class table above.
 - Use disease context and STARTDATE to determine which specific drugs were approved
 - The causative drug class is clinically relevant — funders need to know WHICH specific drugs are associated with the AE
+**Rule 5: Do NOT Tag Supportive Care Drugs as Treatments**
+Tocilizumab, corticosteroids (dexamethasone for CRS), and other supportive care agents used to MANAGE adverse events should NOT be tagged in treatment_1-5 fields. These are AE management interventions, not the disease-directed therapies of interest to funders.
+- Example: "Patient develops Grade 2 CRS, treated with tocilizumab" -> Tag the causative therapy (CAR-T/bispecific) in treatment_1. Do NOT tag tocilizumab.
+- Exception: If the question is SPECIFICALLY about tocilizumab pharmacology or clinical data, then it may be tagged.
+- This applies to ALL CRS/ICANS management agents across CAR-T and bispecific antibody questions.
 
 **Fundable therapies (EXAMPLES - not exhaustive):**
 The lists below are representative examples. Tag any targeted therapy, immunotherapy, CAR-T, ADC, bispecific, or novel agent of pharmaceutical interest, even if not listed here.
