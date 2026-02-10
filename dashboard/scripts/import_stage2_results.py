@@ -4,12 +4,19 @@ Import Stage 2 tagging results (JSON) into the dashboard database.
 Uses QUESTIONGROUPDESIGNATION (QGD = source_id) as the stable key for upsert.
 Human-reviewed questions are protected from overwrite by default.
 
+Supports two targets:
+    sqlite   — Local SQLite database (default, existing behavior)
+    supabase — Supabase PostgreSQL (requires SUPABASE_URL + SUPABASE_SERVICE_KEY)
+
 Usage:
-    # Upsert (safe default): update existing, insert new, protect human-reviewed
+    # Upsert to SQLite (default)
     python dashboard/scripts/import_stage2_results.py --upsert --file data/checkpoints/stage2_tagged_multiple_myeloma.json
 
     # Upsert all checkpoint files
     python dashboard/scripts/import_stage2_results.py --upsert --all
+
+    # Upsert to Supabase
+    python dashboard/scripts/import_stage2_results.py --upsert --all --target supabase
 
     # Clear and re-import (DESTRUCTIVE — requires --force)
     python dashboard/scripts/import_stage2_results.py --clear --force --file data/checkpoints/stage2_tagged_multiple_myeloma.json
@@ -556,6 +563,12 @@ def main():
         action="store_true",
         help="Required with --clear. With --upsert, also overwrites human-reviewed questions."
     )
+    parser.add_argument(
+        "--target",
+        choices=["sqlite", "supabase"],
+        default="sqlite",
+        help="Database target: 'sqlite' (default) or 'supabase' (requires SUPABASE_URL + SUPABASE_SERVICE_KEY)"
+    )
     args = parser.parse_args()
 
     # Validate arguments
@@ -572,13 +585,17 @@ def main():
     if args.clear and not args.force:
         parser.error("--clear requires --force to confirm destructive operation")
 
-    # Database path
-    db_path = Path(__file__).parent.parent / "data" / "questions.db"
-    logger.info(f"Database path: {db_path}")
-    logger.info(f"Mode: {'upsert' if args.upsert else 'clear+reimport'}")
+    # Initialize database based on target
+    if args.target == 'supabase':
+        from dashboard.backend.services.supabase_db import SupabaseDatabaseService
+        db = SupabaseDatabaseService()
+        logger.info(f"Target: Supabase PostgreSQL")
+    else:
+        db_path = Path(__file__).parent.parent / "data" / "questions.db"
+        db = DatabaseService(db_path)
+        logger.info(f"Target: SQLite ({db_path})")
 
-    # Initialize database
-    db = DatabaseService(db_path)
+    logger.info(f"Mode: {'upsert' if args.upsert else 'clear+reimport'}")
 
     # Collect files to import
     files_to_import = []
