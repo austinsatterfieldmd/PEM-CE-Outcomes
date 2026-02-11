@@ -238,7 +238,7 @@ function App() {
 
       // CSV headers - all 70 fields + metadata + confidence + legacy
       const headers = [
-        'ID', 'Source File', 'Question', 'Correct Answer', 'Incorrect Answers',
+        'QGD', 'Source File', 'Question', 'Correct Answer', 'Incorrect Answers',
         'Incorrect Answer 1', 'Incorrect Answer 2', 'Incorrect Answer 3', 'Incorrect Answer 4', 'Incorrect Answer 5',
         // Core Classification
         'Topic', 'Disease State 1', 'Disease State 2', 'Disease Type 1', 'Disease Type 2', 'Disease Stage', 'Treatment Line',
