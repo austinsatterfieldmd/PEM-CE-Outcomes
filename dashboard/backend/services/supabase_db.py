@@ -49,15 +49,15 @@ class SupabaseDatabaseService:
         """Look up a question by its source_id (QGD)."""
         result = (
             self.client.table('questions')
-            .select('id, source_id, question_stem, edited_by_user')
+            .select('id, source_id, question_stem')
             .eq('source_id', source_id)
             .limit(1)
             .execute()
         )
         if result.data:
             row = result.data[0]
-            # Normalize edited_by_user to bool
-            row['edited_by_user'] = bool(row.get('edited_by_user'))
+            # Supabase schema doesn't have edited_by_user column (always False for production)
+            row['edited_by_user'] = False
             return row
         return None
 
