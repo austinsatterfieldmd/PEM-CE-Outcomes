@@ -11,6 +11,7 @@ import { getSupabaseClient } from './supabase'
 import type {
   SearchResponse,
   FilterOptions,
+  FilterOption,
   Stats,
   QuestionDetailData,
   SearchFilters,
@@ -27,6 +28,87 @@ import type {
   ReportStatsResponse
 } from '../types'
 import type { TagProposal, ProposalStats } from './api'
+
+// ============================================================
+// Advanced Filter Helpers
+// ============================================================
+
+/**
+ * Map from FilterOptions key to tag table column name(s).
+ * Multi-slot fields (e.g. drug_class_1/2/3) list all columns.
+ */
+const ADVANCED_COLUMN_MAP: Record<string, string[]> = {
+  treatment_eligibilities: ['treatment_eligibility'],
+  age_groups: ['age_group'],
+  fitness_statuses: ['fitness_status'],
+  organ_dysfunctions: ['organ_dysfunction'],
+  disease_specific_factors: ['disease_specific_factor'],
+  comorbidities: ['comorbidity_1', 'comorbidity_2', 'comorbidity_3'],
+  drug_classes: ['drug_class_1', 'drug_class_2', 'drug_class_3'],
+  drug_targets: ['drug_target_1', 'drug_target_2', 'drug_target_3'],
+  prior_therapies: ['prior_therapy_1', 'prior_therapy_2', 'prior_therapy_3'],
+  resistance_mechanisms: ['resistance_mechanism'],
+  metastatic_sites: ['metastatic_site_1', 'metastatic_site_2', 'metastatic_site_3'],
+  symptoms: ['symptom_1', 'symptom_2', 'symptom_3'],
+  performance_statuses: ['performance_status'],
+  toxicity_types: ['toxicity_type_1', 'toxicity_type_2', 'toxicity_type_3', 'toxicity_type_4', 'toxicity_type_5'],
+  toxicity_organs: ['toxicity_organ'],
+  toxicity_grades: ['toxicity_grade'],
+  efficacy_endpoints: ['efficacy_endpoint_1', 'efficacy_endpoint_2', 'efficacy_endpoint_3'],
+  outcome_contexts: ['outcome_context'],
+  clinical_benefits: ['clinical_benefit'],
+  guideline_sources: ['guideline_source_1', 'guideline_source_2'],
+  evidence_types: ['evidence_type'],
+  cme_outcome_levels: ['cme_outcome_level'],
+  stem_types: ['stem_type'],
+  lead_in_types: ['lead_in_type'],
+  answer_formats: ['answer_format'],
+  distractor_homogeneities: ['distractor_homogeneity'],
+}
+
+/**
+ * Fetch distinct values + counts for advanced filter categories
+ * directly from the tags table. Covers categories not returned
+ * by the Supabase RPC functions.
+ */
+async function fetchAdvancedFilterValues(): Promise<Partial<FilterOptions>> {
+  const supabase = getSupabaseClient()
+
+  // Build select string with all advanced columns
+  const allColumns = new Set<string>()
+  for (const cols of Object.values(ADVANCED_COLUMN_MAP)) {
+    for (const col of cols) allColumns.add(col)
+  }
+
+  const { data, error } = await supabase
+    .from('tags')
+    .select(Array.from(allColumns).join(','))
+
+  if (error || !data) {
+    console.warn('Failed to fetch advanced filter values:', error?.message)
+    return {}
+  }
+
+  // For each category, count distinct non-null values across all its columns
+  const result: Partial<FilterOptions> = {}
+  for (const [catKey, columns] of Object.entries(ADVANCED_COLUMN_MAP)) {
+    const counts: Record<string, number> = {}
+    for (const row of data) {
+      for (const col of columns) {
+        const val = (row as any)[col]
+        if (val != null && val !== '') {
+          counts[val] = (counts[val] || 0) + 1
+        }
+      }
+    }
+    const options: FilterOption[] = Object.entries(counts)
+      .map(([value, count]) => ({ value, count }))
+      .sort((a, b) => b.count - a.count)
+    ;(result as any)[catKey] = options
+  }
+
+  return result
+}
 
 // ============================================================
 // Search & Question Management
@@ -99,12 +181,16 @@ export async function searchQuestions(params: SearchFilters & {
 
 export async function getFilterOptions(): Promise<FilterOptions> {
   const supabase = getSupabaseClient()
-  const { data, error } = await supabase.rpc('get_filter_options')
 
-  if (error) throw new Error(`Filter options failed: ${error.message}`)
+  // Fetch RPC options and advanced column values in parallel
+  const [rpcResult, advancedValues] = await Promise.all([
+    supabase.rpc('get_filter_options'),
+    fetchAdvancedFilterValues()
+  ])
 
-  // Transform {value, count} arrays to match FilterOptions type
-  const result = data as any
+  if (rpcResult.error) throw new Error(`Filter options failed: ${rpcResult.error.message}`)
+
+  const result = rpcResult.data as any
   const transform = (arr: any[]) => (arr || []).map((item: any) => ({
     value: item.value,
     count: item.count
@@ -121,33 +207,33 @@ export async function getFilterOptions(): Promise<FilterOptions> {
     trials: transform(result.trials),
     activities: transform(result.activities),
     source_files: transform(result.source_files),
-    // Extended fields - these are populated by get_filter_options if data exists
-    treatment_eligibilities: [],
-    age_groups: [],
-    fitness_statuses: [],
-    organ_dysfunctions: [],
-    disease_specific_factors: [],
-    comorbidities: [],
-    drug_classes: [],
-    drug_targets: [],
-    prior_therapies: [],
-    resistance_mechanisms: [],
-    metastatic_sites: [],
-    symptoms: [],
-    performance_statuses: [],
-    toxicity_types: [],
-    toxicity_organs: [],
-    toxicity_grades: [],
-    efficacy_endpoints: [],
-    outcome_contexts: [],
-    clinical_benefits: [],
-    guideline_sources: [],
-    evidence_types: [],
-    cme_outcome_levels: [],
-    stem_types: [],
-    lead_in_types: [],
-    answer_formats: [],
-    distractor_homogeneities: []
+    // Advanced fields — populated from direct tags table query
+    treatment_eligibilities: advancedValues.treatment_eligibilities || [],
+    age_groups: advancedValues.age_groups || [],
+    fitness_statuses: advancedValues.fitness_statuses || [],
+    organ_dysfunctions: advancedValues.organ_dysfunctions || [],
+    disease_specific_factors: advancedValues.disease_specific_factors || [],
+    comorbidities: advancedValues.comorbidities || [],
+    drug_classes: advancedValues.drug_classes || [],
+    drug_targets: advancedValues.drug_targets || [],
+    prior_therapies: advancedValues.prior_therapies || [],
+    resistance_mechanisms: advancedValues.resistance_mechanisms || [],
+    metastatic_sites: advancedValues.metastatic_sites || [],
+    symptoms: advancedValues.symptoms || [],
+    performance_statuses: advancedValues.performance_statuses || [],
+    toxicity_types: advancedValues.toxicity_types || [],
+    toxicity_organs: advancedValues.toxicity_organs || [],
+    toxicity_grades: advancedValues.toxicity_grades || [],
+    efficacy_endpoints: advancedValues.efficacy_endpoints || [],
+    outcome_contexts: advancedValues.outcome_contexts || [],
+    clinical_benefits: advancedValues.clinical_benefits || [],
+    guideline_sources: advancedValues.guideline_sources || [],
+    evidence_types: advancedValues.evidence_types || [],
+    cme_outcome_levels: advancedValues.cme_outcome_levels || [],
+    stem_types: advancedValues.stem_types || [],
+    lead_in_types: advancedValues.lead_in_types || [],
+    answer_formats: advancedValues.answer_formats || [],
+    distractor_homogeneities: advancedValues.distractor_homogeneities || []
   }
 }
 
@@ -185,6 +271,9 @@ export async function getDynamicFilterOptions(currentFilters: SearchFilters): Pr
     return getFilterOptions()
   }
 
+  // Fetch advanced column values in parallel (RPC doesn't cover these)
+  const advancedValues = await fetchAdvancedFilterValues()
+
   const result = data as any
   const transform = (arr: any[]) => (arr || []).map((item: any) => ({
     value: item.value,
@@ -201,34 +290,35 @@ export async function getDynamicFilterOptions(currentFilters: SearchFilters): Pr
     biomarkers: transform(result.biomarkers),
     trials: transform(result.trials),
     source_files: transform(result.source_files),
-    treatment_eligibilities: transform(result.treatment_eligibilities),
-    age_groups: transform(result.age_groups || []),
-    fitness_statuses: transform(result.fitness_statuses || []),
-    organ_dysfunctions: transform(result.organ_dysfunctions || []),
-    // Fields not in dynamic RPC yet — return empty arrays
+    // Use RPC values where available, fall back to direct query
+    treatment_eligibilities: transform(result.treatment_eligibilities) || advancedValues.treatment_eligibilities || [],
+    age_groups: transform(result.age_groups || []).length > 0 ? transform(result.age_groups) : (advancedValues.age_groups || []),
+    fitness_statuses: transform(result.fitness_statuses || []).length > 0 ? transform(result.fitness_statuses) : (advancedValues.fitness_statuses || []),
+    organ_dysfunctions: transform(result.organ_dysfunctions || []).length > 0 ? transform(result.organ_dysfunctions) : (advancedValues.organ_dysfunctions || []),
+    // Advanced fields — populated from direct tags table query
     activities: [],
-    disease_specific_factors: [],
-    comorbidities: [],
-    drug_classes: [],
-    drug_targets: [],
-    prior_therapies: [],
-    resistance_mechanisms: [],
-    metastatic_sites: [],
-    symptoms: [],
-    performance_statuses: [],
-    toxicity_types: [],
-    toxicity_organs: [],
-    toxicity_grades: [],
-    efficacy_endpoints: [],
-    outcome_contexts: [],
-    clinical_benefits: [],
-    guideline_sources: [],
-    evidence_types: [],
-    cme_outcome_levels: [],
-    stem_types: [],
-    lead_in_types: [],
-    answer_formats: [],
-    distractor_homogeneities: []
+    disease_specific_factors: advancedValues.disease_specific_factors || [],
+    comorbidities: advancedValues.comorbidities || [],
+    drug_classes: advancedValues.drug_classes || [],
+    drug_targets: advancedValues.drug_targets || [],
+    prior_therapies: advancedValues.prior_therapies || [],
+    resistance_mechanisms: advancedValues.resistance_mechanisms || [],
+    metastatic_sites: advancedValues.metastatic_sites || [],
+    symptoms: advancedValues.symptoms || [],
+    performance_statuses: advancedValues.performance_statuses || [],
+    toxicity_types: advancedValues.toxicity_types || [],
+    toxicity_organs: advancedValues.toxicity_organs || [],
+    toxicity_grades: advancedValues.toxicity_grades || [],
+    efficacy_endpoints: advancedValues.efficacy_endpoints || [],
+    outcome_contexts: advancedValues.outcome_contexts || [],
+    clinical_benefits: advancedValues.clinical_benefits || [],
+    guideline_sources: advancedValues.guideline_sources || [],
+    evidence_types: advancedValues.evidence_types || [],
+    cme_outcome_levels: advancedValues.cme_outcome_levels || [],
+    stem_types: advancedValues.stem_types || [],
+    lead_in_types: advancedValues.lead_in_types || [],
+    answer_formats: advancedValues.answer_formats || [],
+    distractor_homogeneities: advancedValues.distractor_homogeneities || []
   }
 }
 
@@ -691,16 +781,13 @@ export async function exportQuestions(filters: SearchFilters): Promise<{ questio
 }
 
 export async function exportQuestionsFull(filters: SearchFilters): Promise<{ questions: any[], total: number }> {
-  // Full export with all 70 fields — get question details for each
+  // Full export with all tag fields + question data + performance + activities
   const searchResult = await searchQuestions({
     ...filters,
     page: 1,
     page_size: 10000
   })
 
-  // For full export, we need all tag fields
-  // The search results already include basic fields; for full export
-  // we query the tags table directly
   const supabase = getSupabaseClient()
   const questionIds = searchResult.questions.map((q: any) => q.id)
 
@@ -708,14 +795,35 @@ export async function exportQuestionsFull(filters: SearchFilters): Promise<{ que
     return { questions: [], total: 0 }
   }
 
-  const { data: fullData, error } = await supabase
-    .from('tags')
-    .select('*, questions!inner(id, source_id, source_file, question_stem, correct_answer, incorrect_answers)')
-    .in('question_id', questionIds)
+  // Fetch tags, questions, and activities separately in batches
+  // (avoids nested join issues with large result sets)
+  const batchSize = 500
+  const allTags: any[] = []
+  const questionLookup: Record<number, any> = {}
+  const actLookup: Record<number, string[]> = {}
 
-  if (error) throw new Error(`Full export failed: ${error.message}`)
+  for (let i = 0; i < questionIds.length; i += batchSize) {
+    const batch = questionIds.slice(i, i + batchSize)
 
-  // Build a lookup of performance and activities from search results
+    const [tagsResult, questionsResult, qaResult] = await Promise.all([
+      supabase.from('tags').select('*').in('question_id', batch),
+      supabase.from('questions').select('id, source_id, source_file, question_stem, correct_answer, incorrect_answers, is_oncology').in('id', batch),
+      supabase.from('question_activities').select('question_id, activity_name').in('question_id', batch)
+    ])
+
+    if (tagsResult.data) allTags.push(...tagsResult.data)
+    if (questionsResult.data) {
+      for (const q of questionsResult.data) questionLookup[q.id] = q
+    }
+    if (qaResult.data) {
+      for (const row of qaResult.data) {
+        if (!actLookup[row.question_id]) actLookup[row.question_id] = []
+        actLookup[row.question_id].push(row.activity_name)
+      }
+    }
+  }
+
+  // Build performance lookup from search results
   const perfLookup: Record<number, any> = {}
   for (const q of searchResult.questions) {
     perfLookup[q.id] = {
@@ -723,33 +831,31 @@ export async function exportQuestionsFull(filters: SearchFilters): Promise<{ que
       post_score: q.post_score,
       knowledge_gain: q.knowledge_gain,
       sample_size: q.sample_size,
-      activity_count: q.activity_count
+      pre_n: (q as any).pre_n,
+      post_n: (q as any).post_n,
+      activity_count: (q as any).activity_count
     }
   }
 
-  // Fetch activity names for all exported questions
-  const actLookup: Record<number, string[]> = {}
-  const batchSize = 500
-  for (let i = 0; i < questionIds.length; i += batchSize) {
-    const batch = questionIds.slice(i, i + batchSize)
-    const { data: qaData } = await supabase
-      .from('question_activities')
-      .select('question_id, activity_name')
-      .in('question_id', batch)
-    if (qaData) {
-      for (const row of qaData) {
-        if (!actLookup[row.question_id]) actLookup[row.question_id] = []
-        actLookup[row.question_id].push(row.activity_name)
-      }
+  // Merge: flatten question fields + tags + performance + activities
+  const merged = allTags.map((tag: any) => {
+    const qn = questionLookup[tag.question_id] || {}
+    const perf = perfLookup[tag.question_id] || {}
+    return {
+      ...tag,
+      // Flatten question fields to top level for CSV mapping
+      questions: qn,
+      source_id: qn.source_id,
+      source_file: qn.source_file,
+      question_stem: qn.question_stem,
+      correct_answer: qn.correct_answer,
+      incorrect_answers: qn.incorrect_answers,
+      is_oncology: qn.is_oncology,
+      // Performance
+      ...perf,
+      activities_list: (actLookup[tag.question_id] || []).join('; ')
     }
-  }
-
-  // Merge performance and activities into full data
-  const merged = (fullData || []).map((row: any) => ({
-    ...row,
-    ...(perfLookup[row.question_id] || {}),
-    activities_list: (actLookup[row.question_id] || []).join('; ')
-  }))
+  })
 
   return { questions: merged, total: merged.length }
 }

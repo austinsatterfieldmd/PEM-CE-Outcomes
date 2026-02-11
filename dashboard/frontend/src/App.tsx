@@ -236,9 +236,10 @@ function App() {
         return `"${str.replace(/"/g, '""')}"`
       }
 
-      // CSV headers - all 70 fields + metadata
+      // CSV headers - all 70 fields + metadata + confidence + legacy
       const headers = [
         'ID', 'Source File', 'Question', 'Correct Answer', 'Incorrect Answers',
+        'Incorrect Answer 1', 'Incorrect Answer 2', 'Incorrect Answer 3', 'Incorrect Answer 4', 'Incorrect Answer 5',
         // Core Classification
         'Topic', 'Disease State 1', 'Disease State 2', 'Disease Type 1', 'Disease Type 2', 'Disease Stage', 'Treatment Line',
         // Multi-value Fields
@@ -272,6 +273,12 @@ function App() {
         'Answer Option Count', 'Correct Answer Position',
         // Review metadata
         'Tag Status', 'Agreement Level', 'Needs Review', 'Review Reason',
+        // Additional metadata & confidence
+        'Is Oncology', 'Overall Confidence', 'Worst Case Agreement', 'Review Flags',
+        'Disease State (legacy)', 'Disease Type (legacy)', 'Treatment (legacy)', 'Biomarker (legacy)', 'Trial (legacy)',
+        'Topic Confidence', 'Topic Method', 'Disease State Confidence', 'Disease Stage Confidence',
+        'Disease Type Confidence', 'Treatment Line Confidence', 'Treatment Confidence',
+        'Biomarker Confidence', 'Trial Confidence',
         // Performance
         'Pre-Test Score', 'Post-Test Score', 'Knowledge Gain', 'Sample Size', 'Activities'
       ]
@@ -281,11 +288,18 @@ function App() {
         ...result.questions.map((q: any) => {
           const qn = q.questions || {} // nested question data from tags join
           return [
-            qn.source_id || q.question_id,
-            escapeCSV(qn.source_file),
-            escapeCSV(qn.question_stem),
-            escapeCSV(qn.correct_answer),
-            escapeCSV(qn.incorrect_answers),
+            q.source_id || qn.source_id || q.question_id,
+            escapeCSV(q.source_file || qn.source_file),
+            escapeCSV(q.question_stem || qn.question_stem),
+            escapeCSV(q.correct_answer || qn.correct_answer),
+            escapeCSV(q.incorrect_answers || qn.incorrect_answers),
+            // Individual incorrect answers (parsed from JSON array)
+            ...(() => {
+              let ia: string[] = []
+              try { ia = JSON.parse(q.incorrect_answers || qn.incorrect_answers || '[]') } catch { /* not JSON */ }
+              if (!Array.isArray(ia)) ia = []
+              return [escapeCSV(ia[0]), escapeCSV(ia[1]), escapeCSV(ia[2]), escapeCSV(ia[3]), escapeCSV(ia[4])]
+            })(),
             // Core
             escapeCSV(q.topic),
             escapeCSV(q.disease_state_1 || q.disease_state),
@@ -323,6 +337,19 @@ function App() {
             q.answer_option_count || '', escapeCSV(q.correct_answer_position),
             // Review metadata
             escapeCSV(q.tag_status), escapeCSV(q.agreement_level), q.needs_review ? 'TRUE' : 'FALSE', escapeCSV(q.review_reason),
+            // Additional metadata & confidence
+            q.is_oncology === true ? 'TRUE' : q.is_oncology === false ? 'FALSE' : '',
+            q.overall_confidence != null ? Number(q.overall_confidence).toFixed(2) : '',
+            escapeCSV(q.worst_case_agreement), escapeCSV(q.review_flags),
+            escapeCSV(q.disease_state), escapeCSV(q.disease_type), escapeCSV(q.treatment), escapeCSV(q.biomarker), escapeCSV(q.trial),
+            q.topic_confidence != null ? Number(q.topic_confidence).toFixed(2) : '', escapeCSV(q.topic_method),
+            q.disease_state_confidence != null ? Number(q.disease_state_confidence).toFixed(2) : '',
+            q.disease_stage_confidence != null ? Number(q.disease_stage_confidence).toFixed(2) : '',
+            q.disease_type_confidence != null ? Number(q.disease_type_confidence).toFixed(2) : '',
+            q.treatment_line_confidence != null ? Number(q.treatment_line_confidence).toFixed(2) : '',
+            q.treatment_confidence != null ? Number(q.treatment_confidence).toFixed(2) : '',
+            q.biomarker_confidence != null ? Number(q.biomarker_confidence).toFixed(2) : '',
+            q.trial_confidence != null ? Number(q.trial_confidence).toFixed(2) : '',
             // Performance
             q.pre_score !== null && q.pre_score !== undefined ? q.pre_score.toFixed(1) + '%' : '',
             q.post_score !== null && q.post_score !== undefined ? q.post_score.toFixed(1) + '%' : '',
