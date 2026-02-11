@@ -134,13 +134,13 @@ You must assign values for all 70 tag fields (disease_state is already determine
 - `"Overlap syndrome"` - Features of both acute and chronic GVHD
 
 **disease_type_2 - Disease Status (CRITICAL):**
-- `"Treatment-naive"` - GVHD not yet treated (will receive 1L therapy, usually steroids)
+- `"Steroid-naive"` - GVHD not yet treated with steroids (will receive 1L therapy)
 - `"Steroid-refractory"` - Failed steroid therapy (starting 2L+ therapy)
 
 **INFERENCE from question text:**
 - "day 28 post-transplant", "within first 100 days" -> disease_type_1: "Acute GVHD"
 - "7 months after transplant", "fasciitis", "lichen sclerosis-like", "sclerotic" -> disease_type_1: "Chronic GVHD"
-- "newly diagnosed GVHD", "treatment-naive" -> disease_type_2: "Treatment-naive"
+- "newly diagnosed GVHD", "treatment-naive", "before starting steroids" -> disease_type_2: "Steroid-naive"
 - "steroid-refractory", "after steroids failed", "doesn't improve with prednisone" -> disease_type_2: "Steroid-refractory"
 
 **Organ involvement hints (for disease_type_1):**
@@ -215,13 +215,13 @@ You must assign values for all 70 tag fields (disease_state is already determine
 - Tacrolimus + Methotrexate - Traditional regimen
 - Calcineurin inhibitor-based + vedolizumab - GI-focused
 
-**NOTE:** Prophylaxis agents are NOT typically pharma-fundable CME targets. Tag only if specifically asked about.
+**NOTE:** Tag ALL prophylaxis agents mentioned, including backbone regimens (PTCy, tacrolimus, MMF, methotrexate, cyclosporine).
 
 ---
 
 ### ACUTE GVHD TREATMENT
 
-**Treatment-Naive (First-line):**
+**Steroid-Naive (First-line):**
 | Drug | Status | Notes |
 |------|--------|-------|
 | **Methylprednisolone** / **Prednisone** | Standard 1L | Backbone of GVHD treatment |
@@ -268,11 +268,12 @@ You must assign values for all 70 tag fields (disease_state is already determine
 
 ---
 
-### Backbone Immunosuppression (DO NOT TAG unless specifically asked about)
-- Corticosteroids (prednisone, methylprednisolone)
-- Tacrolimus, cyclosporine
-- MMF
-- **Exception:** Tag if question specifically asks about these agents or their management
+### Backbone Immunosuppression (ALWAYS TAG)
+- Corticosteroids (prednisone, methylprednisolone) -> Tag as treatment
+- Tacrolimus, cyclosporine -> Tag as treatment
+- MMF (mycophenolate mofetil) -> Tag as treatment
+- Post-transplant cyclophosphamide (PTCy) -> Tag as treatment
+- Tag ALL drugs mentioned in the question/answer, including steroids and standard agents
 
 ---
 
@@ -752,7 +753,9 @@ Respond with ONLY a JSON object containing all 70 fields. Use `null` for fields 
     "disease_stage": null,
     "disease_type_1": null,
     "treatment_line": "Prophylaxis",
-    "treatment_1": null,
+    "treatment_1": "Post-transplant cyclophosphamide",
+    "treatment_2": "Tacrolimus",
+    "treatment_3": "Mycophenolate mofetil",
     ...
     "cme_outcome_level": "4 - Competence",
     ...
@@ -761,7 +764,7 @@ Respond with ONLY a JSON object containing all 70 fields. Use `null` for fields 
 **Rationale:**
 - Question about GVHD prevention, not treatment -> Prophylaxis topic
 - At time of transplant -> treatment_line: "Prophylaxis"
-- PTCy/Tac/MMF is backbone prophylaxis, not typically pharma-fundable -> treatment_1 null
+- PTCy/Tac/MMF are the prophylaxis agents discussed -> Tag all three
 
 ### Example 4: Third-Line Chronic GVHD (Axatilimab)
 
