@@ -149,7 +149,7 @@ export async function searchQuestions(params: SearchFilters & {
     p_exclude_numeric: params.exclude_numeric ?? null,
     p_activity_start_after: params.activity_start_after || null,
     p_activity_start_before: params.activity_start_before || null,
-    p_advanced_filters: params.advanced_filters ? JSON.stringify(params.advanced_filters) : null,
+    p_advanced_filters: params.advanced_filters || null,
     p_page: params.page || 1,
     p_page_size: params.page_size || 20,
     p_sort_by: params.sort_by || 'id',
@@ -263,7 +263,7 @@ export async function getDynamicFilterOptions(currentFilters: SearchFilters): Pr
     p_age_groups: currentFilters.age_groups?.length ? currentFilters.age_groups : null,
     p_fitness_statuses: currentFilters.fitness_statuses?.length ? currentFilters.fitness_statuses : null,
     p_organ_dysfunctions: currentFilters.organ_dysfunctions?.length ? currentFilters.organ_dysfunctions : null,
-    p_advanced_filters: currentFilters.advanced_filters ? JSON.stringify(currentFilters.advanced_filters) : null
+    p_advanced_filters: currentFilters.advanced_filters || null
   })
 
   if (error) {
