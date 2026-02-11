@@ -82,22 +82,17 @@ You must assign values for all 70 tag fields (disease_state is already determine
 
 | Topic | Use When... |
 |-------|-------------|
-| **Treatment selection** | Choosing WHICH drug/regimen to use for a patient (patient vignette + "which therapy") |
+| **Treatment selection** | Choosing WHICH drug/regimen to use (including prophylaxis regimens). Patient vignette + "which therapy?" |
 | **Treatment indication** | Whether a patient MEETS CRITERIA for a treatment - eligibility, candidacy, **approved indications**. "Which patients are eligible for ruxolitinib?", "What is the indication for axatilimab?" |
 | **Clinical efficacy** | Response rates, survival outcomes, clinical trial results, "key findings", **"what were the results of REACH2 trial"** |
-| **Prophylaxis** | GVHD prevention regimens, prophylaxis strategies, "to prevent GVHD" |
 
-**Topic Disambiguation - "Prophylaxis" vs "Treatment selection" vs "Treatment indication":**
-- "What is the best GVHD prophylaxis for matched unrelated donor?" -> **Prophylaxis** (prevention strategy)
-- "Patient developed chronic GVHD. What treatment do you recommend?" -> **Treatment selection** (choosing treatment for established GVHD)
-- "Which patients should receive prophylaxis with PTCy?" -> **Treatment indication** (who is eligible for prophylaxis)
+**CRITICAL: Topic reflects the QUESTION TYPE, not the clinical setting.**
 
-**CRITICAL: Prophylaxis topic + treatment_line alignment:**
-- When topic is **Prophylaxis**, treatment_line should be `"Prophylaxis"` (NOT "1L")
-- Prophylaxis = preventing GVHD before it occurs (at/after transplant)
-- Treatment selection = treating GVHD that has already developed
-- A question about selecting a prophylaxis REGIMEN is topic: "Prophylaxis", treatment_line: "Prophylaxis"
-- A question about selecting treatment for ESTABLISHED GVHD is topic: "Treatment selection", treatment_line: "1L" or "2L" etc.
+**Examples:**
+- "What is the best GVHD prophylaxis for matched unrelated donor?" → **Treatment selection** (choosing which regimen) + treatment_line: "Prophylaxis"
+- "Patient developed chronic GVHD. What treatment do you recommend?" → **Treatment selection** (choosing treatment) + treatment_line: "1L"
+- "Which patients should receive prophylaxis with PTCy?" → **Treatment indication** (who is eligible) + treatment_line: "Prophylaxis"
+- "What were the results of REACH3 trial?" → **Clinical efficacy** + treatment_line: "2L"
 
 **Topic Disambiguation - Safety profile vs AE management:**
 - **Safety profile** = knowing WHAT adverse events to expect (awareness, education, recognition)
@@ -135,13 +130,17 @@ You must assign values for all 70 tag fields (disease_state is already determine
 
 **disease_type_2 - Disease Status (CRITICAL):**
 - `"Steroid-naive"` - GVHD not yet treated with steroids (will receive 1L therapy)
-- `"Steroid-refractory"` - Failed steroid therapy (starting 2L+ therapy)
+- `"Steroid-refractory"` - Failed steroid therapy (receiving 2L+ therapy)
+
+**DEFAULT INFERENCE for targeted therapies:**
+- **Axatilimab or Belumosudil** questions → Default to `"Steroid-refractory"` (unless explicitly about steroid-naive clinical trial)
+- **Ruxolitinib** questions → Default to `"Steroid-refractory"` for steroid-refractory indication (REACH trials)
 
 **INFERENCE from question text:**
-- "day 28 post-transplant", "within first 100 days" -> disease_type_1: "Acute GVHD"
-- "7 months after transplant", "fasciitis", "lichen sclerosis-like", "sclerotic" -> disease_type_1: "Chronic GVHD"
-- "newly diagnosed GVHD", "treatment-naive", "before starting steroids" -> disease_type_2: "Steroid-naive"
-- "steroid-refractory", "after steroids failed", "doesn't improve with prednisone" -> disease_type_2: "Steroid-refractory"
+- "day 28 post-transplant", "within first 100 days" → disease_type_1: "Acute GVHD"
+- "7 months after transplant", "fasciitis", "lichen sclerosis-like", "sclerotic" → disease_type_1: "Chronic GVHD"
+- "newly diagnosed GVHD", "before starting steroids" → disease_type_2: "Steroid-naive"
+- "steroid-refractory", "after steroids failed", "doesn't improve with prednisone" → disease_type_2: "Steroid-refractory"
 
 **Organ involvement hints (for disease_type_1):**
 - Lower GI involvement (diarrhea) -> Often Acute GVHD
@@ -154,41 +153,49 @@ You must assign values for all 70 tag fields (disease_state is already determine
 
 **Valid values:**
 - `"Prophylaxis"` - Prevention at time of transplant (NOT treatment of established GVHD)
-- `"Steroid-naive"` - GVHD diagnosed but NOT YET treated with steroids (pre-1L, treatment-naive)
-- `"1L"` - First-line treatment (usually steroids for treatment-naive GVHD)
-- `"2L"` - Second-line (first targeted therapy after steroid failure)
-- `"3L"` - Third-line
-- `"4L+"` - Fourth-line or later
+- `"1L"` - First-line treatment (steroids for steroid-naive GVHD)
+- `"2L"` - Second-line (first targeted therapy after steroid failure, e.g., ruxolitinib)
+- `"3L"` - Third-line (steroid-refractory + 1 prior non-steroid treatment, e.g., belumosudil, axatilimab)
+- `"4L+"` - Fourth-line or later (steroid-refractory + 2+ prior non-steroid treatments)
 
-**CRITICAL: Avoid double-tagging between disease_type_2 and treatment_line.**
-- **disease_type_2** captures the disease STATUS (Treatment-naive vs Steroid-refractory)
-- **treatment_line** captures the actual LINE of therapy being discussed
-- Use `"Steroid-naive"` as treatment_line when the question is about a patient with newly diagnosed GVHD who has NOT yet started steroids. This avoids redundancy with disease_type_2: "Treatment-naive".
+**CRITICAL: disease_type_2 vs treatment_line**
+- **disease_type_2**: Disease STATUS (Steroid-naive vs Steroid-refractory)
+- **treatment_line**: Actual LINE number (1L, 2L, 3L, 4L+)
 
-**Mapping:**
-- Newly diagnosed GVHD, not yet treated -> disease_type_2: "Treatment-naive", treatment_line: "Steroid-naive"
-- Treatment-naive patient receiving steroids -> disease_type_2: "Treatment-naive", treatment_line: "1L"
-- Steroid-refractory patient receiving ruxolitinib -> disease_type_2: "Steroid-refractory", treatment_line: "2L"
-- Failed ruxolitinib, receiving belumosudil -> disease_type_2: "Steroid-refractory", treatment_line: "3L"
-- Failed 2+ prior lines, receiving axatilimab -> disease_type_2: "Steroid-refractory", treatment_line: "3L" or "4L+"
+**Treatment Line Logic:**
+| Clinical Scenario | disease_type_2 | treatment_line | Example |
+|-------------------|----------------|----------------|---------|
+| Steroid-naive patient receiving steroids | Steroid-naive | 1L | Newly diagnosed, starting prednisone |
+| Steroid-refractory, first targeted therapy | Steroid-refractory | 2L | After steroids failed, starting ruxolitinib |
+| Steroid-refractory + 1 prior non-steroid | Steroid-refractory | 3L | After steroids + ruxolitinib, now belumosudil |
+| Steroid-refractory + 2+ prior non-steroid | Steroid-refractory | 4L+ | After steroids + ruxolitinib + belumosudil |
 
 **Triggers:**
-- "GVHD prophylaxis", "to prevent GVHD", "at time of transplant" -> treatment_line: "Prophylaxis"
-- "newly diagnosed GVHD", "treatment-naive GVHD", "before starting steroids" -> treatment_line: "Steroid-naive"
-- "first-line", "initial treatment", "starting steroids" (when GVHD develops) -> treatment_line: "1L"
-- "second-line", "after steroids" -> treatment_line: "2L"
-- "after 2 prior lines of systemic therapy" -> treatment_line: "3L"
-- "previously treated with steroids and ibrutinib" -> treatment_line: "3L"
+- "GVHD prophylaxis", "to prevent GVHD", "at time of transplant" → treatment_line: "Prophylaxis"
+- "newly diagnosed GVHD", "starting steroids", "first-line" → treatment_line: "1L"
+- "steroid-refractory", "after steroids failed", "second-line" → treatment_line: "2L"
+- "after 2 prior lines" (steroids + 1 other) → treatment_line: "3L"
+- "previously treated with steroids, ruxolitinib, and belumosudil" → treatment_line: "4L+"
 
 ### 6. treatment_1 through treatment_5 (up to 5 drugs)
 **OPTIONAL** - Can be null. Only tag fundable drugs when mentioned/inferable.
 
 **CRITICAL RULES:**
-- Only tag drugs of interest to pharmaceutical CME funders
+- **GVHD EXCEPTION: Tag ALL treatments mentioned, including backbone agents** (see below)
 - Put each drug in a separate field (treatment_1, treatment_2, etc.)
 - **Use proper case for drug names** (e.g., "Ruxolitinib", not "RUXOLITINIB")
 - **TAG TREATMENTS FROM THE CORRECT ANSWER**
 - **Check STARTDATE for drug availability**
+
+**GVHD-SPECIFIC: Tag ALL Backbone Agents**
+Unlike other diseases, for GVHD you must tag ALL treatments including:
+- **Corticosteroids** (prednisone, methylprednisolone)
+- **Calcineurin inhibitors** (tacrolimus, cyclosporine)
+- **Immunosuppressants** (mycophenolate mofetil / MMF)
+- **Post-transplant cyclophosphamide (PTCy)**
+- **All prophylaxis agents** (including backbone regimens)
+
+This applies to both prophylaxis and treatment questions. Tag every drug mentioned in the correct answer.
 
 ---
 
@@ -265,15 +272,6 @@ You must assign values for all 70 tag fields (disease_state is already determine
 **Chronic GVHD organ-specific considerations:**
 - Skin/fasciitis/sclerosis -> ROCK2 inhibitor (belumosudil) may be particularly effective
 - Fibrotic features -> CSF-1R inhibitor (axatilimab) targets fibrosis pathway
-
----
-
-### Backbone Immunosuppression (ALWAYS TAG)
-- Corticosteroids (prednisone, methylprednisolone) -> Tag as treatment
-- Tacrolimus, cyclosporine -> Tag as treatment
-- MMF (mycophenolate mofetil) -> Tag as treatment
-- Post-transplant cyclophosphamide (PTCy) -> Tag as treatment
-- Tag ALL drugs mentioned in the question/answer, including steroids and standard agents
 
 ---
 
@@ -622,32 +620,35 @@ Tag "Variable" with Homogeneous distractors ONLY when one answer contains **addi
 
 | Question Pattern | Infer |
 |-----------------|-------|
-| GVHD prophylaxis, at transplant | -> treatment_line: "Prophylaxis", topic: "Prophylaxis" |
+| "Which GVHD prophylaxis regimen?" | -> topic: "Treatment selection", treatment_line: "Prophylaxis" |
+| "Who should receive PTCy prophylaxis?" | -> topic: "Treatment indication", treatment_line: "Prophylaxis" |
 | Day 28 post-transplant + symptoms | -> disease_type_1: "Acute GVHD" |
 | 7 months post-transplant + fasciitis | -> disease_type_1: "Chronic GVHD" |
-| Newly diagnosed GVHD, receiving steroids | -> disease_type_2: "Treatment-naive", treatment_line: "1L" |
-| After steroid failure | -> disease_type_2: "Steroid-refractory", treatment_line: "2L" |
-| After steroids + one more therapy | -> disease_type_2: "Steroid-refractory", treatment_line: "3L" |
-| "After 2+ prior lines" | -> disease_type_2: "Steroid-refractory", treatment_line: "3L" |
-| "Previously treated with steroids and ibrutinib" | -> prior_therapy: steroids + ibrutinib, treatment_line: "3L" |
+| Newly diagnosed GVHD, receiving steroids | -> disease_type_2: "Steroid-naive", treatment_line: "1L" |
+| After steroid failure, starting ruxolitinib | -> disease_type_2: "Steroid-refractory", treatment_line: "2L" |
+| After steroids + ruxolitinib, now belumosudil | -> disease_type_2: "Steroid-refractory", treatment_line: "3L" |
+| After steroids + ruxolitinib + belumosudil | -> disease_type_2: "Steroid-refractory", treatment_line: "4L+" |
+| Axatilimab or belumosudil question | -> disease_type_2: "Steroid-refractory" (unless steroid-naive trial) |
 | Fibrotic features (fasciitis, sclerosis) | -> symptom_1: "Fasciitis", may favor belumosudil or axatilimab |
 | REACH2 trial | -> Ruxolitinib, acute GVHD, steroid-refractory, 2L |
 | REACH3 trial | -> Ruxolitinib, chronic GVHD, steroid-refractory, 2L |
-| ROCKstar trial | -> Belumosudil, chronic GVHD |
-| AGAVE-201 trial | -> Axatilimab, chronic GVHD, 3L+ |
+| ROCKstar trial | -> Belumosudil, chronic GVHD, steroid-refractory, 3L |
+| AGAVE-201 trial | -> Axatilimab, chronic GVHD, steroid-refractory, 3L |
 
 ---
 
 ## Important Guidelines for GVHD
 
-1. **Prophylaxis vs Treatment is CRITICAL** - treatment_line: "Prophylaxis" vs "1L", "2L", etc.
-2. **Acute vs Chronic in disease_type_1** - Different disease biology, different approved agents
-3. **Steroid-refractory in disease_type_2** - Captures disease status (treatment-naive vs refractory)
-4. **Numeric line in treatment_line** - 1L (steroids), 2L (first targeted), 3L, 4L+
-5. **Organ involvement in symptom fields** - Fasciitis, diarrhea, elevated LFTs, etc.
-6. **NIH severity in disease_specific_factor** - NIH mild, moderate, severe
-7. **Prior therapy in prior_therapy field** - "After ibrutinib" is prior_therapy
-8. **Tag from CORRECT answer only** - Don't tag distractors
+1. **Topic = Question type, NOT clinical setting** - "Which prophylaxis?" = Treatment selection
+2. **Prophylaxis vs Treatment in treatment_line** - "Prophylaxis" vs "1L", "2L", "3L", "4L+"
+3. **Acute vs Chronic in disease_type_1** - Different disease biology, different approved agents
+4. **Steroid-naive vs Steroid-refractory in disease_type_2** - Disease status (use consistently)
+5. **Treatment line logic** - 1L (steroids), 2L (first targeted after steroids), 3L (after steroids + 1 targeted), 4L+ (after steroids + 2+ targeted)
+6. **Tag ALL treatments for GVHD** - Including PTCy, tacrolimus, MMF, steroids (backbone agents)
+7. **Axatilimab/Belumosudil default** - Assume steroid-refractory unless stated otherwise
+8. **Organ involvement in symptom fields** - Fasciitis, diarrhea, elevated LFTs, etc.
+9. **NIH severity in disease_specific_factor** - NIH mild, moderate, severe
+10. **Tag from CORRECT answer only** - Don't tag distractors
 
 ---
 
@@ -749,22 +750,26 @@ Respond with ONLY a JSON object containing all 70 fields. Use `null` for fields 
 
 ```json
 {
-    "topic": "Prophylaxis",
+    "topic": "Treatment selection",
     "disease_stage": null,
     "disease_type_1": null,
+    "disease_type_2": null,
     "treatment_line": "Prophylaxis",
     "treatment_1": "Post-transplant cyclophosphamide",
     "treatment_2": "Tacrolimus",
     "treatment_3": "Mycophenolate mofetil",
+    "age_group": "Transitional",
     ...
     "cme_outcome_level": "4 - Competence",
     ...
 }
 ```
 **Rationale:**
-- Question about GVHD prevention, not treatment -> Prophylaxis topic
+- Question asks "WHICH prophylaxis regimen?" -> Treatment selection (choosing regimen)
 - At time of transplant -> treatment_line: "Prophylaxis"
+- disease_type_2: null (no GVHD yet, this is prevention)
 - PTCy/Tac/MMF are the prophylaxis agents discussed -> Tag all three
+- 70-year-old patient -> age_group: "Transitional"
 
 ### Example 4: Third-Line Chronic GVHD (Axatilimab)
 
