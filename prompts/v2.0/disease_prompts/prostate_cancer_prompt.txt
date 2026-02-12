@@ -19,13 +19,13 @@ This question has been classified as being about **Prostate Cancer**. Your task 
 Prostate cancer screening questions (PSA testing, biomarker assays, mpMRI for screening) belong to **Primary Care/Preventive Medicine**, NOT oncology.
 
 **Red flags that suggest NON-ONCOLOGY (screening):**
-1. Question focuses on **who should be screened** (age, risk factors, family history)
-2. PSA screening **guidelines** and **thresholds** for initial screening
+1. Question focuses on **who should be screened** (age, risk factors, family history, race)
+2. PSA screening **guidelines** and **thresholds** for initial screening decisions
 3. **Ancillary biomarker tests** for screening decisions (PHI, IsoPSA, 4Kscore, PCA3, SelectMDx, ExoDx)
 4. mpMRI for **detection** of prostate cancer in asymptomatic patients
-5. PI-RADS scoring for **screening** purposes
-6. Biopsy indication in **previously undiagnosed** patients
-7. Answer choices focus on screening guidelines, not treatment
+5. PI-RADS scoring for **screening** purposes (not staging)
+6. Biopsy indication in **previously undiagnosed** patients based on screening results
+7. Answer choices focus on screening guidelines, shared decision-making about screening
 
 **If you detect this pattern:**
 - Tag `topic: "Non-oncology - Screening"` to flag for manual review
@@ -36,25 +36,30 @@ Prostate cancer screening questions (PSA testing, biomarker assays, mpMRI for sc
 - "Which genomic test stratifies risk in localized prostate cancer?" → ONCOLOGY (treatment decision-making)
 - "mpMRI for radiation therapy planning" → ONCOLOGY (treatment planning)
 
-### Secondary Immunodeficiency (SID) Questions — Flag as NON-ONCOLOGY
+---
 
-Patients with cancer often develop secondary immunodeficiency. Questions about **managing infections or diagnosing immunodeficiency** belong to **Infectious Disease/Immunology**, NOT oncology.
+### Neuroendocrine Prostate Cancer — Flag and STOP
 
-**Red flags that suggest NON-ONCOLOGY (SID):**
-1. Activity name contains "SID", "Secondary Immunodeficiency", or "Immunodeficiency"
-2. Patient has prostate cancer BUT the question asks about:
-   - Infection diagnosis/management (CMV, PJP, fungal, etc.)
-   - Immunoglobulin replacement therapy
-   - Vaccination in immunocompromised patients
-   - Tests to diagnose immunodeficiency (not cancer)
-3. Answer choices focus on immunology/infectious disease concepts, NOT cancer treatment
+Prostate cancer can undergo **neuroendocrine differentiation** (treatment-emergent NEPC), which is a distinct disease entity requiring different treatment approaches.
 
-**If you detect this pattern:**
-- Tag `topic: "Non-oncology - SID"` to flag for manual review
+**Red flags that suggest NEUROENDOCRINE carcinoma:**
+1. "Small cell prostate cancer", "neuroendocrine prostate cancer", "NEPC"
+2. "Lineage plasticity", "AR-independent"
+3. Low or undetectable PSA despite disease progression
+4. Chromogranin, synaptophysin, NSE markers mentioned
+5. Platinum-based chemotherapy (cisplatin/etoposide) as treatment
+6. Treatment-emergent after ARSI therapy
 
-**True oncology questions in infection context:**
-- "How should you modify treatment during active infection?" → ONCOLOGY (about prostate cancer treatment modification)
-- "Which prostate cancer treatment has highest infection risk?" → ONCOLOGY (about drug safety)
+**If detected:**
+1. Tag `topic: "Non-oncology - Neuroendocrine"`
+2. **STOP tagging** - do NOT fill in any other fields
+3. This question will be reclassified to "Neuroendocrine carcinoma" disease state
+
+**Why stop?** Neuroendocrine prostate cancer has distinct biology and treatment paradigms that require the neuroendocrine carcinoma prompt, not prostate cancer tagging rules.
+
+**True oncology prostate cancer questions mentioning neuroendocrine:**
+- "What biomarker predicts transformation to neuroendocrine histology?" → ONCOLOGY (still about prostate cancer progression)
+- Brief mention as a resistance mechanism → ONCOLOGY (context, not primary focus)
 
 ---
 
@@ -64,311 +69,1234 @@ This question has been classified as **Prostate cancer**. Apply the following di
 
 ---
 
-## disease_type: CRITICAL - Castration Status
+## Tag Fields
+
+You must assign values for all 56 tag fields:
+
+---
+
+## Group A: Core Fields (19 fields)
+
+### 1. topic
+**REQUIRED** - Every question must have exactly one topic. Never null.
+
+| Topic | Use When... | Prostate Cancer Examples |
+|-------|-------------|--------------------------|
+| **Treatment selection** | Choosing WHICH drug/regimen to use for a patient (patient vignette + "which therapy") | "Which treatment for mCRPC with BRCA2 mutation?", "Best option for high-volume mHSPC?" |
+| **Treatment indication** | Whether a patient MEETS CRITERIA for a treatment — eligibility, candidacy, approved indications, contraindications | "Which patients are eligible for Lu-177-PSMA-617?", "Does castration resistance qualify for enzalutamide?", "FDA indication for olaparib" |
+| **Clinical efficacy** | Response rates, survival outcomes, trial results, "key findings", "where has X demonstrated efficacy" | "What OS benefit did VISION show?", "Key findings from PROfound trial", "PSA response with abiraterone" |
+
+**⚠️ Topic Disambiguation - "Indication" vs "Efficacy":**
+- "Where is olaparib **indicated**?" → **Treatment indication** (asking about approved label/indications)
+- "Where has olaparib **demonstrated efficacy**?" → **Clinical efficacy** (asking about trial results/outcomes)
+- Key distinction: "indicated" = regulatory approval; "demonstrated efficacy" = clinical evidence
+
+**⚠️ Topic Disambiguation - Safety profile vs Prophylaxis vs AE management (CRITICAL THREE-WAY):**
+- **Safety profile** = knowing WHAT adverse events to expect (awareness, education, recognition)
+- **Prophylaxis** = knowing HOW TO PREVENT toxicities BEFORE they occur (prevention, premedication, mitigation)
+- **AE management** = knowing WHAT TO DO after an AE has already occurred (intervention, dose modification)
+
+Key test: What is the educational focus?
+- "What AEs should patients expect on Lu-177-PSMA-617?" → **Safety profile** (awareness)
+- "What prophylaxis is needed before starting radium-223?" → **Prophylaxis** (prevention)
+- "Patient develops Grade 3 anemia on talazoparib. What do you do?" → **AE management** (intervention)
+
+**Prostate Cancer-specific Prophylaxis examples:**
+- "Should patients on abiraterone receive bone-protective agents?" → **Prophylaxis**; treatment_1: "Abiraterone"
+- "Which cardiac monitoring is needed with darolutamide?" → **Prophylaxis**; treatment_1: "Darolutamide"
+- "Steroid prophylaxis for ARSI-related toxicity?" → **Prophylaxis**; treatment_1: relevant ARSI
+
+**Treatment tagging for Prophylaxis questions:** Tag the drug(s) that CAUSE the toxicity requiring prophylaxis, NOT the prophylactic agent itself.
+
+| **Safety profile** | Knowing WHAT AEs to expect or recognize — awareness, anticipation. "What are the common AEs of cabazitaxel?", "Which cardiac AEs occur with enzalutamide?" |
+| **AE management** | What to DO about an AE already occurring — hold drug, dose-reduce, manage. "Patient develops seizure on enzalutamide, what is next step?" |
+| **Prophylaxis** | Knowing HOW TO PREVENT toxicities BEFORE they occur — premedication, monitoring. "What monitoring needed before Lu-177-PSMA?", "Bone-protective therapy with ADT?" |
+| **Biomarker testing** | **TREATMENT IMPLICATIONS of results** - "Patient has BRCA2 mutation, which treatment?", "HRR+ disease, what drug targets this?", "Decipher score 0.8, what is prognosis?" |
+| **Mechanism of action** | Drug targets, pathways, MOA. "How does Lu-177-PSMA-617 work?", "Mechanism of PARP inhibition" |
+| **Diagnosis** | Diagnostic criteria, Gleason scoring, biopsy interpretation |
+| **Prognosis** | Risk stratification, Gleason/Grade Groups, D'Amico risk, genomic risk scores |
+| **Imaging interpretation** | **READING/INTERPRETING results** - "How to interpret focal bone uptake on PSMA PET?", "What does SUVmax >10 indicate?", "PI-RADS 5 lesion findings?" |
+| **Staging** | **ORDERING imaging for staging** + TNM classification - "When to order PSMA PET in newly diagnosed high-risk?", "M0 vs M1 classification", "Bone scan for staging workup" |
+| **Study design** | Trial design, patient enrollment criteria, endpoints, statistical considerations |
+| **Multidisciplinary care** | Coordination between urology, radiation oncology, medical oncology; referrals; team-based care |
+| **Shared decision-making** | Patient-provider communication, discussing treatment options, addressing patient concerns/preferences, active surveillance decisions |
+| **Survivorship** | Long-term side effects, QOL, sexual health, bone health after ADT |
+| **Disparities in care** | Racial/ethnic disparities (African American men higher risk), inequities in access/outcomes |
+| **Barriers to care** | Obstacles to treatment (cost, access to novel therapies, adherence) |
+
+**Additional Prostate Cancer Topics:**
+| **Genetic testing** | **INDICATIONS/ORDERING** - "Which mCRPC patients need germline testing?", "When to refer for genetic counseling?", "What are criteria for HRR panel testing?" |
+| **Radiation therapy** | When radiation is the focus (SBRT vs EBRT, dose/fractionation, combination with ADT) |
+| **Surgical management** | Radical prostatectomy indications, complications, surgical vs radiation decisions |
+| **Active surveillance** | Criteria, monitoring schedules, triggers for intervention in low-risk disease |
+
+---
+
+### 2. disease_stage
+**OPTIONAL** - Tag when staging information is explicitly mentioned or clearly inferable.
+
+**Valid values:**
+- `"Localized"` - Stage I-II, T1-T2, organ-confined, no metastases, curative intent
+- `"Locally advanced"` - Stage III, T3-T4, extracapsular extension, seminal vesicle invasion, high-risk but may still be curative
+- `"Biochemical recurrence"` - Rising PSA after definitive therapy (surgery/radiation) with NO visible metastases on imaging
+- `"Metastatic"` - Stage IV, M1, bone metastases, lymph node metastases, visceral metastases, systemic therapy required
+
+**When to tag:**
+- Staging explicitly mentioned ("Stage III", "T3N0M0", "M1 disease")
+- Clinical scenario clearly indicates stage (e.g., "bone metastases" → Metastatic)
+- Post-treatment status ("PSA relapse after prostatectomy" → Biochemical recurrence)
+
+**When null is appropriate:**
+- General questions about drug mechanisms without stage context
+- Questions applicable across multiple stages
+- Stage not mentioned or inferable
+
+**IMPORTANT - Biochemical Recurrence is Distinct:**
+- BCR = rising PSA after treatment, NO visible metastases (M0)
+- This is different from metastatic disease (M1)
+- BCR has specific management (salvage RT, early systemic therapy, observation)
+
+**CRITICAL - DO NOT CONFUSE:**
+- Castration status (mCRPC vs mHSPC) goes in **disease_type**, NOT disease_stage
+- "Metastatic" in disease_stage refers to presence of metastases
+- Castration resistance refers to disease behavior, not metastatic burden
+
+---
+
+### 3-4. disease_type_1, disease_type_2
+**OPTIONAL but CRITICAL** - Two slots for disease subtypes. Use disease_type_1 first; disease_type_2 only for rare overlapping classifications.
 
 **PROSTATE CANCER'S #1 DISTINGUISHING FEATURE IS CASTRATION STATUS.**
 
 The disease_type field captures **castration status**, NOT molecular subtypes (unlike breast cancer or NSCLC).
 
-### Castration Status Hierarchy
+### Castration Status (PRIMARY - use disease_type_1)
 
-| disease_type Value | Definition | Key Indicators |
-|-------------------|------------|----------------|
-| `"mCRPC"` | **Metastatic Castration-Resistant Prostate Cancer** | Metastases + rising PSA despite castrate testosterone (<50 ng/dL) |
-| `"nmCRPC"` | **Non-Metastatic Castration-Resistant Prostate Cancer** | No distant metastases + rising PSA despite castrate testosterone |
-| `"mHSPC"` | **Metastatic Hormone-Sensitive Prostate Cancer** | Metastases + responds to ADT (castrate testosterone not yet reached or PSA still falling) |
-| `"Localized high-risk"` | High-risk localized disease | Gleason ≥8, PSA >20, or cT3-T4 |
-| `"Localized intermediate-risk"` | Intermediate-risk localized | Gleason 7, PSA 10-20, or cT2b-c |
-| `"Localized low-risk"` | Low-risk localized | Gleason ≤6, PSA <10, cT1-T2a |
-| `"Neuroendocrine"` | Neuroendocrine prostate cancer | Treatment-emergent NEPC, small cell features, low/absent PSA |
-| `null` | Default if castration status unclear | |
+| disease_type_1 Value | Definition | Key Indicators |
+|---------------------|------------|----------------|
+| `"mCRPC"` | **Metastatic Castration-Resistant** | Metastases + rising PSA despite castrate testosterone (<50 ng/dL) + on ADT |
+| `"nmCRPC"` | **Non-Metastatic Castration-Resistant** | No distant metastases (M0) + rising PSA despite castrate testosterone + on ADT |
+| `"mHSPC"` | **Metastatic Hormone-Sensitive** | Metastases + responds to ADT (PSA falling or testosterone not yet castrate) |
+| `"Localized high-risk"` | High-risk localized disease | Gleason ≥8, PSA >20, or cT3-T4; D'Amico high-risk |
+| `"Localized intermediate-risk"` | Intermediate-risk localized | Gleason 7, PSA 10-20, or cT2b-c; D'Amico intermediate-risk |
+| `"Localized low-risk"` | Low-risk localized | Gleason ≤6, PSA <10, cT1-T2a; D'Amico low-risk; active surveillance candidate |
+| `null` | Default if castration status unclear | General questions without specific subtype context |
 
-### Critical Decision Points
+**IMPORTANT:** Neuroendocrine prostate cancer has been removed from this list. If the question is about neuroendocrine carcinoma, it will be reclassified (see logic above).
+
+**Critical Decision Points:**
 
 **mCRPC vs mHSPC:**
-- If "castration-resistant", "CRPC", "castrate testosterone", "rising PSA on ADT" → mCRPC
-- If "hormone-sensitive", "HSPC", "de novo metastatic", "initiating ADT" → mHSPC
-- If metastatic + on ADT but no mention of resistance → mHSPC (default to hormone-sensitive)
+- "Castration-resistant", "CRPC", "rising PSA on ADT", "castrate testosterone levels" → mCRPC
+- "Hormone-sensitive", "HSPC", "de novo metastatic", "initiating ADT", "treatment-naive metastatic" → mHSPC
+- If metastatic + on ADT but no mention of resistance status → **default to mHSPC** (hormone-sensitive until proven otherwise)
 
 **nmCRPC:**
-- Rising PSA + castrate testosterone + NO distant metastases (M0)
-- Often mentioned in context of apalutamide (SPARTAN), enzalutamide (PROSPER), darolutamide (ARAMIS)
+- Rising PSA + castrate testosterone + **NO distant metastases** (M0)
+- Often mentioned in context of:
+  - Apalutamide (SPARTAN trial)
+  - Enzalutamide (PROSPER trial)
+  - Darolutamide (ARAMIS trial)
+- **PSA doubling time** may be mentioned (marker of progression risk)
 
-**Neuroendocrine:**
-- Look for "small cell", "neuroendocrine", "lineage plasticity", "low PSA with high disease burden"
-- Often treatment-emergent after ARSI therapy
+**Localized Risk Stratification:**
+- Use D'Amico risk criteria when mentioned:
+  - High-risk: Gleason 8-10, PSA >20, or cT3-T4
+  - Intermediate-risk: Gleason 7, PSA 10-20, or cT2b-c
+  - Low-risk: Gleason ≤6, PSA <10, cT1-T2a
+
+**When to use disease_type_2:**
+- Rare overlap scenarios only
+- Example: Patient with mCRPC who also has high-volume disease → disease_type_1: "mCRPC", disease_type_2: null (high-volume goes in biomarker)
+- Generally, disease_type_2 should remain null
+
+**INFERENCE from trial context:**
+- LATITUDE, STAMPEDE, ARCHES, TITAN, ARASENS → mHSPC
+- SPARTAN, PROSPER, ARAMIS → nmCRPC
+- COU-AA-302, PREVAIL, PROfound, VISION → mCRPC
 
 ---
 
-## disease_stage: Prostate Cancer Staging
+### 5. treatment_line
+**OPTIONAL** - Can be null, but try hard to infer from context.
 
-| Value | Triggers | Notes |
-|-------|----------|-------|
-| `"Localized"` | Stage I-II, T1-T2, "organ-confined", "no metastases" | Curative intent |
-| `"Locally advanced"` | Stage III, T3-T4, "extracapsular extension", "seminal vesicle invasion" | High-risk, may still be curative |
-| `"Metastatic"` | Stage IV, M1, "bone metastases", "lymph node mets", "visceral mets" | Systemic therapy |
-| `"Biochemical recurrence"` | "Rising PSA after definitive therapy", "PSA relapse" | Post-prostatectomy/radiation |
-
-**NOTE:** Castration status (mCRPC vs mHSPC) goes in disease_type, NOT disease_stage.
-
----
-
-## treatment_line: Prostate Cancer Conventions
+**Valid values:**
 
 **Localized/Locally Advanced:**
-- `"Neoadjuvant"` - Before surgery or radiation
-- `"Adjuvant"` - After surgery (for high-risk features)
-- `"Salvage"` - For biochemical recurrence after definitive therapy
+- `"Neoadjuvant"` - Before surgery or definitive radiation
+- `"Adjuvant"` - After surgery (for high-risk features like positive margins, extracapsular extension)
+- `"Perioperative"` - Treatment given both before AND after surgery (e.g., ADT spanning surgical period)
+- `"Salvage"` - For biochemical recurrence after definitive therapy (salvage radiation, early systemic therapy)
 
 **Metastatic Hormone-Sensitive (mHSPC):**
-- `"1L"` - First-line systemic therapy (ADT ± intensification)
-- Treatment intensification refers to adding ARSI or docetaxel to ADT
+- `"1L"` - First-line systemic therapy for metastatic disease (ADT ± intensification with ARSI or docetaxel)
+- Treatment intensification = adding ARSI or chemotherapy to ADT backbone
 
 **Castration-Resistant (CRPC):**
 - `"1L"` - First treatment after developing castration resistance
 - `"2L+"` - Second-line or later in CRPC setting
-- Note: Count lines WITHIN CRPC, not overall (e.g., abiraterone for mHSPC → enzalutamide for mCRPC = "1L" CRPC)
+- **CRITICAL:** Count lines WITHIN CRPC, not overall treatment history
+  - Example: Patient on ADT + abiraterone (mHSPC) → progresses to CRPC → enzalutamide = "1L" in CRPC setting
 
-**Maintenance:**
-- `"Maintenance"` - Continuation therapy (rare in prostate cancer)
+**Other:**
+- `"Maintenance"` - Continuation therapy after achieving response (rare in prostate cancer; ADT is continuous, not "maintenance")
 
----
+**When to infer:**
+- Trial context: LATITUDE → 1L mHSPC, PROfound → 2L+ mCRPC
+- Keywords: "newly diagnosed", "de novo metastatic" → 1L; "after progression on", "post-abiraterone" → 2L+
+- Drug context: Quad regimens (ADT + ARSI + docetaxel) typically 1L mHSPC; Lu-177-PSMA typically 2L+ mCRPC
 
-## Fundable Prostate Cancer Treatments
+**When null is appropriate:**
+- MOA questions without treatment line context
+- General biomarker/genomics questions
+- Safety profile questions without specific line mentioned
 
-**NOTE:** This table lists COMMON drugs for reference. It is NOT exhaustive. If a question mentions a drug, drug class, or mechanism not listed here, STILL tag it using the appropriate fields (treatment_1-5, drug_class_1-3, drug_target_1-3). Always tag what the question discusses, even if not in this table.
+**Perioperative Example:**
+- "Patient receives 6 months ADT before radical prostatectomy and continues for 18 months after surgery" → treatment_line: "Perioperative"
+- Perioperative refers to treatment spanning BOTH before AND after definitive local therapy
 
-**TAG ONLY these drugs. DO NOT tag ADT/LHRH agonists (leuprolide, goserelin) or first-gen antiandrogens (bicalutamide, flutamide) UNLESS they are the primary focus.**
-
-### Androgen Receptor Signaling Inhibitors (ARSIs)
-**Setting:** mHSPC, nmCRPC, mCRPC
-`"abiraterone"`, `"enzalutamide"`, `"apalutamide"`, `"darolutamide"`
-
-### Chemotherapy
-**Setting:** mHSPC (docetaxel + ADT), mCRPC
-`"docetaxel"`, `"cabazitaxel"`
-
-### PARP Inhibitors
-**Setting:** mCRPC with HRR mutations (BRCA1/2, ATM, etc.)
-`"olaparib"`, `"rucaparib"`, `"talazoparib"`, `"niraparib"`
-
-### Radioligand Therapy
-**Setting:** mCRPC, PSMA-avid disease
-`"lutetium-177-PSMA-617"` (Lu-177-PSMA-617), `"radium-223"`
-
-### Immunotherapy
-**Setting:** MSI-H/dMMR mCRPC
-`"pembrolizumab"`, `"nivolumab"`
-
-### Other Targeted Therapies
-`"olaparib + abiraterone"` (combination), `"talazoparib + enzalutamide"` (combination)
-
-### Drug Class Expansion (Use STARTDATE for temporal context)
-
-| Drug Class | Setting | Expand To |
-|------------|---------|-----------|
-| ARSI | mHSPC | abiraterone, enzalutamide, apalutamide, darolutamide (post-2022) |
-| ARSI | nmCRPC | apalutamide, enzalutamide, darolutamide |
-| ARSI | mCRPC | abiraterone, enzalutamide |
-| PARP inhibitor | mCRPC HRR+ | olaparib, rucaparib (post-2020), talazoparib (post-2023) |
-| Chemotherapy | mHSPC | docetaxel (only if mentioned) |
-| Chemotherapy | mCRPC | docetaxel, cabazitaxel |
-| Radioligand | mCRPC PSMA+ | lutetium-177-PSMA-617 (post-2022), radium-223 (bone-targeted) |
+**Maintenance Example (rare in prostate cancer):**
+- "Patient with mCRPC achieved PSA response with docetaxel, now continuing abiraterone" → treatment_line: "Maintenance"
+- Note: This is uncommon terminology in prostate cancer since ADT is continuous and most drugs are used until progression
 
 ---
 
-## Biomarker Tagging Rules
+### 6-10. treatment_1 through treatment_5 (up to 5 drugs)
+**OPTIONAL** - Can be null. Tag fundable drugs when mentioned/inferable.
 
-### Genomic/Molecular Biomarkers
+**MULTI-VALUE FIELD:** Use `treatment_1`, `treatment_2`, etc. for multiple drugs (up to 5). Use `null` for unused slots.
+
+**When to tag:** Question discusses specific fundable drug(s) in question, answer, or inferable from trial.
+
+**When null is appropriate:** Imaging/staging questions; diagnosis questions; prognosis questions where no fundable drug is mentioned.
+
+**CRITICAL RULES:**
+- Tag ALL relevant drugs of interest to pharmaceutical CME funders
+- **TAG chemotherapy** (docetaxel, cabazitaxel) - these ARE fundable topics in prostate cancer
+- **DO NOT tag ADT/LHRH agonists** (leuprolide, goserelin) or first-gen antiandrogens (bicalutamide, flutamide) UNLESS they are the primary focus
+- For combinations, tag ALL fundable drugs in separate slots
+- Use proper case: "Abiraterone" not "abiraterone", "Enzalutamide" not "enzalutamide"
+
+**Fundable Prostate Cancer Treatments:**
+
+**Androgen Receptor Signaling Inhibitors (ARSIs):**
+- `"Abiraterone"` - ARSI + CYP17 inhibitor
+- `"Enzalutamide"` - Second-generation antiandrogen
+- `"Apalutamide"` - Second-generation antiandrogen
+- `"Darolutamide"` - Second-generation antiandrogen
+
+**Chemotherapy:**
+- `"Docetaxel"` - Taxane chemotherapy (mHSPC intensification, mCRPC)
+- `"Cabazitaxel"` - Taxane chemotherapy (post-docetaxel mCRPC)
+
+**PARP Inhibitors:**
+- `"Olaparib"` - PARP inhibitor (HRR-mutated mCRPC)
+- `"Rucaparib"` - PARP inhibitor (BRCA1/2-mutated mCRPC)
+- `"Talazoparib"` - PARP inhibitor (combination with enzalutamide)
+- `"Niraparib"` - PARP inhibitor (combination with abiraterone)
+
+**Radioligand Therapy:**
+- `"Lutetium-177-PSMA-617"` (or `"Lu-177-PSMA-617"`) - PSMA-directed radioligand
+- `"Radium-223"` - Bone-targeted alpha emitter (for bone-predominant mCRPC)
+
+**Immunotherapy:**
+- `"Pembrolizumab"` - PD-1 inhibitor (for MSI-H/dMMR mCRPC)
+- `"Nivolumab"` - PD-1 inhibitor (investigational in prostate cancer)
+- `"Sipuleucel-T"` - Autologous cellular immunotherapy (mCRPC, minimal symptoms)
+
+**PARP + ARSI Combinations:**
+- Tag both drugs when combination is mentioned:
+  - Talazoparib + enzalutamide (TALAPRO-2) → treatment_1: "Talazoparib", treatment_2: "Enzalutamide"
+  - Niraparib + abiraterone (MAGNITUDE) → treatment_1: "Niraparib", treatment_2: "Abiraterone"
+  - Olaparib + abiraterone → treatment_1: "Olaparib", treatment_2: "Abiraterone"
+
+**Multi-drug examples:**
+- "ADT with abiraterone and prednisone" → treatment_1: "Abiraterone" (prednisone is backbone, not fundable)
+- "Darolutamide plus docetaxel plus ADT" (ARASENS) → treatment_1: "Darolutamide", treatment_2: "Docetaxel"
+- "Enzalutamide after progression on abiraterone" → treatment_1: "Enzalutamide", prior_therapy_1: "Abiraterone"
+
+---
+
+### 11-15. biomarker_1 through biomarker_5 (up to 5 biomarkers)
+**OPTIONAL** - Can be null. Tag biomarkers when explicitly mentioned or clearly inferable.
+
+**MULTI-VALUE FIELD:** Use `biomarker_1`, `biomarker_2`, etc. for multiple biomarkers. Use `null` for unused slots.
+
+**CRITICAL: Two use cases for biomarker tagging:**
+
+1. **Questions ABOUT a biomarker test** (indications, when to order, thresholds):
+   - Tag the **SPECIFIC BIOMARKER** being tested to indicate what the question is about
+   - "Which patients need PSMA PET?" → `biomarker_1: "PSMA PET"`
+   - "When to order Decipher score?" → `biomarker_1: "Decipher"`
+   - "Which mCRPC patients need germline BRCA testing?" → `biomarker_1: "BRCA1/2"`
+   - "Indications for HRR mutation testing?" → `biomarker_1: "HRR mutation"`
+
+2. **Clinical vignettes WITH a biomarker result** (patient has specific status):
+   - Tag the **RESULT/STATUS** of the patient
+   - "Patient with PSMA-positive disease..." → `biomarker_1: "PSMA-positive"`
+   - "Germline BRCA2 mutation..." → `biomarker_1: "BRCA2"`
+   - "HRR+ mCRPC patient..." → `biomarker_1: "HRR mutation"`
+
+**When null is appropriate:** General treatment questions without biomarker context; questions where biomarker is irrelevant.
+
+**Prostate Cancer Biomarkers:**
+
+### Genomic/Molecular Biomarkers (Treatment-Directing)
 
 **Homologous Recombination Repair (HRR) Mutations:**
 Tag when testing for PARP inhibitor eligibility:
-- `"BRCA1"`, `"BRCA2"`, `"BRCA1/2"` (most common)
-- `"ATM"`, `"PALB2"`, `"CHEK2"`, `"RAD51"`, `"FANCA"` (other HRR genes)
-- `"HRR mutation"` (generic, if specific gene not mentioned)
+- `"BRCA1"` - BRCA1 mutation (germline or somatic)
+- `"BRCA2"` - BRCA2 mutation (most common HRR mutation in prostate cancer)
+- `"BRCA1/2"` - When both mentioned together or not specified
+- `"ATM"` - ATM mutation (second most common HRR gene)
+- `"PALB2"` - PALB2 mutation
+- `"CHEK2"` - CHEK2 mutation
+- `"RAD51"`, `"FANCA"`, `"BRIP1"` - Other HRR genes
+- `"HRR mutation"` - Generic term when specific gene not mentioned
 
 **Mismatch Repair Deficiency:**
-Tag for immunotherapy eligibility:
-- `"MSI-H"` (microsatellite instability-high)
-- `"dMMR"` (deficient mismatch repair)
+Tag for immunotherapy (pembrolizumab) eligibility:
+- `"MSI-H"` - Microsatellite instability-high
+- `"dMMR"` - Deficient mismatch repair
+- Note: MSI-H/dMMR is rare in prostate cancer (<3%)
 
 **PSMA Expression:**
-Tag for radioligand therapy eligibility:
-- `"PSMA-positive"`, `"PSMA-avid"`, `"PSMA expression"`
-- Note: PSMA PET imaging is used to assess PSMA expression
+Tag for radioligand therapy (Lu-177-PSMA-617) eligibility:
+- `"PSMA-positive"` - PSMA-expressing disease (eligible for Lu-177-PSMA)
+- `"PSMA-negative"` - No PSMA expression (NOT eligible for Lu-177-PSMA, consider FDG PET for aggressive variants)
+- **CRITICAL:** Use ONLY these two terms. Do NOT use "PSMA-avid" or "PSMA expression" to avoid normalization issues.
 
 **Other Molecular Features:**
-- `"AR-V7"` (androgen receptor variant 7, predicts ARSI resistance)
-- `"Neuroendocrine markers"` (chromogranin, synaptophysin)
+- `"AR-V7"` - Androgen receptor variant 7 (predicts ARSI resistance)
+- `"TP53"` - TP53 mutation (aggressive disease, poor prognosis)
+- `"PTEN"` - PTEN loss (associated with aggressive disease)
 
 ### Prognostic/Risk Biomarkers
 
 **Gleason Score / Grade Groups:**
-- `"Gleason 6"` (Grade Group 1, low-risk)
-- `"Gleason 7"` (Grade Group 2-3, intermediate-risk)
-- `"Gleason 8-10"` (Grade Group 4-5, high-risk)
-- Tag as biomarker_1 when explicitly discussed for risk stratification
+Tag when explicitly discussed for risk stratification or treatment decisions:
+- `"Gleason 6"` - Grade Group 1 (low-risk, 3+3)
+- `"Gleason 7"` - Grade Group 2-3 (intermediate-risk, 3+4 or 4+3)
+- `"Gleason 8"` - Grade Group 4 (high-risk, 4+4)
+- `"Gleason 9-10"` - Grade Group 5 (very high-risk, 4+5, 5+4, or 5+5)
+- `"Grade Group 1"`, `"Grade Group 2"`, etc. - If Grade Group terminology used instead of Gleason
 
 **PSA (Prostate-Specific Antigen):**
-- Tag `"PSA"` when explicitly discussed as a biomarker for monitoring/prognosis
-- DO NOT tag PSA if it's just mentioned as a lab value in passing
+- `"PSA"` - Tag when PSA is explicitly the focus of discussion (PSA kinetics, PSA doubling time, PSA response)
+- **DO NOT tag** PSA if it's just mentioned as a lab value in passing
+- PSA is ubiquitous in prostate cancer - only tag when it's clinically significant to the question
 
-**Genomic Tests:**
+**Genomic Risk Scores:**
 Tag when explicitly discussed for risk stratification or treatment decisions:
-- `"Oncotype DX Prostate"` (Genomic Prostate Score)
-- `"Prolaris"` (Cell Cycle Progression Score)
-- `"Decipher"` (Genomic Classifier)
-- `"FoundationOne"`, `"Guardant360"` (comprehensive genomic profiling)
+- `"Oncotype DX Prostate"` - Genomic Prostate Score (GPS) for localized disease
+- `"Decipher"` - Genomic Classifier (GC) score after prostatectomy
+- `"Prolaris"` - Cell Cycle Progression (CCP) score
+- `"FoundationOne"`, `"Guardant360"` - Comprehensive genomic profiling
 
-**Volume of Metastases:**
-- `"High-volume disease"` - for mHSPC risk stratification (≥4 bone mets with ≥1 beyond spine/pelvis, or visceral mets)
-- `"Low-volume disease"` - for mHSPC risk stratification
+**Volume of Metastases (mHSPC Risk Stratification):**
+- `"High-volume disease"` - ≥4 bone mets with ≥1 beyond spine/pelvis, OR visceral metastases (CHAARTED criteria)
+- `"Low-volume disease"` - Does not meet high-volume criteria
 
----
+**Other Prognostic Biomarkers:**
+- `"Circulating tumor cells (CTCs)"` - Prognostic in mCRPC
+- `"LDH"` - Lactate dehydrogenase (marker of disease burden)
+- `"Alkaline phosphatase"` - Marker of bone metastases
 
-## Biomarker Redundancy (Prostate Cancer Specific)
+### Imaging Biomarkers (NOT traditional biomarkers, but functionally similar)
 
-| If disease_type is... | DO NOT tag biomarker: |
-|----------------------|----------------------|
-| Any value | **PSA** (unless PSA is explicitly the focus of the question) |
-
-**Non-redundant biomarkers to ALWAYS tag when relevant:**
-- HRR mutations (BRCA1/2, ATM, etc.) - for PARP inhibitor decisions
-- MSI-H/dMMR - for immunotherapy decisions
-- PSMA expression - for radioligand therapy decisions
-- Gleason score/Grade Group - for risk stratification
-- Genomic tests (Oncotype DX, Decipher, Prolaris) - for treatment decisions
+- `"PI-RADS 5"`, `"PI-RADS 4"`, etc. - Prostate Imaging Reporting and Data System score on mpMRI
+- `"SUVmax"` - Standardized uptake value on PET imaging (PSMA or FDG PET)
 
 ---
 
-## Trial Inference Table (Prostate Cancer)
+### 16-18. trial_1, trial_2, trial_3 (up to 3 trials)
+**OPTIONAL** - Can be null. Tag clinical trials when explicitly mentioned or clearly inferable.
 
-### Metastatic Hormone-Sensitive (mHSPC)
-| Drug + Context | Trial | disease_type | treatment_line |
-|----------------|-------|--------------|----------------|
-| Abiraterone + prednisone + ADT in mHSPC | `"LATITUDE"`, `"STAMPEDE"` | `"mHSPC"` | `"1L"` |
-| Enzalutamide + ADT in mHSPC | `"ARCHES"`, `"ENZAMET"` | `"mHSPC"` | `"1L"` |
-| Apalutamide + ADT in mHSPC | `"TITAN"` | `"mHSPC"` | `"1L"` |
-| Darolutamide + docetaxel + ADT in mHSPC | `"ARASENS"` | `"mHSPC"` | `"1L"` |
-| Docetaxel + ADT in mHSPC | `"CHAARTED"`, `"STAMPEDE"` | `"mHSPC"` | `"1L"` |
+**When to tag:**
+- Trial name explicitly mentioned
+- Trial data/results discussed
+- Drug + setting combination strongly suggests specific trial (e.g., abiraterone in mHSPC → LATITUDE/STAMPEDE)
 
-### Non-Metastatic Castration-Resistant (nmCRPC)
-| Drug + Context | Trial | disease_type | treatment_line |
-|----------------|-------|--------------|----------------|
-| Apalutamide in nmCRPC | `"SPARTAN"` | `"nmCRPC"` | `"1L"` |
-| Enzalutamide in nmCRPC | `"PROSPER"` | `"nmCRPC"` | `"1L"` |
-| Darolutamide in nmCRPC | `"ARAMIS"` | `"nmCRPC"` | `"1L"` |
+**When null is appropriate:**
+- General treatment questions without trial context
+- MOA or safety profile questions not tied to specific trial data
 
-### Metastatic Castration-Resistant (mCRPC) - Hormone Therapy
-| Drug + Context | Trial | disease_type | treatment_line |
-|----------------|-------|--------------|----------------|
-| Abiraterone + prednisone in mCRPC (chemo-naive) | `"COU-AA-302"` | `"mCRPC"` | `"1L"` |
-| Abiraterone + prednisone in mCRPC (post-chemo) | `"COU-AA-301"` | `"mCRPC"` | `"2L+"` |
-| Enzalutamide in mCRPC (chemo-naive) | `"PREVAIL"` | `"mCRPC"` | `"1L"` |
-| Enzalutamide in mCRPC (post-chemo) | `"AFFIRM"` | `"mCRPC"` | `"2L+"` |
+**Major Prostate Cancer Trials (by setting):**
 
-### Metastatic Castration-Resistant (mCRPC) - PARP Inhibitors
-| Drug + Context | Trial | disease_type | treatment_line | biomarker |
-|----------------|-------|--------------|----------------|-----------|
-| Olaparib in mCRPC with HRR mutations | `"PROfound"` | `"mCRPC"` | `"2L+"` | `"BRCA1/2"` or `"HRR mutation"` |
-| Rucaparib in mCRPC with BRCA1/2 | `"TRITON2"`, `"TRITON3"` | `"mCRPC"` | `"2L+"` | `"BRCA1/2"` |
-| Talazoparib + enzalutamide in mCRPC | `"TALAPRO-2"` | `"mCRPC"` | `"1L"` | `"HRR mutation"` (may be unselected) |
-| Niraparib + abiraterone in mCRPC | `"MAGNITUDE"` | `"mCRPC"` | `"1L"` | `"BRCA1/2"` |
+**mHSPC (Metastatic Hormone-Sensitive):**
+- `"LATITUDE"` - Abiraterone + ADT in high-risk mHSPC
+- `"STAMPEDE"` - Abiraterone + ADT, docetaxel + ADT, abiraterone + docetaxel + ADT
+- `"ARCHES"` - Enzalutamide + ADT in mHSPC
+- `"ENZAMET"` - Enzalutamide + ADT ± docetaxel in mHSPC
+- `"TITAN"` - Apalutamide + ADT in mHSPC
+- `"ARASENS"` - Darolutamide + docetaxel + ADT in mHSPC
+- `"CHAARTED"` - Docetaxel + ADT in mHSPC (defined high-volume disease)
 
-### Metastatic Castration-Resistant (mCRPC) - Radioligand Therapy
-| Drug + Context | Trial | disease_type | treatment_line | biomarker |
-|----------------|-------|--------------|----------------|-----------|
-| Lu-177-PSMA-617 in mCRPC (PSMA+) | `"VISION"` | `"mCRPC"` | `"2L+"` | `"PSMA-positive"` |
-| Radium-223 in mCRPC with bone mets | `"ALSYMPCA"` | `"mCRPC"` | `"2L+"` | null |
+**nmCRPC (Non-Metastatic Castration-Resistant):**
+- `"SPARTAN"` - Apalutamide in nmCRPC
+- `"PROSPER"` - Enzalutamide in nmCRPC
+- `"ARAMIS"` - Darolutamide in nmCRPC
 
-### Metastatic Castration-Resistant (mCRPC) - Chemotherapy
-| Drug + Context | Trial | disease_type | treatment_line |
-|----------------|-------|--------------|----------------|
-| Docetaxel in mCRPC | `"TAX327"`, `"SWOG 9916"` | `"mCRPC"` | `"1L"` or `"2L+"` |
-| Cabazitaxel in mCRPC (post-docetaxel) | `"TROPIC"` | `"mCRPC"` | `"2L+"` |
+**mCRPC (Metastatic Castration-Resistant) - ARSIs:**
+- `"COU-AA-302"` - Abiraterone in chemo-naive mCRPC
+- `"COU-AA-301"` - Abiraterone post-docetaxel mCRPC
+- `"PREVAIL"` - Enzalutamide in chemo-naive mCRPC
+- `"AFFIRM"` - Enzalutamide post-docetaxel mCRPC
 
-### Localized/Locally Advanced
-| Drug + Context | Trial | disease_type | treatment_line |
-|----------------|-------|--------------|----------------|
-| Abiraterone + ADT + radiation (high-risk) | `"STAMPEDE"` | `"Localized high-risk"` | `"Adjuvant"` or `"Neoadjuvant"` |
-| ADT + radiation vs radiation alone | `"RTOG 0815"`, `"RTOG 9408"` | `"Localized"` | `"Adjuvant"` |
+**mCRPC - PARP Inhibitors:**
+- `"PROfound"` - Olaparib vs ARSI in HRR-mutated mCRPC
+- `"TRITON2"` - Rucaparib in BRCA-mutated mCRPC
+- `"TRITON3"` - Rucaparib vs docetaxel or ARSI in HRR-mutated mCRPC
+- `"TALAPRO-2"` - Talazoparib + enzalutamide in mCRPC (HRR-enriched)
+- `"MAGNITUDE"` - Niraparib + abiraterone in HRR-mutated mCRPC
+
+**mCRPC - Radioligand Therapy:**
+- `"VISION"` - Lu-177-PSMA-617 vs standard of care in PSMA+ mCRPC
+- `"ALSYMPCA"` - Radium-223 vs placebo in bone-predominant mCRPC
+
+**mCRPC - Chemotherapy:**
+- `"TAX327"` - Docetaxel in mCRPC (established docetaxel benefit)
+- `"TROPIC"` - Cabazitaxel post-docetaxel mCRPC
+- `"CARD"` - Cabazitaxel vs ARSI in mCRPC
+
+**Localized/Adjuvant:**
+- `"RTOG 9408"`, `"RTOG 0815"` - ADT + radiation in localized disease
+- `"STAMPEDE"` (adjuvant arm) - Abiraterone + ADT + radiation in high-risk localized
 
 ---
 
-## Contextual Inference from Trials
+## Group B: Treatment Metadata (10 fields)
 
-| Trial | Inferred disease_type | Inferred treatment_line | Inferred disease_stage |
-|-------|----------------------|------------------------|----------------------|
-| LATITUDE, STAMPEDE (ADT+abi) | `"mHSPC"` | `"1L"` | `"Metastatic"` |
-| ARCHES, ENZAMET | `"mHSPC"` | `"1L"` | `"Metastatic"` |
-| TITAN | `"mHSPC"` | `"1L"` | `"Metastatic"` |
-| ARASENS | `"mHSPC"` | `"1L"` | `"Metastatic"` |
-| SPARTAN | `"nmCRPC"` | `"1L"` | `"Metastatic"` (NOTE: non-metastatic = M0) |
-| PROSPER | `"nmCRPC"` | `"1L"` | `"Metastatic"` (NOTE: non-metastatic = M0) |
-| ARAMIS | `"nmCRPC"` | `"1L"` | `"Metastatic"` (NOTE: non-metastatic = M0) |
-| COU-AA-302, PREVAIL | `"mCRPC"` | `"1L"` | `"Metastatic"` |
-| COU-AA-301, AFFIRM | `"mCRPC"` | `"2L+"` | `"Metastatic"` |
-| PROfound | `"mCRPC"` | `"2L+"` | `"Metastatic"` |
-| TRITON2, TRITON3 | `"mCRPC"` | `"2L+"` | `"Metastatic"` |
-| TALAPRO-2 | `"mCRPC"` | `"1L"` | `"Metastatic"` |
-| VISION | `"mCRPC"` | `"2L+"` | `"Metastatic"` |
-| ALSYMPCA | `"mCRPC"` | `"2L+"` | `"Metastatic"` |
+### 19-21. drug_class_1, drug_class_2, drug_class_3 (up to 3 drug classes)
+**OPTIONAL** - Can be null. Tag when treatments are mentioned (corresponding to treatment_1-5).
+
+**MULTI-VALUE FIELD:** Use separate slots for multiple drug classes. Corresponds to treatment_1-5 fields.
+
+**When to tag:**
+- Treatment is tagged → assign corresponding drug class
+- Drug class is mentioned in question/answer without specific drug → tag the class
+
+**When null is appropriate:**
+- No treatments discussed
+- Diagnosis/prognosis questions without treatment context
+
+**Prostate Cancer Drug Classes:**
+
+| Drug Class | Drugs in This Class | Use |
+|------------|---------------------|-----|
+| `"Androgen receptor signaling inhibitor (ARSI)"` | Abiraterone, Enzalutamide, Apalutamide, Darolutamide | mHSPC, nmCRPC, mCRPC |
+| `"Taxane chemotherapy"` | Docetaxel, Cabazitaxel | mHSPC (docetaxel), mCRPC |
+| `"PARP inhibitor"` | Olaparib, Rucaparib, Talazoparib, Niraparib | HRR-mutated mCRPC |
+| `"Radioligand therapy"` | Lu-177-PSMA-617, Radium-223 | PSMA+ mCRPC, bone-predominant mCRPC |
+| `"Immune checkpoint inhibitor (PD-1)"` | Pembrolizumab, Nivolumab | MSI-H/dMMR mCRPC |
+| `"Cellular immunotherapy"` | Sipuleucel-T | Minimally symptomatic mCRPC |
+
+**Examples:**
+- treatment_1: "Abiraterone" → drug_class_1: "Androgen receptor signaling inhibitor (ARSI)"
+- treatment_1: "Docetaxel" → drug_class_1: "Taxane chemotherapy"
+- treatment_1: "Olaparib" → drug_class_1: "PARP inhibitor"
+- treatment_1: "Lu-177-PSMA-617" → drug_class_1: "Radioligand therapy"
+
+---
+
+### 22-24. drug_target_1, drug_target_2, drug_target_3 (up to 3 targets)
+**OPTIONAL** - Can be null. Tag molecular targets when treatments are mentioned.
+
+**MULTI-VALUE FIELD:** Corresponds to treatment_1-5 and drug_class_1-3.
+
+**When to tag:**
+- Treatment with known molecular target is mentioned
+- MOA question explicitly discusses target
+
+**When null is appropriate:**
+- No treatments with defined targets discussed
+- General questions without target-specific context
+
+**Prostate Cancer Drug Targets:**
+
+| Target | Drugs | Mechanism |
+|--------|-------|-----------|
+| `"Androgen receptor"` | Enzalutamide, Apalutamide, Darolutamide | Direct AR antagonism |
+| `"CYP17"` | Abiraterone | Androgen synthesis inhibition |
+| `"Tubulin"` | Docetaxel, Cabazitaxel | Microtubule stabilization |
+| `"PARP"` | Olaparib, Rucaparib, Talazoparib, Niraparib | DNA repair inhibition |
+| `"PSMA"` | Lu-177-PSMA-617 | PSMA-directed radioligand delivery |
+| `"Bone"` | Radium-223 | Bone-targeted alpha radiation |
+| `"PD-1"` | Pembrolizumab, Nivolumab | Immune checkpoint blockade |
+
+**Examples:**
+- treatment_1: "Enzalutamide" → drug_target_1: "Androgen receptor"
+- treatment_1: "Abiraterone" → drug_target_1: "CYP17"
+- treatment_1: "Olaparib" → drug_target_1: "PARP"
+- treatment_1: "Lu-177-PSMA-617" → drug_target_1: "PSMA"
+
+---
+
+### 25-27. prior_therapy_1, prior_therapy_2, prior_therapy_3 (up to 3 prior therapies)
+**OPTIONAL** - Can be null. Tag prior therapies when patient has received previous treatment.
+
+**MULTI-VALUE FIELD:** Use separate slots for multiple prior therapies.
+
+**When to tag:**
+- Patient described as having received prior treatment(s)
+- "After progression on X", "post-abiraterone", "taxane-refractory"
+- Prior therapy context is relevant to current treatment selection
+
+**When null is appropriate:**
+- Treatment-naive patients
+- Questions where prior therapy is not mentioned or relevant
+
+**Common Prior Therapies in Prostate Cancer:**
+- `"Abiraterone"`, `"Enzalutamide"`, `"Apalutamide"`, `"Darolutamide"` - Prior ARSIs
+- `"Docetaxel"`, `"Cabazitaxel"` - Prior chemotherapy
+- `"Radical prostatectomy"`, `"Radiation therapy"` - Prior definitive therapy (for biochemical recurrence context)
+- `"Prior ARSI"` - Generic term when specific ARSI not named
+- `"Prior chemotherapy"` - Generic term when specific chemo not named
+
+**Examples:**
+- "Patient with mCRPC progressing after abiraterone" → prior_therapy_1: "Abiraterone"
+- "Post-docetaxel mCRPC receiving cabazitaxel" → prior_therapy_1: "Docetaxel"
+- "BCR after prostatectomy and salvage radiation" → prior_therapy_1: "Radical prostatectomy", prior_therapy_2: "Radiation therapy"
+
+---
+
+### 28. resistance_mechanism
+**OPTIONAL** - Can be null. Tag when mechanism of treatment resistance is discussed.
+
+**When to tag:**
+- Question explicitly discusses resistance mechanism
+- Answer explains WHY treatment failed
+
+**When null is appropriate (MOST CASES):**
+- General treatment selection questions
+- Questions where resistance mechanism is not the focus
+
+**Prostate Cancer Resistance Mechanisms:**
+- `"AR amplification"` - Androgen receptor gene amplification (ARSI resistance)
+- `"AR mutations"` - AR point mutations (e.g., F877L, T878A)
+- `"AR-V7"` - AR splice variant 7 (constitutively active, ARSI resistance)
+- `"Lineage plasticity"` - Transformation to AR-independent state (neuroendocrine features)
+- `"HRR pathway alterations"` - Loss of HRR function (relevant for PARP inhibitor resistance/sensitivity)
+- `"PI3K-AKT pathway activation"` - Alternative growth signaling
+- `"PSMA loss"` - Loss of PSMA expression (Lu-177-PSMA resistance)
+
+**Example:**
+- Q: "Why did this mCRPC patient not respond to enzalutamide after abiraterone?"
+- A: "AR-V7 splice variant confers resistance to ARSIs"
+- Tags: resistance_mechanism: "AR-V7"
+
+---
+
+## Group C: Clinical Context (9 fields)
+
+### 29-31. metastatic_site_1, metastatic_site_2, metastatic_site_3 (up to 3 sites)
+**OPTIONAL** - Can be null. Tag when metastatic sites are explicitly mentioned.
+
+**MULTI-VALUE FIELD:** Use separate slots for multiple metastatic sites.
+
+**When to tag:**
+- Metastatic sites explicitly mentioned in clinical vignette
+- Site-specific treatment considerations discussed (e.g., brain mets, liver mets)
+
+**When null is appropriate:**
+- Localized/non-metastatic disease
+- Metastatic disease without specific sites mentioned
+- Questions where metastatic site is irrelevant
+
+**Common Prostate Cancer Metastatic Sites:**
+- `"Bone"` - Most common metastatic site in prostate cancer
+- `"Lymph nodes"` - Regional or distant lymph node involvement
+- `"Liver"` - Visceral metastases, poor prognosis
+- `"Lung"` - Visceral metastases
+- `"Brain"` - Rare in prostate cancer, poor prognosis
+- `"Peritoneum"`, `"Adrenal"` - Other visceral sites
+
+**Examples:**
+- "Patient with bone and lymph node metastases" → metastatic_site_1: "Bone", metastatic_site_2: "Lymph nodes"
+- "Visceral mets to liver" → metastatic_site_1: "Liver"
+
+---
+
+### 32-34. symptom_1, symptom_2, symptom_3 (up to 3 symptoms)
+**OPTIONAL** - Can be null. Tag when symptoms are explicitly mentioned and clinically relevant.
+
+**MULTI-VALUE FIELD:** Use separate slots for multiple symptoms.
+
+**When to tag:**
+- Symptoms explicitly described in patient vignette
+- Symptom management is focus of question
+- Symptoms guide treatment selection (e.g., "minimally symptomatic" for sipuleucel-T)
+
+**When null is appropriate:**
+- Asymptomatic patients
+- Symptoms not mentioned
+- Questions where symptoms are irrelevant
+
+**Common Prostate Cancer Symptoms:**
+- `"Bone pain"` - Most common symptom in metastatic prostate cancer
+- `"Fatigue"` - Common with advanced disease, ADT, chemotherapy
+- `"Urinary obstruction"` - From local tumor growth or pelvic lymph nodes
+- `"Hematuria"` - Blood in urine
+- `"Weight loss"` - Advanced disease
+- `"Spinal cord compression"` - Oncologic emergency
+- `"Hot flashes"` - ADT-related
+- `"Sexual dysfunction"` - ADT-related, post-treatment
+- `"Minimally symptomatic"` - Specific indication for sipuleucel-T
+
+**Examples:**
+- "Patient with mCRPC and bone pain" → symptom_1: "Bone pain"
+- "Minimally symptomatic mCRPC patient" → symptom_1: "Minimally symptomatic"
+
+---
+
+## Group B: Patient Characteristics
+
+These fields capture patient-level characteristics that influence treatment decisions.
+
+### 35. treatment_eligibility
+**OPTIONAL** - Usually null for prostate cancer. No transplant-based treatment in prostate cancer.
+
+**Valid values:**
+- `null` - Default for most questions
+
+**When to tag (rare):**
+- If question explicitly tests knowledge about general candidacy for systemic therapy vs. supportive care only
+
+---
+
+### 36. age_group
+**REQUIRED when patient age is stated** - Tag the age category whenever a specific age (e.g., "72-year-old") appears in the question stem.
+
+**Valid values:**
+- `"Young"` - Adults under 65 years
+- `"Transitional"` - 65-75 years (transitional fitness, may have competing comorbidities)
+- `"Elderly"` - 75 years or older
+
+**When to tag:**
+- Age explicitly stated in vignette
+- Trial with age-based eligibility
+- "Elderly" or "young" patient explicitly mentioned
+
+**When null is appropriate:**
+- Age not mentioned or implied
+- General treatment questions
+
+**Examples:**
+- "72-year-old man with mCRPC" → age_group: "Transitional"
+- "85-year-old man with ECOG 2" → age_group: "Elderly"
+
+---
+
+### 37. organ_dysfunction
+**OPTIONAL** - Relevant organ impairment affecting treatment selection.
+
+**Valid values:**
+- `"Renal"` - Renal insufficiency, CKD (affects radium-223 eligibility, PARP inhibitor dosing)
+- `"Cardiac"` - Heart failure, MI history, arrhythmia (affects ARSI selection)
+- `"Hepatic"` - Liver dysfunction (affects abiraterone, enzalutamide metabolism)
+
+**When to tag:**
+- Explicitly mentioned in vignette
+- Dose adjustment discussion due to organ function
+- Organ function affects drug selection
+
+**When null is appropriate:**
+- Organ function not mentioned
+- General treatment questions
+
+**Examples:**
+- "Patient with CrCl 25 mL/min" → organ_dysfunction: "Renal"
+- "History of CHF considering ARSI" → organ_dysfunction: "Cardiac"
+
+---
+
+### 38. fitness_status
+**OPTIONAL** - Overall patient fitness level.
+
+**Valid values:**
+- `"Fit"` - Good performance status, can tolerate intensive therapy
+- `"Frail"` - Poor functional status, requires dose reductions or modified regimens
+
+**When to tag:**
+- Explicitly mentioned ("frail patient", "fit for intensive therapy")
+- ECOG/performance status implies frailty (ECOG ≥2)
+- Geriatric assessment mentioned
+
+**When null is appropriate:**
+- Fitness not mentioned or implied
+- General mechanism/efficacy questions
+
+**Examples:**
+- "Frail elderly patient with nmCRPC" → fitness_status: "Frail"
+- "Fit patient with ECOG 0" → fitness_status: "Fit"
+
+---
+
+### 39. disease_specific_factor
+**OPTIONAL** - Reserved for disease-specific factors not captured elsewhere.
+
+**For Prostate Cancer - valid values:**
+- `"Hereditary prostate cancer"` - Germline BRCA1/2, ATM, PALB2, Lynch syndrome, HOXB13
+- `"African American"` - Higher incidence, more aggressive disease at diagnosis, disparities in care
+- `null` - Default for most questions without specific factors
+
+**When to tag:**
+- Question specifically mentions or tests knowledge about these factors
+- Clinical vignette includes these conditions as relevant context
+- Germline testing discussed
+
+**When null is appropriate:**
+- Standard mCRPC, mHSPC, or localized scenarios without special factors
+
+**Examples:**
+- "Germline BRCA2 mutation" → disease_specific_factor: "Hereditary prostate cancer"
+- "African American man with high-risk localized prostate cancer" → disease_specific_factor: "African American"
+
+---
+
+### 40-42. comorbidity_1, comorbidity_2, comorbidity_3
+**OPTIONAL** - Patient comorbidities that affect treatment decisions.
+
+**CRITICAL: Only tag comorbidities explicitly stated in the question stem.** Comorbidities are medical conditions SEPARATE from the primary disease. Do NOT infer comorbidities from age, disease stage, or treatment history alone.
+
+**MULTI-VALUE FIELD:** Use `comorbidity_1`, `comorbidity_2`, etc. for multiple comorbidities (up to 3). Use `null` for unused slots.
+
+**Common prostate cancer-relevant comorbidities:**
+- `"Seizure disorder"` - Contraindication for enzalutamide
+- `"Heart failure"` / `"CHF"` - Cardiovascular risk with ADT, ARSI selection
+- `"Atrial fibrillation"` - Anticoagulation considerations, cardiovascular risk
+- `"Myocardial infarction"` / `"MI history"` - Cardiovascular risk assessment
+- `"Diabetes"` - Metabolic complications with ADT
+- `"Hypertension"` - Cardiovascular risk, common with ADT
+- `"COPD"` - Pulmonary considerations
+- `"Chronic kidney disease"` / `"CKD"` - Dose adjustments, drug selection
+- `"Osteoporosis"` - Bone health with ADT, fracture risk
+- `"VTE history"` - Thrombosis risk considerations
+- `"Prior malignancy"` - History of other cancers
+
+**When to tag:**
+- Clinical vignette mentions specific comorbidities
+- Comorbidity affects treatment choice being discussed
+- Question focuses on managing patient with comorbidities
+
+**When null is appropriate:**
+- General treatment/efficacy questions without patient context
+- No comorbidities mentioned in vignette
+
+**Examples:**
+- "Patient with seizure disorder considering ARSI" → comorbidity_1: "Seizure disorder"
+- "History of MI, atrial fibrillation" → comorbidity_1: "Myocardial infarction", comorbidity_2: "Atrial fibrillation"
+
+---
+
+### 43. performance_status
+**OPTIONAL** - Can be null. Tag when explicitly mentioned.
+
+**When to tag:**
+- ECOG or Karnofsky performance status explicitly stated
+- Functional status relevant to treatment selection (e.g., "good performance status", "debilitated")
+
+**When null is appropriate (MOST CASES):**
+- Performance status not mentioned
+- Patient functional status not relevant to question
+
+**Valid values:**
+- `"ECOG 0"` - Fully active, no restrictions
+- `"ECOG 1"` - Restricted in strenuous activity, ambulatory
+- `"ECOG 2"` - Ambulatory, capable of self-care, unable to work
+- `"ECOG 3"` - Limited self-care, confined to bed/chair >50% of waking hours
+- `"ECOG 4"` - Completely disabled, totally confined to bed/chair
+- `"Good performance status"` - General term (ECOG 0-1)
+- `"Poor performance status"` - General term (ECOG 2-4)
+
+**Examples:**
+- "ECOG 1 patient with mCRPC" → performance_status: "ECOG 1"
+- "Debilitated patient with poor PS" → performance_status: "Poor performance status"
+
+---
+
+## Group D: Safety/Toxicity (7 fields)
+
+### 44-48. toxicity_type_1 through toxicity_type_5 (up to 5 toxicity types)
+**OPTIONAL** - Can be null. Tag when specific adverse events are discussed.
+
+**MULTI-VALUE FIELD:** Use separate slots for multiple toxicity types.
+
+**When to tag:**
+- AE explicitly mentioned in question, answer, or patient vignette
+- Safety profile question asks "what AEs to expect?"
+- AE management question describes specific toxicity
+
+**When null is appropriate:**
+- No toxicities discussed
+- Efficacy-only questions
+
+**Common Prostate Cancer Treatment Toxicities:**
+
+**ARSI-related:**
+- `"Fatigue"` - Common with all ARSIs
+- `"Hypertension"` - Abiraterone (mineralocorticoid excess)
+- `"Seizure"` - Enzalutamide (rare, contraindicated if seizure history)
+- `"Falls"` - Darolutamide, enzalutamide (CNS effects)
+- `"Cardiac events"` - ARSIs (MI, arrhythmia, heart failure)
+- `"Rash"` - Apalutamide, darolutamide
+- `"Hypothyroidism"` - Apalutamide
+
+**Chemotherapy-related:**
+- `"Neutropenia"` - Docetaxel, cabazitaxel (dose-limiting)
+- `"Peripheral neuropathy"` - Taxanes
+- `"Diarrhea"` - Cabazitaxel (can be severe)
+- `"Nail changes"` - Docetaxel
+- `"Fluid retention"` - Docetaxel
+
+**PARP inhibitor-related:**
+- `"Anemia"` - Most common hematologic toxicity
+- `"Nausea"` - Common gastrointestinal AE
+- `"Fatigue"` - Common
+- `"Thrombocytopenia"` - Less common than anemia
+
+**Radioligand therapy-related:**
+- `"Bone marrow suppression"` - Lu-177-PSMA, radium-223 (anemia, thrombocytopenia, leukopenia)
+- `"Xerostomia"` - Dry mouth (PSMA+ salivary glands affected by Lu-177-PSMA)
+- `"Nausea"` - Common with radioligands
+
+**ADT-related (tag if explicitly discussed):**
+- `"Hot flashes"` - Very common
+- `"Osteoporosis"` - Long-term ADT effect
+- `"Metabolic syndrome"` - Weight gain, diabetes, dyslipidemia
+- `"Cognitive changes"` - Memory, concentration issues
+- `"Sexual dysfunction"` - Loss of libido, erectile dysfunction
+- `"Gynecomastia"` - Breast tissue growth
+
+**Examples:**
+- "Common AEs of Lu-177-PSMA include anemia and xerostomia" → toxicity_type_1: "Anemia", toxicity_type_2: "Xerostomia"
+- "Patient develops Grade 3 neutropenia on docetaxel" → toxicity_type_1: "Neutropenia"
+
+---
+
+### 49. toxicity_organ
+**OPTIONAL** - Can be null. Tag when organ system affected by toxicity is relevant.
+
+**When to tag:**
+- Organ-specific toxicity discussed
+- AE management question where organ system guides intervention
+
+**When null is appropriate (MOST CASES):**
+- No toxicities discussed
+- Toxicity type is sufficient without organ specification
+
+**Common Organ Systems:**
+- `"Hematologic"` - Bone marrow suppression (anemia, neutropenia, thrombocytopenia)
+- `"Cardiac"` - Heart failure, MI, arrhythmia
+- `"Hepatic"` - Liver enzyme elevations, hepatotoxicity
+- `"Renal"` - Kidney impairment
+- `"Neurologic"` - Neuropathy, seizures, cognitive changes
+- `"Gastrointestinal"` - Diarrhea, nausea
+- `"Dermatologic"` - Rash, nail changes
+- `"Endocrine"` - Hypothyroidism, adrenal insufficiency
+
+**Examples:**
+- "Grade 3 neutropenia on cabazitaxel" → toxicity_organ: "Hematologic"
+- "Abiraterone-related hypertension" → toxicity_organ: "Cardiac"
+
+---
+
+### 50. toxicity_grade
+**OPTIONAL** - Can be null. Tag when CTCAE grade is explicitly mentioned.
+
+**When to tag:**
+- Grade explicitly stated (e.g., "Grade 3 anemia")
+- Grade is relevant to management decision
+
+**When null is appropriate (MOST CASES):**
+- Grade not mentioned
+- General safety profile questions without specific grades
+
+**Valid values:**
+- `"Grade 1"` - Mild
+- `"Grade 2"` - Moderate
+- `"Grade 3"` - Severe
+- `"Grade 4"` - Life-threatening
+- `"Grade 5"` - Death
+
+**Examples:**
+- "Patient develops Grade 3 neutropenia" → toxicity_grade: "Grade 3"
+- "Grade 2 fatigue on enzalutamide" → toxicity_grade: "Grade 2"
+
+---
+
+## Group E: Efficacy/Outcomes (5 fields)
+
+### 51-53. efficacy_endpoint_1, efficacy_endpoint_2, efficacy_endpoint_3 (up to 3 endpoints)
+**OPTIONAL** - Can be null. Tag when efficacy outcomes are explicitly discussed.
+
+**MULTI-VALUE FIELD:** Use separate slots for multiple endpoints.
+
+**When to tag:**
+- Trial results discussed (primary/secondary endpoints)
+- Clinical efficacy question asks about outcomes
+- Response criteria mentioned
+
+**When null is appropriate:**
+- Safety-only questions
+- Treatment selection without efficacy data discussion
+- General MOA questions
+
+**Common Prostate Cancer Efficacy Endpoints:**
+
+**Survival endpoints (hard endpoints):**
+- `"Overall survival (OS)"` - Primary endpoint in many trials
+- `"Radiographic progression-free survival (rPFS)"` - Disease progression on imaging
+- `"Metastasis-free survival (MFS)"` - Time to first metastasis (nmCRPC trials: SPARTAN, PROSPER, ARAMIS)
+
+**PSA endpoints:**
+- `"PSA response"` - ≥50% decline from baseline
+- `"PSA progression"` - Rising PSA indicating disease progression
+- `"Time to PSA progression"` - Delay in PSA rise
+
+**Response endpoints:**
+- `"Objective response rate (ORR)"` - Measurable disease response (RECIST)
+- `"Complete response (CR)"` - Disappearance of all disease
+- `"Partial response (PR)"` - ≥30% reduction in tumor size
+
+**Symptomatic endpoints:**
+- `"Pain palliation"` - Improvement in bone pain
+- `"Quality of life (QOL)"` - Patient-reported outcomes
+- `"Time to symptomatic progression"` - Delay in symptom worsening
+
+**Surrogate endpoints:**
+- `"Time to castration resistance"` - Delay in CRPC development (mHSPC trials)
+- `"Time to chemotherapy"` - Delay in need for chemotherapy
+- `"Time to skeletal-related event"` - Bone complication prevention
+
+**Examples:**
+- "VISION trial showed OS benefit" → efficacy_endpoint_1: "Overall survival (OS)"
+- "SPARTAN trial primary endpoint was MFS" → efficacy_endpoint_1: "Metastasis-free survival (MFS)"
+- "PSA response rate of 60%" → efficacy_endpoint_1: "PSA response"
+
+---
+
+### 54. outcome_context
+**OPTIONAL** - Can be null. Tag when context of outcome is specified.
+
+**When to tag:**
+- Question specifies whether outcome is primary vs secondary endpoint
+- Subgroup analysis mentioned
+- Interim vs final analysis specified
+
+**When null is appropriate (MOST CASES):**
+- Outcome context not specified
+- General efficacy discussion
+
+**Valid values:**
+- `"Primary endpoint"` - Trial's pre-specified primary outcome
+- `"Secondary endpoint"` - Pre-specified secondary outcome
+- `"Exploratory endpoint"` - Post-hoc or exploratory analysis
+- `"Subgroup analysis"` - Outcome in subgroup (e.g., BRCA-mutated, high-volume disease)
+- `"Interim analysis"` - Pre-planned early look at data
+- `"Final analysis"` - Mature data, final trial results
+
+**Examples:**
+- "Primary endpoint of OS was met" → outcome_context: "Primary endpoint"
+- "Subgroup analysis showed greater benefit in BRCA2-mutated patients" → outcome_context: "Subgroup analysis"
+
+---
+
+### 55. clinical_benefit
+**OPTIONAL** - Can be null. Tag when magnitude or significance of benefit is discussed.
+
+**When to tag:**
+- Question asks about magnitude of benefit
+- Statistical significance mentioned
+- Comparison of benefit between treatments
+
+**When null is appropriate (MOST CASES):**
+- Clinical benefit not discussed
+- Yes/no efficacy question without magnitude
+
+**Valid values:**
+- `"Statistically significant"` - p<0.05, trial met primary endpoint
+- `"Not statistically significant"` - Failed to meet endpoint
+- `"Clinically meaningful"` - Significant AND clinically relevant benefit
+- `"Modest benefit"` - Statistically significant but small effect size
+- `"Superior to comparator"` - Better than control arm
+- `"Non-inferior to comparator"` - Not worse than control
+- `"No benefit"` - No improvement over control
+
+**Examples:**
+- "VISION showed statistically significant OS benefit" → clinical_benefit: "Statistically significant"
+- "PROfound trial demonstrated superior rPFS" → clinical_benefit: "Superior to comparator"
+
+---
+
+## Group F: Evidence/Guidelines (3 fields)
+
+### 56-57. guideline_source_1, guideline_source_2 (up to 2 sources)
+**OPTIONAL** - Can be null. Tag when clinical guidelines are explicitly referenced.
+
+**MULTI-VALUE FIELD:** Use separate slots if multiple guidelines cited.
+
+**When to tag:**
+- Guideline explicitly mentioned (e.g., "per NCCN guidelines")
+- Question asks about guideline recommendations
+- Treatment indication based on guideline
+
+**When null is appropriate (MOST CASES):**
+- No guidelines referenced
+- General treatment questions without guideline context
+
+**Prostate Cancer Guideline Sources:**
+- `"NCCN"` - National Comprehensive Cancer Network (most commonly cited in US)
+- `"AUA/ASCO/ASTRO"` - American Urological Association / American Society of Clinical Oncology / American Society for Radiation Oncology (joint guidelines)
+- `"EAU"` - European Association of Urology
+- `"ESMO"` - European Society for Medical Oncology
+- `"ASCO"` - American Society of Clinical Oncology (standalone)
+- `"AUA"` - American Urological Association (standalone)
+- `"FDA label"` - FDA-approved indications
+
+**Examples:**
+- "Per NCCN guidelines, which patients are candidates for active surveillance?" → guideline_source_1: "NCCN"
+- "AUA/ASCO/ASTRO guidelines recommend..." → guideline_source_1: "AUA/ASCO/ASTRO"
+
+---
+
+### 58. evidence_type
+**OPTIONAL** - Can be null. Tag level of evidence when explicitly discussed.
+
+**When to tag:**
+- Question explicitly discusses evidence quality/level
+- Study design is the focus (e.g., "Phase 3 trial", "retrospective analysis")
+
+**When null is appropriate (MOST CASES):**
+- Evidence type not discussed
+- General treatment questions
+
+**Valid values:**
+- `"Phase 1"`, `"Phase 1/2"`, `"Phase 2"`, `"Phase 2/3"`, `"Phase 3"` - Clinical trial phases
+- `"Meta-analysis"` - Pooled analysis of multiple trials
+- `"Retrospective study"` - Non-randomized, observational
+- `"Real-world evidence"` - Data from clinical practice (not trial)
+- `"Guideline recommendation"` - Based on expert consensus
+
+**DO NOT USE:** "Single-arm trial" - Use the phase instead (Phase 1, Phase 2, etc.)
+
+**Examples:**
+- "Phase 3 VISION trial demonstrated..." → evidence_type: "Phase 3"
+- "Real-world data suggests..." → evidence_type: "Real-world evidence"
+
+---
+
+## Group G: Question Format/Quality (13 fields)
+
+### 59. cme_outcome_level
+**REQUIRED** - Every question must have a CME level. Never null.
+
+**Valid values:**
+- `"3 - Knowledge"` - Tests recall of facts, definitions, mechanisms
+- `"4 - Competence"` - Tests application to clinical scenarios
+
+**CRITICAL RULE:** If the clinical vignette is NOT REQUIRED to answer the question, it's **Level 3 (Knowledge)**, not Level 4.
+
+**Test:** Could someone answer this question correctly WITHOUT reading the patient details?
+- YES → `"3 - Knowledge"` (the vignette is just context/decoration)
+- NO → `"4 - Competence"` (must apply knowledge to the specific patient)
+
+**Examples:**
+- "What is the mechanism of action of enzalutamide?" → cme_outcome_level: "3 - Knowledge" (fact recall)
+- "A 65-year-old man with mCRPC and BRCA2 mutation... which treatment?" → cme_outcome_level: "4 - Competence" (application to patient)
+
+---
+
+### 60. data_response_type
+**REQUIRED** - Every question must have a response type. Never null.
+
+**Valid values:**
+- `"Qualitative"` - Text-based answer (drug name, disease name, concept)
+- `"Numeric"` - Number answer (5-year survival rate, PSA value)
+- `"Comparative"` - Comparing two or more options (A vs B vs C)
+- `"Boolean"` - True/False, Yes/No
+
+**Most common in oncology:** `"Qualitative"` (drug names, treatment selection)
+
+---
+
+### 61. stem_type
+**REQUIRED** - Every question must have a stem type. Never null.
+
+**Valid values:**
+- `"Clinical vignette"` - Patient case scenario (most common in oncology CME)
+- `"Direct question"` - Straightforward question without case context
+- `"Incomplete statement"` - "The mechanism of X is..."
+
+---
+
+### 62. lead_in_type
+**REQUIRED** - Every question must have a lead-in type. Never null.
+
+**Valid values:**
+- `"Standard"` - "What is...", "Which treatment..."
+- `"Negative (EXCEPT/NOT)"` - "Which is NOT true?", "All EXCEPT..."
+- `"Best answer"` - "What is the BEST next step?", "MOST appropriate..."
+- `"True statement"` - "Which is true?"
+
+---
+
+### 63. answer_format
+**REQUIRED** - Every question must have an answer format. Never null.
+
+**Valid values:**
+- `"Single best"` - One correct answer (most common)
+- `"Compound (A+B)"` - Combination answer (e.g., "A and C")
+- `"All of above"` - All options are correct
+- `"None of above"` - None of the options are correct
+
+---
+
+### 64. answer_option_count (COMPUTED - not LLM-tagged)
+**COMPUTED FIELD** - This is derived from raw data (count of answer choices), NOT tagged by LLM.
+
+Do NOT tag this field. It will be computed automatically.
+
+---
+
+### 65. correct_answer_position (COMPUTED - not LLM-tagged)
+**COMPUTED FIELD** - This is derived from raw data (A, B, C, D, E position of correct answer), NOT tagged by LLM.
+
+Do NOT tag this field. It will be computed automatically.
+
+---
+
+### 66. answer_length_pattern
+**REQUIRED** - Every question must have an answer length pattern. Never null.
+
+**Valid values:**
+- `"Uniform"` - All answer options approximately same length
+- `"Variable"` - Mix of short and long answers
+- `"Correct longest"` - Correct answer is noticeably longest
+- `"Correct shortest"` - Correct answer is noticeably shortest
+
+**DEFAULT: If `distractor_homogeneity` = "Homogeneous", ALWAYS tag `answer_length_pattern` = "Uniform".**
+
+Override to "Variable" or "Correct longest/shortest" ONLY when the length difference is EGREGIOUS — e.g., one answer is a single word and another is a full sentence with additional clinical detail.
+
+**"Uniform"** = All options are CONCEPTUALLY similar in complexity:
+- All single drug names: "Abiraterone" / "Enzalutamide" / "Olaparib" → **Uniform**
+- All short phrases: "Continue therapy" / "Switch treatment" / "Monitor PSA" → **Uniform**
+
+**"Variable"** = Options differ in TYPE or COMPLEXITY:
+- Mix of single words and detailed explanations: "Abiraterone" / "Continue current therapy and monitor for progression" → **Variable**
+
+**"Correct longest/shortest"** = The CORRECT answer is noticeably longer/shorter than ALL distractors
+
+---
+
+### 67. distractor_homogeneity
+**REQUIRED** - Every question must have a distractor homogeneity rating. Never null.
+
+**Valid values:**
+- `"Homogeneous"` - All distractors from same category
+- `"Heterogeneous"` - Mixed distractor types
+
+**"Homogeneous"** = All distractors are the SAME TYPE:
+- All drug names: "Abiraterone" / "Enzalutamide" / "Docetaxel" / "Olaparib" → **Homogeneous**
+- All clinical actions: "Hold therapy" / "Dose reduce" / "Discontinue" → **Homogeneous**
+- All trial names: "LATITUDE" / "VISION" / "PROfound" → **Homogeneous**
+
+**"Heterogeneous"** = Distractors are DIFFERENT TYPES:
+- Treatment + Safety + Mechanism: "Abiraterone" / "Anemia occurs in 50%" / "PARP targeting" → **Heterogeneous**
+
+---
+
+### 68-73. flaw_absolute_terms, flaw_grammatical_cue, flaw_implausible_distractor, flaw_clang_association, flaw_convergence_vulnerability, flaw_double_negative
+**REQUIRED** - These are boolean fields (true/false). Never null.
+
+**Item-writing flaws to detect:**
+
+**flaw_absolute_terms** (`true` / `false`):
+- Words like "always", "never", "all", "none", "only" that signal incorrect options
+
+**flaw_grammatical_cue** (`true` / `false`):
+- Grammatical mismatch between stem and incorrect options
+
+**flaw_implausible_distractor** (`true` / `false`):
+- Obviously wrong distractor that no competent clinician would choose
+
+**flaw_clang_association** (`true` / `false`):
+- Word in stem repeated verbatim in correct answer (cueing)
+
+**flaw_convergence_vulnerability** (`true` / `false`):
+- Multiple distractors can be eliminated by same reasoning
+
+**flaw_double_negative** (`true` / `false`):
+- Double negative phrasing (confusing)
+
+**Default for most well-written questions:** All flaws should be `false`
 
 ---
 
 ## Disease-Specific Tagging Examples
 
-### Example 1: mCRPC with BRCA2, PARP Inhibitor
-**Question:** "A 65-year-old patient with mCRPC and a BRCA2 mutation is progressing on ADT + Abiraterone. Which treatment option provides the best efficacy?"
-**Answer:** "PARP inhibitor"
+### Example 1: mCRPC with BRCA2, PARP Inhibitor Selection
+**Question:** "A 65-year-old patient with mCRPC and a BRCA2 mutation is progressing on ADT + abiraterone. Which treatment option provides the best efficacy?"
+**Answer:** "Olaparib"
 
 **Tags:**
 - `topic`: "Treatment selection"
-- `disease_type`: "mCRPC"
+- `disease_type_1`: "mCRPC"
 - `disease_stage`: "Metastatic"
-- `treatment_line`: "2L+" (progressing after abiraterone)
-- `treatment_1`: "olaparib" or "rucaparib" (PARP inhibitor - infer from answer)
+- `treatment_line`: "2L+"
+- `treatment_1`: "Olaparib"
 - `biomarker_1`: "BRCA2"
 - `drug_class_1`: "PARP inhibitor"
 - `drug_target_1`: "PARP"
 - `prior_therapy_1`: "Abiraterone"
-- `trial_1`: "PROfound" or "TRITON3" (depending on context)
+- `trial_1`: "PROfound"
+- `cme_outcome_level`: "4 - Competence"
+- `data_response_type`: "Qualitative"
+- `stem_type`: "Clinical vignette"
+- `lead_in_type`: "Best answer"
+- `answer_format`: "Single best"
 
 **Rationale:** BRCA2 mutation drives PARP inhibitor selection. Castration-resistant + metastatic = mCRPC. Progressing after abiraterone = 2L+ in CRPC setting.
 
 ---
 
-### Example 2: mHSPC High-Volume, Treatment Intensification
-**Question:** "A 65-year-old man with newly diagnosed mHSPC presents with high-volume disease. Which treatment intensification strategy prolongs time until castration resistance?"
-**Answer:** "ADT with ARSI and Docetaxel"
+### Example 2: mHSPC High-Volume, Triplet Therapy
+**Question:** "A 65-year-old man with newly diagnosed high-volume mHSPC presents with 8 bone metastases and lung nodules. Which treatment intensification strategy prolongs time until castration resistance?"
+**Answer:** "ADT + darolutamide + docetaxel"
 
 **Tags:**
 - `topic`: "Treatment selection"
-- `disease_type`: "mHSPC"
+- `disease_type_1`: "mHSPC"
 - `disease_stage`: "Metastatic"
 - `treatment_line`: "1L"
-- `treatment_1`: "darolutamide" (ARSI, if ARASENS trial context)
-- `treatment_2`: "docetaxel"
+- `treatment_1`: "Darolutamide"
+- `treatment_2`: "Docetaxel"
 - `biomarker_1`: "High-volume disease"
+- `metastatic_site_1`: "Bone"
+- `metastatic_site_2`: "Lung"
 - `drug_class_1`: "Androgen receptor signaling inhibitor (ARSI)"
 - `drug_class_2`: "Taxane chemotherapy"
 - `drug_target_1`: "Androgen receptor"
-- `trial_1`: "ARASENS" (darolutamide + docetaxel + ADT)
+- `drug_target_2`: "Tubulin"
+- `trial_1`: "ARASENS"
+- `efficacy_endpoint_1`: "Overall survival (OS)"
+- `cme_outcome_level`: "4 - Competence"
 
-**Rationale:** High-volume mHSPC benefits from triplet therapy (ADT + ARSI + docetaxel). ARASENS trial showed OS benefit.
+**Rationale:** High-volume mHSPC benefits from triplet therapy. ARASENS trial showed OS benefit. Tag both darolutamide and docetaxel as fundable treatments.
 
 ---
 
-### Example 3: Lu-177-PSMA-617 for mCRPC
-**Question:** "A 65-year-old gentleman with mCRPC has progressed despite abiraterone, docetaxel, and cabazitaxel. He has PSMA-avid disease on PSMA PET. Which radioligand therapy improves OS?"
+### Example 3: Lu-177-PSMA-617 for PSMA-Positive mCRPC
+**Question:** "A 65-year-old gentleman with mCRPC has progressed despite abiraterone, docetaxel, and cabazitaxel. He has PSMA-positive disease on PSMA PET. Which radioligand therapy improves OS?"
 **Answer:** "Lu-177-PSMA-617"
 
 **Tags:**
-- `topic`: "Treatment selection"
-- `disease_type`: "mCRPC"
+- `topic`: "Clinical efficacy"
+- `disease_type_1`: "mCRPC"
 - `disease_stage`: "Metastatic"
-- `treatment_line`: "2L+" (3rd line or later)
-- `treatment_1`: "lutetium-177-PSMA-617"
+- `treatment_line`: "2L+"
+- `treatment_1`: "Lutetium-177-PSMA-617"
 - `biomarker_1`: "PSMA-positive"
 - `drug_class_1`: "Radioligand therapy"
 - `drug_target_1`: "PSMA"
@@ -376,127 +1304,174 @@ Tag when explicitly discussed for risk stratification or treatment decisions:
 - `prior_therapy_2`: "Docetaxel"
 - `prior_therapy_3`: "Cabazitaxel"
 - `trial_1`: "VISION"
+- `efficacy_endpoint_1`: "Overall survival (OS)"
+- `cme_outcome_level`: "4 - Competence"
 
-**Rationale:** PSMA-avid disease required for Lu-177-PSMA-617. Multiple prior therapies = 2L+ setting. VISION trial showed OS benefit.
+**Rationale:** PSMA-positive disease required for Lu-177-PSMA-617. Multiple prior therapies = 2L+ setting. Topic is "Clinical efficacy" because question asks what Lu-177-PSMA "improves".
 
 ---
 
 ### Example 4: nmCRPC, Delayed Metastases
-**Question:** "A patient with rising PSA (8 ng/mL) on ADT, castrate testosterone, and no metastases on conventional imaging. Which agent delays metastases and death?"
+**Question:** "A patient with rising PSA (8 ng/mL) on ADT, castrate testosterone (<20 ng/dL), and no metastases on conventional imaging. Which agent delays metastases and death?"
 **Answer:** "Apalutamide"
 
 **Tags:**
-- `topic`: "Treatment selection"
-- `disease_type`: "nmCRPC"
-- `disease_stage`: "Metastatic" (NOTE: M0 disease)
-- `treatment_line`: "1L" (first treatment for CRPC)
-- `treatment_1`: "apalutamide"
+- `topic`: "Clinical efficacy"
+- `disease_type_1`: "nmCRPC"
+- `disease_stage`: "Metastatic"
+- `treatment_line`: "1L"
+- `treatment_1`: "Apalutamide"
 - `drug_class_1`: "Androgen receptor signaling inhibitor (ARSI)"
 - `drug_target_1`: "Androgen receptor"
 - `trial_1`: "SPARTAN"
-- `efficacy_endpoint_1`: "Metastasis-free survival"
+- `efficacy_endpoint_1`: "Metastasis-free survival (MFS)"
+- `efficacy_endpoint_2`: "Overall survival (OS)"
+- `cme_outcome_level`: "4 - Competence"
 
-**Rationale:** Rising PSA + castrate testosterone + no metastases = nmCRPC. SPARTAN showed apalutamide delays metastases.
-
----
-
-### Example 5: Neuroendocrine Transformation
-**Question:** "A 65-year-old man with mCRPC on enzalutamide develops new lymphadenopathy and UNDETECTABLE PSA. Biopsy shows neuroendocrine prostate cancer. What is the best treatment?"
-**Answer:** "Platinum-based chemotherapy (cisplatin + etoposide)"
-
-**Tags:**
-- `topic`: "Treatment selection"
-- `disease_type`: "Neuroendocrine"
-- `disease_stage`: "Metastatic"
-- `treatment_line`: "2L+" (after ARSI failure)
-- `treatment_1`: null (chemotherapy backbone, not fundable)
-- `biomarker_1`: "Neuroendocrine markers"
-- `prior_therapy_1`: "Enzalutamide"
-- `resistance_mechanism`: "Lineage plasticity"
-
-**Rationale:** Undetectable PSA + neuroendocrine features = treatment-emergent NEPC. Requires platinum chemotherapy, not ARSI.
+**Rationale:** Rising PSA + castrate testosterone + no metastases = nmCRPC. SPARTAN showed apalutamide delays metastases (MFS) and death (OS).
 
 ---
 
-### Example 6: Localized High-Risk, Genomic Testing
+### Example 5: Localized High-Risk, Genomic Testing
 **Question:** "A 65-year-old male with high-risk localized prostate cancer (Gleason 8, PSA 18) undergoes prostate biopsy. Which test stratifies risk and informs treatment?"
-**Answer:** "Genomic profiling (Decipher, Oncotype DX)"
+**Answer:** "Genomic profiling (Decipher or Oncotype DX)"
 
 **Tags:**
 - `topic`: "Biomarker testing"
-- `disease_type`: "Localized high-risk"
+- `disease_type_1`: "Localized high-risk"
 - `disease_stage`: "Localized"
-- `treatment_line`: null (pre-treatment, risk stratification)
+- `treatment_line`: null
 - `biomarker_1`: "Gleason 8"
-- `biomarker_2`: "Decipher" or "Oncotype DX Prostate" (genomic test)
+- `biomarker_2`: "Decipher"
+- `biomarker_3`: "PSA"
+- `cme_outcome_level`: "4 - Competence"
 
-**Rationale:** High-risk features (Gleason 8, PSA 18) warrant genomic testing for further risk stratification.
-
----
-
-## Edge Cases and Special Considerations
-
-### 1. Screening vs Staging Imaging
-- **Screening:** mpMRI for detecting cancer in asymptomatic patients → NON-ONCOLOGY
-- **Staging:** PSMA PET for newly diagnosed high-risk prostate cancer → ONCOLOGY (tag as "Biomarker testing")
-
-### 2. Counting Treatment Lines in CRPC
-- **Key Principle:** Count lines WITHIN the CRPC setting, NOT overall treatment lines
-- Example: ADT + abiraterone (mHSPC) → progresses → enzalutamide (mCRPC) = "1L" in CRPC setting
-
-### 3. Combination Therapies (PARP + ARSI)
-- Newer trials use PARP inhibitor + ARSI combinations (TALAPRO-2, MAGNITUDE)
-- Tag both drugs: treatment_1: "talazoparib", treatment_2: "enzalutamide"
-- Tag both drug classes: drug_class_1: "PARP inhibitor", drug_class_2: "ARSI"
-
-### 4. Neuroendocrine Transformation
-- Look for "lineage plasticity", "small cell features", "undetectable PSA with disease progression"
-- disease_type: "Neuroendocrine"
-- Treatment shifts to platinum-based chemotherapy (NOT fundable, don't tag)
-
-### 5. PSA Flare vs Progression
-- PSA can transiently rise after starting ADT ("PSA flare") - not progression
-- True progression: sustained PSA rise after initial response
-
-### 6. PSMA PET vs FDG PET
-- PSMA PET: detects PSMA-expressing disease (most prostate cancers)
-- FDG PET: detects high-grade, aggressive disease (PSMA-negative variants)
-- If "discordant PSMA non-avid disease" → consider tagging as aggressive/neuroendocrine features
+**Rationale:** High-risk features (Gleason 8, PSA 18) warrant genomic testing. This is biomarker testing (not treatment selection).
 
 ---
 
-## Common Pitfalls to Avoid
+### Example 6: Perioperative Treatment
+**Question:** "A patient with high-risk localized prostate cancer (cT3a, Gleason 9) receives 6 months of ADT before radical prostatectomy and continues for 2 years after surgery. What treatment line is this?"
+**Answer:** "Perioperative ADT"
 
-1. **Don't confuse mHSPC with mCRPC:**
-   - "De novo metastatic" → mHSPC
-   - "Rising PSA on ADT" → mCRPC
+**Tags:**
+- `topic`: "Treatment selection"
+- `disease_type_1`: "Localized high-risk"
+- `disease_stage`: "Locally advanced"
+- `treatment_line`: "Perioperative"
+- `biomarker_1`: "Gleason 9"
+- `cme_outcome_level`: "4 - Competence"
 
-2. **Don't tag ADT/LHRH agonists unless they're the focus:**
-   - ADT is the backbone, not the fundable treatment
-
-3. **Don't tag screening questions as oncology:**
-   - "Who should be screened?" → NON-ONCOLOGY
-   - "Should we do PSMA PET in newly diagnosed high-risk?" → ONCOLOGY (staging)
-
-4. **Don't forget castration status in disease_type:**
-   - This is THE defining feature of prostate cancer
-
-5. **Don't tag PSA as biomarker unless it's explicitly the focus:**
-   - PSA is mentioned in almost every question - only tag when PSA itself is being discussed
-
-6. **HRR mutations ≠ BRCA only:**
-   - BRCA1/2 are the most common, but ATM, PALB2, CHEK2 also qualify for PARP inhibitors
+**Rationale:** Perioperative = treatment spanning before AND after surgery. cT3a = locally advanced.
 
 ---
 
 ## Summary: Key Takeaways
 
-1. **Castration status is EVERYTHING** - this goes in disease_type
-2. **Screening questions are NON-ONCOLOGY** - flag them
-3. **Count treatment lines WITHIN CRPC** - not overall
-4. **PSMA-positive = radioligand eligible** - tag as biomarker
-5. **HRR mutations = PARP inhibitor eligible** - tag as biomarker
-6. **High-volume mHSPC = triplet therapy** (ADT + ARSI + docetaxel)
-7. **Neuroendocrine transformation = platinum chemo** (not ARSI)
+1. **Castration status is EVERYTHING** - this goes in disease_type (mCRPC, nmCRPC, mHSPC)
+2. **Screening questions are NON-ONCOLOGY** - flag for reclassification
+3. **Neuroendocrine: auto-reclassify if unanimous, flag if conflict**
+4. **Count treatment lines WITHIN CRPC** - not overall treatment history
+5. **PSMA: only use "PSMA-positive" or "PSMA-negative"** - no other variants
+6. **HRR mutations = PARP inhibitor eligible** - includes BRCA1/2, ATM, PALB2, etc.
+7. **High-volume mHSPC = triplet therapy** (ADT + ARSI + docetaxel)
+8. **BCR is distinct stage** - rising PSA after treatment with NO visible metastases
+9. **Tag ALL fundable drugs** - including chemotherapy (docetaxel, cabazitaxel)
+10. **PSA is usually NOT a biomarker** - only tag when PSA itself is the focus
+
+---
+
+## Output Format
+
+Respond with ONLY a JSON object containing all 73 fields. Use `null` for fields that are not applicable or cannot be determined with confidence.
+
+```json
+{
+    "topic": "Treatment selection",
+    "disease_stage": "Metastatic",
+    "disease_type_1": "mCRPC",
+    "disease_type_2": "PSMA-positive",
+    "treatment_line": "1L",
+    "treatment_1": "Lu-177-PSMA-617",
+    "treatment_2": null,
+    "treatment_3": null,
+    "treatment_4": null,
+    "treatment_5": null,
+    "biomarker_1": "PSMA-positive",
+    "biomarker_2": null,
+    "biomarker_3": null,
+    "biomarker_4": null,
+    "biomarker_5": null,
+    "trial_1": "VISION",
+    "trial_2": null,
+    "trial_3": null,
+    "trial_4": null,
+    "trial_5": null,
+    "treatment_eligibility": null,
+    "age_group": null,
+    "organ_dysfunction": null,
+    "fitness_status": null,
+    "disease_specific_factor": null,
+    "comorbidity_1": null,
+    "comorbidity_2": null,
+    "comorbidity_3": null,
+    "drug_class_1": "Radioligand therapy",
+    "drug_class_2": null,
+    "drug_class_3": null,
+    "drug_target_1": "PSMA",
+    "drug_target_2": null,
+    "drug_target_3": null,
+    "prior_therapy_1": "Abiraterone",
+    "prior_therapy_2": "Enzalutamide",
+    "prior_therapy_3": null,
+    "resistance_mechanism": "ARSI-resistant",
+    "metastatic_site_1": "Bone",
+    "metastatic_site_2": null,
+    "metastatic_site_3": null,
+    "symptom_1": null,
+    "symptom_2": null,
+    "symptom_3": null,
+    "performance_status": null,
+    "toxicity_type_1": null,
+    "toxicity_type_2": null,
+    "toxicity_type_3": null,
+    "toxicity_type_4": null,
+    "toxicity_type_5": null,
+    "toxicity_organ": null,
+    "toxicity_grade": null,
+    "efficacy_endpoint_1": "Overall survival (OS)",
+    "efficacy_endpoint_2": null,
+    "efficacy_endpoint_3": null,
+    "outcome_context": "Primary endpoint met",
+    "clinical_benefit": "Superior",
+    "guideline_source_1": null,
+    "guideline_source_2": null,
+    "evidence_type": "Phase 3 RCT",
+    "cme_outcome_level": "4 - Competence",
+    "data_response_type": "Comparative",
+    "stem_type": "Clinical vignette",
+    "lead_in_type": "Best answer",
+    "answer_format": "Single best",
+    "answer_length_pattern": "Uniform",
+    "distractor_homogeneity": "Homogeneous",
+    "flaw_absolute_terms": false,
+    "flaw_grammatical_cue": false,
+    "flaw_implausible_distractor": false,
+    "flaw_clang_association": false,
+    "flaw_convergence_vulnerability": false,
+    "flaw_double_negative": false
+}
+```
+
+## Key Rules for Output
+
+1. **All 73 fields must be present** - Never omit a field; use `null` for inapplicable fields
+2. **Exact canonical values** - Use values exactly as specified in field definitions
+3. **No extra fields** - Only include the 73 defined fields
+4. **Valid JSON** - Ensure proper JSON formatting (double quotes, no trailing commas)
+5. **One topic only** - Topic is the only required field; never null
+6. **Boolean flaw fields** - Use `true` or `false` (not strings, not null) for the 6 flaw_ fields
+7. **Castration status in disease_type** - mCRPC, nmCRPC, mHSPC, nmHSPC
+8. **treatment_eligibility usually null** - No transplant-based treatment in prostate cancer
 
 ---
