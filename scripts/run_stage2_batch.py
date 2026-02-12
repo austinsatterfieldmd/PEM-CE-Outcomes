@@ -428,6 +428,12 @@ def main():
         default=False,
         help="Allow tagging with a fallback prompt (by default, script stops if no dedicated prompt exists)"
     )
+    parser.add_argument(
+        "--raw-data",
+        type=Path,
+        default=None,
+        help="Raw performance data Excel file (for enrichment with pre/post scores)"
+    )
     args = parser.parse_args()
 
     # Set default paths based on disease
@@ -512,6 +518,93 @@ def main():
     if not args.dry_run and results:
         print("\nNormalizing tags...")
         results = normalize_results(results)
+
+        # Enrich with QCore and performance data
+        print("\n📊 Enriching with QCore scores and performance data...")
+        from src.core.preprocessing.qcore_scorer import calculate_qcore_score
+
+        # Try to find raw data file if not specified
+        raw_data_file = args.raw_data
+        if not raw_data_file:
+            # Look for common raw data files
+            possible_files = list(PROJECT_ROOT.glob("data/raw/*DataTable*.xlsx"))
+            if possible_files:
+                raw_data_file = possible_files[0]
+                logger.info(f"Auto-detected raw data file: {raw_data_file.name}")
+
+        # Load performance data if available
+        perf_data = None
+        if raw_data_file and raw_data_file.exists():
+            try:
+                perf_df = pd.read_excel(
+                    raw_data_file,
+                    usecols=['QUESTIONGROUPDESIGNATION', 'SCORINGGROUP',
+                             'PRESCORECALC', 'PRESCOREN', 'POSTSCORECALC', 'POSTSCOREN']
+                )
+                logger.info(f"Loaded performance data: {len(perf_df)} records")
+                perf_data = perf_df
+            except Exception as e:
+                logger.warning(f"Could not load performance data: {e}")
+
+        # Enrich each result
+        qcore_added = 0
+        perf_added = 0
+        for result in results:
+            if result.get('error'):
+                continue
+
+            # Add QCore scores
+            final_tags = result.get('final_tags', {})
+            if final_tags:
+                try:
+                    # Parse CME level
+                    cme_level_raw = final_tags.get('cme_outcome_level', 4)
+                    if isinstance(cme_level_raw, str):
+                        cme_level = int(cme_level_raw.split(' ')[0]) if ' ' in cme_level_raw else int(cme_level_raw)
+                    else:
+                        cme_level = int(cme_level_raw)
+
+                    qcore_result = calculate_qcore_score(final_tags, cme_level=cme_level)
+                    result['qcore_score'] = qcore_result['total_score']
+                    result['qcore_grade'] = qcore_result['grade']
+                    result['qcore_breakdown'] = qcore_result['breakdown']
+                    result['qcore_ready_for_deployment'] = qcore_result['ready_for_deployment']
+                    qcore_added += 1
+                except Exception as e:
+                    logger.warning(f"Failed to calculate QCore for {result.get('source_id')}: {e}")
+
+            # Add performance data
+            if perf_data is not None:
+                qgd = result.get('source_id')
+                if qgd:
+                    matches = perf_data[perf_data['QUESTIONGROUPDESIGNATION'].astype(str) == str(qgd)]
+                    if not matches.empty:
+                        performance_by_audience = {}
+                        for _, row in matches.iterrows():
+                            audience = row['SCORINGGROUP']
+                            pre_correct = row['PRESCORECALC']
+                            pre_total = row['PRESCOREN']
+                            post_correct = row['POSTSCORECALC']
+                            post_total = row['POSTSCOREN']
+
+                            pre_pct = (pre_correct / pre_total * 100) if pre_total > 0 else None
+                            post_pct = (post_correct / post_total * 100) if post_total > 0 else None
+                            change = (post_pct - pre_pct) if (pre_pct is not None and post_pct is not None) else None
+
+                            performance_by_audience[audience] = {
+                                'pre_score_correct': int(pre_correct) if pd.notna(pre_correct) else 0,
+                                'pre_score_total': int(pre_total) if pd.notna(pre_total) else 0,
+                                'pre_score_pct': round(pre_pct, 1) if pre_pct is not None else None,
+                                'post_score_correct': int(post_correct) if pd.notna(post_correct) else 0,
+                                'post_score_total': int(post_total) if pd.notna(post_total) else 0,
+                                'post_score_pct': round(post_pct, 1) if post_pct is not None else None,
+                                'change_pp': round(change, 1) if change is not None else None
+                            }
+
+                        result['performance_by_audience'] = performance_by_audience
+                        perf_added += 1
+
+        logger.info(f"Enrichment complete: QCore={qcore_added}, Performance={perf_added}")
 
     # Save final results (preserving human-reviewed entries from previous runs)
     output_path = PROJECT_ROOT / args.output
