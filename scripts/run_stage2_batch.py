@@ -593,12 +593,12 @@ def main():
             print(f"  New tag values: {new_tag_values}")
         print("="*50)
 
-    # Auto-import to dashboard database
+    # Auto-import to dashboard database (SQLite)
     if not args.dry_run:
         import_script = PROJECT_ROOT / "dashboard" / "scripts" / "import_stage2_results.py"
         if import_script.exists():
             import subprocess
-            print("\nImporting to dashboard database...")
+            print("\n📥 Importing to SQLite dashboard database...")
             result = subprocess.run(
                 ["python", str(import_script), "--file", str(output_path), "--upsert"],
                 cwd=str(PROJECT_ROOT / "dashboard"),
@@ -610,6 +610,26 @@ def main():
                 for line in result.stdout.split('\n'):
                     if 'Inserted' in line or 'Updated' in line or 'Total questions' in line:
                         print(line.split(' - ')[-1] if ' - ' in line else line)
+
+                # Auto-import to Supabase
+                supabase_script = PROJECT_ROOT / "dashboard" / "scripts" / "import_to_supabase.py"
+                if supabase_script.exists():
+                    print("\n☁️  Importing to Supabase...")
+                    supabase_result = subprocess.run(
+                        ["python", str(supabase_script), "--file", str(output_path)],
+                        cwd=str(PROJECT_ROOT / "dashboard"),
+                        capture_output=True,
+                        text=True
+                    )
+                    if supabase_result.returncode == 0:
+                        # Extract key stats from output
+                        for line in supabase_result.stdout.split('\n'):
+                            if 'Inserted' in line or 'Updated' in line or 'Total questions' in line or 'Errors' in line:
+                                print(line.split(' - ')[-1] if ' - ' in line else line)
+                    else:
+                        logger.warning(f"Supabase import failed: {supabase_result.stderr}")
+                else:
+                    logger.warning("Supabase import script not found - skipping cloud sync")
             else:
                 logger.warning(f"Dashboard import failed: {result.stderr}")
 
