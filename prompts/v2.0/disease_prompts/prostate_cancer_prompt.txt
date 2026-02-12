@@ -1150,6 +1150,23 @@ These fields capture patient-level characteristics that influence treatment deci
 - `"All of above"` - All options are correct
 - `"None of above"` - None of the options are correct
 
+**⚠️ CRITICAL: Only tag items from the QUESTION STEM and CORRECT ANSWER**
+
+Do NOT tag treatments, biomarkers, trials, or other entities mentioned ONLY in incorrect/distractor answers.
+
+**When to consider incorrect answers:**
+- `"Compound (A+B)"` format → You may need to evaluate multiple options being compared
+- `"All of above"` / `"None of above"` → Consider all options to determine correctness
+- `"Single best"` → **ONLY tag items from question stem + correct answer**
+
+**Why this matters:** Distractors test whether learners can distinguish correct from incorrect information. Tagging distractors pollutes the dataset with drugs/biomarkers that are NOT actually the focus of the question.
+
+**Examples:**
+- Q: "Which ARSI is indicated for nmCRPC?" Correct: "Apalutamide", Wrong: "Pembrolizumab"
+  - Tag: `treatment_1: "Apalutamide"` (NOT pembrolizumab - it's a distractor)
+- Q: "Which of the following are true? A and C" (Compound format)
+  - Tag: Items from A, B, C, D as needed to capture what's being evaluated
+
 ---
 
 ### 64. answer_option_count (COMPUTED - not LLM-tagged)
