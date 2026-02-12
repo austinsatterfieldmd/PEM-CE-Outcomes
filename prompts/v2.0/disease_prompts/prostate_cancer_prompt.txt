@@ -241,6 +241,14 @@ The disease_type field captures **castration status**, NOT molecular subtypes (u
 **Other:**
 - `"Maintenance"` - Continuation therapy after achieving response (rare in prostate cancer; ADT is continuous, not "maintenance")
 
+**⚠️ CRITICAL VALIDATION - Common Errors to Avoid:**
+- **"Newly diagnosed" is NOT a valid treatment_line value**
+  - If question mentions "newly diagnosed" → map to `"1L"` (first-line)
+  - If question mentions "de novo metastatic" → map to `"1L"`
+- **Treatment lines describe SEQUENCE, not diagnosis timing**
+  - "Newly diagnosed mHSPC starting ADT + abiraterone" → treatment_line: `"1L"` (NOT "Newly diagnosed")
+  - "Newly diagnosed mCRPC starting enzalutamide" → treatment_line: `"1L"` (NOT "Newly diagnosed")
+
 **When to infer:**
 - Trial context: LATITUDE → 1L mHSPC, PROfound → 2L+ mCRPC
 - Keywords: "newly diagnosed", "de novo metastatic" → 1L; "after progression on", "post-abiraterone" → 2L+
@@ -315,6 +323,38 @@ The disease_type field captures **castration status**, NOT molecular subtypes (u
 - "Darolutamide plus docetaxel plus ADT" (ARASENS) → treatment_1: "Darolutamide", treatment_2: "Docetaxel"
 - "Enzalutamide after progression on abiraterone" → treatment_1: "Enzalutamide", prior_therapy_1: "Abiraterone"
 
+**⚠️ CRITICAL: When to Be LITERAL vs When to INFER Treatments**
+
+**LITERAL PHRASING - Example from Question #560:**
+"Which adverse event is most commonly associated with **abiraterone alone** in mCRPC patients?"
+→ treatment_1: "Abiraterone" ONLY (do NOT add prednisone, do NOT add ADT)
+
+**Rationale:** Question explicitly states "abiraterone alone" - respect this literal phrasing even though abiraterone is typically given with prednisone and ADT in clinical practice. The question is testing knowledge about abiraterone-specific toxicity.
+
+**Key phrases that signal LITERAL tagging:**
+- "Drug X **alone**"
+- "Drug X **monotherapy**"
+- "**Specifically** attributable to drug X"
+
+---
+
+**INFER TREATMENTS - Example from Question #353:**
+"Which mCRPC patients should undergo germline and somatic HRR mutation testing?"
+- Answer discusses PARP inhibitor eligibility, FDA approval criteria, mentions PROfound trial
+→ topic: "Biomarker testing"
+→ biomarker_1: "BRCA1/2"
+→ treatment_1: "Olaparib" (INFER - this is why we test for HRR)
+→ treatment_2: "Rucaparib" (INFER - HRR-directed PARP inhibitor)
+→ treatment_3: "Talazoparib" (INFER - HRR-directed PARP inhibitor)
+→ trial_1: "PROfound" (INFER if mentioned in answer options)
+
+**Rationale:** Biomarker testing questions are fundamentally ABOUT the downstream treatments that require the test. Tag the treatments/trials that make the biomarker testing clinically relevant. If the correct answer mentions "PARP inhibitor eligibility" or "treatment selection for HRR+ patients", you should infer the specific PARP inhibitors used in prostate cancer.
+
+**Key phrases that signal INFER treatments:**
+- Topic is "Biomarker testing" + answer discusses treatment eligibility
+- "Which patients need [biomarker] testing?"
+- "Indications for [biomarker] testing in treatment selection"
+
 ---
 
 ### 11-15. biomarker_1 through biomarker_5 (up to 5 biomarkers)
@@ -366,6 +406,12 @@ Tag for radioligand therapy (Lu-177-PSMA-617) eligibility:
 - `"PSMA-negative"` - No PSMA expression (NOT eligible for Lu-177-PSMA, consider FDG PET for aggressive variants)
 - **CRITICAL:** Use ONLY these two terms. Do NOT use "PSMA-avid" or "PSMA expression" to avoid normalization issues.
 
+**Example - Question #536 (PSMA-negative):**
+"Patient with mCRPC, post-docetaxel, PSMA PET shows NO uptake. Next step?"
+- Correct answer discusses FDG PET imaging or alternative therapy options
+→ biomarker_1: "PSMA-negative"
+**Rationale:** PSMA-negative status is clinically actionable (excludes Lu-177-PSMA therapy, indicates need for FDG PET to assess for aggressive variant histology). Tag negative biomarker results just as you would tag positive results.
+
 **Other Molecular Features:**
 - `"AR-V7"` - Androgen receptor variant 7 (predicts ARSI resistance)
 - `"TP53"` - TP53 mutation (aggressive disease, poor prognosis)
@@ -392,6 +438,22 @@ Tag when explicitly discussed for risk stratification or treatment decisions:
 - `"Decipher"` - Genomic Classifier (GC) score after prostatectomy
 - `"Prolaris"` - Cell Cycle Progression (CCP) score
 - `"FoundationOne"`, `"Guardant360"` - Comprehensive genomic profiling
+
+**Including biomarker values (when clinically relevant):**
+
+For biomarkers with specific thresholds or scores, include the value/result when it's clinically actionable:
+- ✓ "Decipher score 0.8" → biomarker: "Decipher 0.8" (high-risk category, >0.6)
+- ✓ "Decipher 0.78" → biomarker: "Decipher 0.78" (specific value matters for risk stratification)
+- ✓ "PSA 50 ng/mL" → biomarker: "PSA 50" (specific value is clinically significant)
+- ✓ "Gleason 8" → biomarker: "Gleason 8" (score already included in name)
+- ✗ "PSA progression" → biomarker: "PSA" (value not specified)
+- ✗ "Elevated PSA" → biomarker: "PSA" (value not specified)
+
+**Example - Question #602 (Decipher with value):**
+"Patient with biochemical recurrence, Decipher score 0.78 (high-risk), Gleason 9-10..."
+→ biomarker_1: "Gleason 9-10"
+→ biomarker_2: "Decipher 0.78"
+**Rationale:** Decipher value determines risk category (high-risk >0.6) which affects treatment intensification decisions. Including the value provides context for why specific treatments are considered.
 
 **Volume of Metastases (mHSPC Risk Stratification):**
 - `"High-volume disease"` - ≥4 bone mets with ≥1 beyond spine/pelvis, OR visceral metastases (CHAARTED criteria)
@@ -1192,18 +1254,51 @@ Do NOT tag this field. It will be computed automatically.
 - `"Correct longest"` - Correct answer is noticeably longest
 - `"Correct shortest"` - Correct answer is noticeably shortest
 
-**DEFAULT: If `distractor_homogeneity` = "Homogeneous", ALWAYS tag `answer_length_pattern` = "Uniform".**
+**⚠️ CRITICAL DEFAULT RULE:**
+If `distractor_homogeneity` = "Homogeneous", you MUST tag `answer_length_pattern` = "Uniform" UNLESS the length difference is EGREGIOUS (see examples below).
 
-Override to "Variable" or "Correct longest/shortest" ONLY when the length difference is EGREGIOUS — e.g., one answer is a single word and another is a full sentence with additional clinical detail.
+**Rule of thumb:** If you're debating whether it's "Variable", it's probably "Uniform". Only use "Variable" when the difference is obvious and extreme.
+
+**When to override to "Variable":**
+Override ONLY when there is an EXTREME disparity in answer length or detail level:
+- ✓ One option is a single word ("Olaparib") and another is a full clinical sentence with multiple concepts ("Enzalutamide with continuation of ADT and close monitoring for PSA progression every 3 months")
+- ✓ One option is 3-4 words and another is 15+ words with multiple distinct clinical actions
+
+**When to keep "Uniform" despite minor length differences:**
+- ✗ All options are treatment regimens with similar structure, even if one has slightly more detail (e.g., "Abiraterone plus ADT" vs "Apalutamide")
+- ✗ All options are clinical management choices (e.g., "Hold therapy", "Switch therapy", "Monitor PSA"), even if one is 2-3 words longer
+- ✗ All options are biomarker tests with similar conceptual complexity
 
 **"Uniform"** = All options are CONCEPTUALLY similar in complexity:
 - All single drug names: "Abiraterone" / "Enzalutamide" / "Olaparib" → **Uniform**
 - All short phrases: "Continue therapy" / "Switch treatment" / "Monitor PSA" → **Uniform**
+- All treatment regimens: "Abiraterone plus ADT" / "Apalutamide plus ADT" / "Enzalutamide" → **Uniform** (even if word counts differ slightly)
 
-**"Variable"** = Options differ in TYPE or COMPLEXITY:
-- Mix of single words and detailed explanations: "Abiraterone" / "Continue current therapy and monitor for progression" → **Variable**
+**"Variable"** = Options differ in TYPE or COMPLEXITY with EGREGIOUS disparity:
+- Mix of single words and detailed explanations: "Abiraterone" / "Continue current therapy and monitor for progression with serial PSA testing and imaging every 3 months" → **Variable**
 
 **"Correct longest/shortest"** = The CORRECT answer is noticeably longer/shorter than ALL distractors
+
+---
+
+**Example - Question #602 (Uniform despite variation):**
+All answer options are treatment recommendations for biochemical recurrence:
+- "Observation with PSA monitoring"
+- "Abiraterone plus ADT"
+- "Apalutamide plus ADT"
+- "Enzalutamide"
+→ answer_length_pattern: **"Uniform"** (all are treatment recommendations with similar conceptual complexity)
+→ distractor_homogeneity: **"Homogeneous"** (all treatment options)
+**Rationale:** While word counts differ slightly (2-4 words), all options represent the SAME TYPE of response (treatment choices) with similar structure. Default to "Uniform" when distractors are homogeneous.
+
+**Example - Question #729 (Actually Variable - egregious difference):**
+- Option A: "Enzalutamide plus talazoparib" (3 words)
+- Option B: "Continued enzalutamide monotherapy" (3 words)
+- Option C: "Hold enzalutamide" (2 words)
+- Option D: "Switch to abiraterone with close monitoring for disease progression and consideration of alternative targeted therapies based on updated molecular profiling" (20+ words with multiple clinical actions)
+→ answer_length_pattern: **"Variable"** (Option D is EGREGIOUSLY longer with multiple distinct concepts)
+→ distractor_homogeneity: **"Homogeneous"** (all treatment management choices, but override justified)
+**Rationale:** Option D is not just longer - it contains multiple distinct clinical actions (switch + monitor + consider alternatives + molecular profiling), while A/B/C are simple 2-3 word treatment choices. This is an EGREGIOUS difference that justifies overriding the "Uniform" default.
 
 ---
 
@@ -1221,6 +1316,18 @@ Override to "Variable" or "Correct longest/shortest" ONLY when the length differ
 
 **"Heterogeneous"** = Distractors are DIFFERENT TYPES:
 - Treatment + Safety + Mechanism: "Abiraterone" / "Anemia occurs in 50%" / "PARP targeting" → **Heterogeneous**
+
+**Example - Question #536 (Homogeneous distractors):**
+"Patient with mCRPC, PSMA-negative on PET. Next step?"
+All answer options are treatment/management recommendations:
+- "Initiate Lu-177-PSMA therapy"
+- "Proceed with FDG PET imaging"
+- "Continue current ADT and monitor"
+- "Switch to alternative ARSI"
+→ distractor_homogeneity: **"Homogeneous"** (all treatment/management choices)
+→ answer_length_pattern: **"Uniform"** (all similar conceptual complexity)
+
+**Rationale:** When all options represent the SAME TYPE of response (all treatments, all diagnostic tests, all monitoring strategies), tag as Homogeneous regardless of the specific drugs/tests mentioned. Here all options are clinical decision points about what to do next - they're conceptually the same type even though one is imaging and the others are therapeutic decisions.
 
 ---
 
