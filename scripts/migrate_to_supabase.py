@@ -126,7 +126,7 @@ def clean_row(row: dict, table_name: str) -> dict:
         "questions": {"qcore_score", "qcore_grade", "qcore_breakdown", "qcore_scored_at"},
         "tags": {"qpulse_score", "qpulse_grade", "qpulse_breakdown", "qpulse_scored_at"},
         "question_activities": {"pre_score", "post_score", "pre_n", "post_n", "activity_id"},
-        "demographic_performance": {"pre_n", "post_n", "activity_id"},
+        "demographic_performance": {"pre_n", "post_n"},
     }
     table_skip = skip_columns.get(table_name, set())
 
