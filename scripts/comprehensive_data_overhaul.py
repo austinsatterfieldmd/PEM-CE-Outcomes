@@ -559,7 +559,8 @@ def phase_3_sync_supabase(dry_run=False):
 
         if not dry_run:
             try:
-                result = client.table(table_name).select('id', count='exact').execute()
+                pk = 'question_id' if table_name == 'tags' else 'id'
+                result = client.table(table_name).select(pk, count='exact').execute()
                 sb_count = result.count
                 match = "OK" if sqlite_count == sb_count else "MISMATCH"
                 logger.info(f"    {table_name}: SQLite={sqlite_count}, Supabase={sb_count} [{match}]")
