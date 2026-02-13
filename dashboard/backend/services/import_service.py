@@ -18,13 +18,13 @@ def get_import_db(target: str = None):
 
     Args:
         target: 'sqlite' or 'supabase'. If None, reads from
-                IMPORT_TARGET env var (default: 'sqlite').
+                IMPORT_TARGET env var (default: 'supabase').
 
     Returns:
         DatabaseService or SupabaseDatabaseService instance.
     """
     if target is None:
-        target = os.environ.get('IMPORT_TARGET', 'sqlite')
+        target = os.environ.get('IMPORT_TARGET', 'supabase')
 
     if target == 'supabase':
         from dashboard.backend.services.supabase_db import SupabaseDatabaseService

@@ -22,6 +22,7 @@ Usage:
     python dashboard/scripts/import_stage2_results.py --clear --force --file data/checkpoints/stage2_tagged_multiple_myeloma.json
 """
 
+import os
 import sys
 from pathlib import Path
 import json
@@ -570,8 +571,8 @@ def main():
     parser.add_argument(
         "--target",
         choices=["sqlite", "supabase"],
-        default="sqlite",
-        help="Database target: 'sqlite' (default) or 'supabase' (requires SUPABASE_URL + SUPABASE_SERVICE_KEY)"
+        default=os.environ.get("IMPORT_TARGET", "supabase"),
+        help="Database target: 'supabase' (default) or 'sqlite'. Override with IMPORT_TARGET env var."
     )
     args = parser.parse_args()
 

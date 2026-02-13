@@ -789,8 +789,8 @@ def main():
                         help="Comma-separated phases to run (default: 0,1,2,3,4)")
     parser.add_argument("--skip-supabase", action="store_true", help="Skip Phase 3 (Supabase sync)")
     parser.add_argument("--target", type=str, choices=["sqlite", "supabase"],
-                        default=os.environ.get("IMPORT_TARGET", "sqlite"),
-                        help="Write target: sqlite or supabase (default: IMPORT_TARGET env var or sqlite)")
+                        default=os.environ.get("IMPORT_TARGET", "supabase"),
+                        help="Write target: supabase (default) or sqlite. Override with IMPORT_TARGET env var.")
     parser.add_argument("--verbose", action="store_true", help="Detailed logging")
     args = parser.parse_args()
 

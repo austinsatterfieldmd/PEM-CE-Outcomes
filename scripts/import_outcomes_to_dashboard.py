@@ -261,8 +261,8 @@ def main():
         "--target",
         type=str,
         choices=["sqlite", "supabase"],
-        default=os.environ.get("IMPORT_TARGET", "sqlite"),
-        help="Write target: sqlite or supabase (default: IMPORT_TARGET env var or sqlite)"
+        default=os.environ.get("IMPORT_TARGET", "supabase"),
+        help="Write target: supabase (default) or sqlite. Override with IMPORT_TARGET env var."
     )
     parser.add_argument(
         "--dry-run",
