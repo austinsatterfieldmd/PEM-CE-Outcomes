@@ -72,7 +72,9 @@ In addition to standard topics, NSCLC questions may use:
 |-------|-------------|
 | **Radiation therapy management** | Questions about radiation planning, dosing, sequencing with systemic therapy (e.g., SBRT for oligometastatic, concurrent CRT for Stage III, brain radiation) |
 | **Surgical management** | Questions about surgical approach, resectability criteria, surgical decision-making (e.g., lobectomy vs sublobar, mediastinal staging, surgery timing relative to systemic therapy) |
-| **Molecular testing** | Questions about NGS, liquid biopsy, reflex testing, testing turnaround, which patients to test |
+
+**⚠️ IMPORTANT: "Biomarker testing" is the correct topic for ALL molecular testing questions.**
+Do NOT use "Molecular testing" as a topic value. Questions about NGS, liquid biopsy, reflex testing, companion diagnostics, testing turnaround, and which patients to test should ALL use topic: `"Biomarker testing"`.
 
 ---
 
@@ -885,7 +887,7 @@ You must assign values for all 66 fields below. Use `null` for fields that are n
 | **Clinical efficacy** | Response rates, survival outcomes, clinical trial results, "key findings" |
 | **Safety profile** | Knowing WHAT AEs to expect or recognize — awareness, anticipation. "What are the common AEs?", "Which symptoms should you monitor?" |
 | **AE management** | What to DO about an AE already occurring — hold drug, dose-reduce, manage. "Patient develops toxicity, what is the next step?" |
-| **Biomarker testing** | Molecular testing, companion diagnostics, test interpretation |
+| **Biomarker testing** | ALL molecular testing: NGS, liquid biopsy, tissue biopsy, reflex testing, companion diagnostics, test interpretation, testing turnaround, which patients to test |
 | **Mechanism of action** | Drug targets, pathways, MOA |
 | **Diagnosis** | Staging, imaging, diagnostic procedures |
 | **Prognosis** | Risk stratification, recurrence scores, survival prediction |
@@ -894,7 +896,6 @@ You must assign values for all 66 fields below. Use `null` for fields that are n
 | **Shared decision-making** | Patient-provider communication, discussing treatment options with patients, addressing patient concerns/preferences |
 | **Radiation therapy management** | Radiation planning, dosing, sequencing with systemic therapy (SBRT, CRT, brain radiation) |
 | **Surgical management** | Surgical approach, resectability, surgical decision-making, timing relative to systemic therapy |
-| **Molecular testing** | NGS, liquid biopsy, reflex testing, which patients to test, testing turnaround |
 | **Disparities in care** | Racial/ethnic disparities, inequities in access/outcomes |
 | **Barriers to care** | Obstacles to treatment (cost, access, adherence) |
 
@@ -1112,6 +1113,9 @@ Use the disease-specific drug table above to map class → individual drugs.
 - `"Never-smoker"` - Higher probability of driver mutations (EGFR, ALK, ROS1)
 - `"Oligometastatic disease"` - Limited metastatic burden, may be eligible for local consolidative therapy
 - `"CNS-only progression"` - Isolated CNS progression while systemic disease controlled
+- `"Liquid biopsy"` - Question focuses on ctDNA/cell-free DNA testing approach
+- `"Tissue biopsy"` - Question focuses on tissue-based molecular testing approach
+- `"Concurrent liquid and tissue biopsy"` - Question discusses or recommends both liquid AND tissue biopsy approaches together
 
 ### comorbidity_1 through comorbidity_3
 **OPTIONAL** - Comorbidities explicitly stated in the question stem that affect treatment decisions.
