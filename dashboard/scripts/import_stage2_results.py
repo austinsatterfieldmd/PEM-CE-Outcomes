@@ -80,6 +80,19 @@ def load_exclusion_list() -> set:
         logger.warning(f"Failed to load exclusion list: {e}")
         return set()
 
+def _to_bool(val) -> bool:
+    """Normalize flaw field values to actual booleans.
+
+    Checkpoint files may contain string "True"/"False" (from vote aggregator bug),
+    actual booleans, or None. This ensures we always write proper booleans to DB.
+    """
+    if isinstance(val, bool):
+        return val
+    if isinstance(val, str):
+        return val.lower() in ('true', 'yes', '1', 't', 'y')
+    return False
+
+
 # 8 core tags used to compute tag_status
 CORE_TAGS = [
     'topic', 'disease_state', 'disease_stage', 'disease_type_1',
@@ -265,12 +278,12 @@ def build_tag_update(result: dict) -> dict:
         'answer_format': final_tags.get('answer_format'),
         'answer_length_pattern': final_tags.get('answer_length_pattern'),
         'distractor_homogeneity': final_tags.get('distractor_homogeneity'),
-        'flaw_absolute_terms': final_tags.get('flaw_absolute_terms'),
-        'flaw_grammatical_cue': final_tags.get('flaw_grammatical_cue'),
-        'flaw_implausible_distractor': final_tags.get('flaw_implausible_distractor'),
-        'flaw_clang_association': final_tags.get('flaw_clang_association'),
-        'flaw_convergence_vulnerability': final_tags.get('flaw_convergence_vulnerability'),
-        'flaw_double_negative': final_tags.get('flaw_double_negative'),
+        'flaw_absolute_terms': _to_bool(final_tags.get('flaw_absolute_terms')),
+        'flaw_grammatical_cue': _to_bool(final_tags.get('flaw_grammatical_cue')),
+        'flaw_implausible_distractor': _to_bool(final_tags.get('flaw_implausible_distractor')),
+        'flaw_clang_association': _to_bool(final_tags.get('flaw_clang_association')),
+        'flaw_convergence_vulnerability': _to_bool(final_tags.get('flaw_convergence_vulnerability')),
+        'flaw_double_negative': _to_bool(final_tags.get('flaw_double_negative')),
 
         # Computed fields
         'answer_option_count': final_tags.get('answer_option_count'),

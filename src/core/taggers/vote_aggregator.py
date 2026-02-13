@@ -179,10 +179,23 @@ class VoteAggregator:
         self.majority_confidence = majority_confidence
         self.conflict_confidence = conflict_confidence
 
-    def _normalize_value(self, value: Any) -> Optional[str]:
-        """Normalize a tag value for comparison."""
+    # Fields that must remain boolean (not stringified)
+    BOOLEAN_FIELDS = {
+        "flaw_absolute_terms", "flaw_grammatical_cue", "flaw_implausible_distractor",
+        "flaw_clang_association", "flaw_convergence_vulnerability", "flaw_double_negative",
+    }
+
+    def _normalize_value(self, value: Any) -> Optional[Any]:
+        """Normalize a tag value for comparison.
+
+        Booleans are converted to lowercase strings ("true"/"false") so that
+        votes from different models compare correctly. The boolean type is
+        restored in get_final_tags() for BOOLEAN_FIELDS.
+        """
         if value is None:
             return None
+        if isinstance(value, bool):
+            return "true" if value else "false"
         if isinstance(value, str):
             # Strip whitespace and normalize case for comparison
             normalized = value.strip()
@@ -364,16 +377,29 @@ class VoteAggregator:
         """
         Extract final tag values from aggregated vote.
 
+        Restores boolean types for BOOLEAN_FIELDS (flaw detectors) which were
+        stringified during normalization for vote comparison.
+
         Args:
             aggregated: AggregatedVote result
 
         Returns:
             Dict of tag field -> final value
         """
-        return {
-            field: vote.final_value
-            for field, vote in aggregated.tags.items()
-        }
+        tags = {}
+        for field, vote in aggregated.tags.items():
+            val = vote.final_value
+            if field in self.BOOLEAN_FIELDS:
+                # Restore actual boolean from string representation
+                if isinstance(val, str):
+                    tags[field] = val.lower() in ('true', 'yes', '1', 't', 'y')
+                elif isinstance(val, bool):
+                    tags[field] = val
+                else:
+                    tags[field] = False  # Default for None/conflict
+            else:
+                tags[field] = val
+        return tags
 
     def get_confidence_scores(self, aggregated: AggregatedVote) -> Dict[str, float]:
         """
