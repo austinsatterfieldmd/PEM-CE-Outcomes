@@ -13,6 +13,13 @@ topics:
 - Shared decision-making
 - Disparities in care
 - Barriers to care
+- Surgical management
+- Radiation therapy management
+- Pathological classification
+- Screening and prevention
+- Imaging
+- Survivorship
+- Genetic testing
 disease_stages:
   solid_tumors:
   - Early-stage
@@ -615,6 +622,11 @@ verified_values:
   - Iron overload
   - Bone pain
   - Pruritus
+  - Hypoxia
+  - Erythromelalgia
+  - Dry eyes
+  - Oral pain
+  - Skin rash
   treatment:
   - Idecabtagene vicleucel
   - Ciltacabtagene autoleucel
@@ -686,6 +698,13 @@ verified_values:
   - Navtemadlin
   - Odronextamab
   - Pivekimab sunirine
+  - Revumenib
+  - Ziftomenib
+  - Midostaurin
+  - Quizartinib
+  - Asciminib
+  - INCA33989
+  - Corticosteroids
   biomarker:
   - del(17p)
   - MRD
@@ -738,6 +757,17 @@ verified_values:
   - RUNX1 mutated
   - ctDNA
   - ctDNA positivity
+  - KMT2Ar (MLL-rearranged)
+  - FLT3-ITD
+  - NPM1 mutated
+  - IDH2 mutated
+  - BCR-ABL1
+  - T315I mutation
+  - CRLF2 overexpression
+  - CD10
+  - BCL6
+  - MUM1
+  - CALR mutated
   drug_class:
   - CAR-T therapy
   - Bispecific antibody
@@ -766,6 +796,10 @@ verified_values:
   - IDH1 inhibitor
   - Hypomethylating agent (HMA)
   - MDM2 inhibitor
+  - Menin inhibitor
+  - FLT3 inhibitor
+  - Third-generation TKI
+  - STAMP inhibitor
   disease_type:
   - High-risk
   - Blastoid
@@ -802,6 +836,12 @@ verified_values:
   - Higher-risk MDS
   - Extranodal MZL
   - MALT lymphoma
+  - Therapy-related AML
+  - De novo AML
+  - Chronic phase
+  - IPI low-intermediate
+  - Chronic GVHD
+  - Steroid-naive
   prior_therapy:
   - Prior anti-CD38
   - Prior PI
@@ -832,6 +872,8 @@ verified_values:
   - Prior R-CVP
   - Preemptive therapy
   - Prior HMA
+  - Prior intensive chemotherapy
+  - Prior dasatinib
   toxicity_type:
   - Infections
   - VTE
@@ -857,6 +899,8 @@ verified_values:
   - Thrombosis
   - Hypogammaglobulinemia
   - Myelosuppression
+  - QTc prolongation
+  - Lipase elevations
   trial:
   - IsKia
   - UNITY-NHL
@@ -893,6 +937,13 @@ verified_values:
   - FLAIR
   - SURPASS ET
   - SOLSTICE
+  - AUGMENT-101
+  - RATIFY
+  - QuANTUM-First
+  - SUNMO
+  - JULIET
+  - L-MIND
+  - STARGLO
   efficacy_endpoint:
   - MRD negativity rate
   - Overall response rate (ORR)
@@ -911,6 +962,7 @@ verified_values:
   - Clinical response rate
   - CMV viremia clearance
   - Time to CMV reactivation
+  - CMV disease prevention
   toxicity_organ:
   - Hepatic
   - Cardiac
@@ -919,6 +971,8 @@ verified_values:
   - Hematologic
   - Gastrointestinal
   - Vascular
+  - Pulmonary
+  - GI
   metastatic_site:
   - Mediastinum
   - Bone
@@ -927,6 +981,7 @@ verified_values:
   - Blood
   - Skin
   - CNS metastases
+  - CNS
 normalization_rules:
   treatment_line:
     1L: Newly diagnosed

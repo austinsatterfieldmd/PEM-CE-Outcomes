@@ -74,6 +74,55 @@ HER2 IHC 0 OR negative → HER2-negative
 - Otherwise → Use `"HR+/HER2-"` (CDK4/6i, endocrine therapy drive treatment)
 - *Rationale:* T-DXd is the only drug specifically approved for HER2-low. When T-DXd is the treatment, HER2-low status is clinically actionable.
 
+### Edge Case: HER2-ultralow and T-DXd (DESTINY-Breast06)
+**HER2-ultralow** is a newly defined category based on DESTINY-Breast06 (DB-06) trial findings:
+- **Definition:** HER2 IHC 0 with **faint, incomplete membrane staining** in ≤10% of cells — previously grouped with HER2-negative
+- **Clinical significance:** DB-06 showed T-DXd benefit in HER2-ultralow patients, expanding treatment eligibility beyond HER2-low (IHC 1+ or IHC 2+/ISH-)
+- **When to use `"HER2-ultralow"`:**
+  - Question discusses T-DXd in patients with IHC 0 with faint staining
+  - Question references DB-06 / DESTINY-Breast06 specifically
+  - Question asks about reclassification of HER2 IHC 0 specimens
+  - Question discusses the distinction between "true HER2 0" (no staining) and "HER2-ultralow" (faint staining)
+- **IHC scoring hierarchy for disease_type:**
+  - IHC 3+ or IHC 2+/ISH+ → `"HER2+"` (always)
+  - IHC 2+/ISH- or IHC 1+ → `"HER2-low"`
+  - IHC 0 with faint membrane staining → `"HER2-ultralow"`
+  - IHC 0 with NO staining → HER2-negative (use `"HR+/HER2-"` or `"Triple-negative"` based on HR status)
+
+### Pathological Classification Values for disease_type
+
+When the question focuses on **histologic type, grading, or molecular classification** (topic = "Pathological classification"), use these disease_type values:
+
+| Scenario | disease_type Value |
+|----------|-------------------|
+| Invasive ductal carcinoma (IDC/NST) focus | `"IDC"` |
+| Invasive lobular carcinoma focus | `"ILC"` |
+| Tubular carcinoma | `"Tubular"` |
+| Mucinous (colloid) carcinoma | `"Mucinous"` |
+| Papillary carcinoma (invasive or intraductal) | `"Papillary"` |
+| Medullary-like carcinoma | `"Medullary"` |
+| Micropapillary carcinoma | `"Micropapillary"` |
+| Inflammatory breast cancer | `"Inflammatory"` |
+| Phyllodes tumor (benign, borderline, or malignant) | `"Phyllodes"` |
+| Paget disease of the nipple | `"Paget disease"` |
+| DCIS (ductal carcinoma in situ) | `"DCIS"` |
+| LCIS (lobular carcinoma in situ) | `"LCIS"` |
+| Atypical ductal hyperplasia (ADH) | `"ADH"` |
+| Desmoid fibromatosis | `"Desmoid"` |
+
+**When both receptor subtype AND histologic type are relevant:**
+- Prioritize receptor subtype (HER2+, HR+/HER2-, Triple-negative) for treatment-focused questions
+- Use histologic type for pathology-focused questions where histology drives the clinical scenario
+- Use `disease_specific_factor` to capture the histologic type when receptor subtype takes priority in disease_type
+
+### Molecular Classification (Intrinsic Subtypes)
+When a question specifically discusses intrinsic/PAM50 subtypes, tag in `disease_specific_factor`:
+- `"Luminal A"` - HR+, HER2-, low Ki-67, low grade
+- `"Luminal B"` - HR+, HER2- or HER2+, high Ki-67 or high grade
+- `"Basal-like"` - Usually Triple-negative, EGFR+/CK5/6+
+- `"HER2-enriched"` - HER2+ by PAM50 (may or may not match clinical HER2)
+- `"Normal-like"` - Similar to normal breast tissue
+
 ---
 
 ## disease_stage: Breast Cancer Staging
@@ -106,16 +155,22 @@ HER2 IHC 0 OR negative → HER2-negative
 **NOTE:** This table lists COMMON drugs for reference. It is NOT exhaustive. If a question mentions a drug, drug class, or mechanism not listed here, STILL tag it using the appropriate fields (treatment_1-5, drug_class_1-3, drug_target_1-3). Always tag what the question discusses, even if not in this table.
 
 ### HER2+ Disease
-`"trastuzumab"`, `"pertuzumab"`, `"trastuzumab deruxtecan"`, `"trastuzumab emtansine"`, `"tucatinib"`, `"neratinib"`, `"lapatinib"`, `"margetuximab"`
+`"trastuzumab"`, `"pertuzumab"`, `"trastuzumab deruxtecan"`, `"trastuzumab emtansine"`, `"tucatinib"`, `"neratinib"`, `"lapatinib"`, `"margetuximab"`, `"disitamab vedotin"`, `"patritumab deruxtecan"`
 
 ### HR+/HER2- Disease
 **CDK4/6 Inhibitors:** `"palbociclib"`, `"ribociclib"`, `"abemaciclib"`
-**Other:** `"everolimus"`, `"alpelisib"`, `"elacestrant"`, `"capivasertib"`, `"inavolisib"`
+**Oral SERDs/Novel Endocrine:** `"elacestrant"`, `"imlunestrant"`, `"lasofoxifene"`, `"camizestrant"`, `"amcenestrant"`
+**PI3K/AKT Pathway:** `"alpelisib"`, `"capivasertib"`, `"inavolisib"`, `"everolimus"`
+**Other:** `"goserelin"` (OFS), `"leuprolide"` (OFS)
 
 ### Triple-Negative Disease
-**Immunotherapy:** `"pembrolizumab"`, `"atezolizumab"`
-**ADCs:** `"sacituzumab govitecan"`, `"datopotamab deruxtecan"`
+**Immunotherapy:** `"pembrolizumab"`, `"atezolizumab"`, `"durvalumab"`
+**ADCs:** `"sacituzumab govitecan"`, `"datopotamab deruxtecan"`, `"sacituzumab tirumotecan"`
 **PARP Inhibitors:** `"olaparib"`, `"talazoparib"`
+
+### Cross-Subtype ADCs (tag based on patient's disease_type)
+**HER2-targeting ADCs:** `"trastuzumab deruxtecan"` (T-DXd), `"trastuzumab emtansine"` (T-DM1), `"disitamab vedotin"`, `"patritumab deruxtecan"` (HER3-targeting)
+**TROP2-targeting ADCs:** `"sacituzumab govitecan"` (SG), `"datopotamab deruxtecan"` (Dato-DXd), `"sacituzumab tirumotecan"` (Sac-TMT), `"raludotutag deruxtecan"`
 
 ### Drug Class Expansion (Use STARTDATE for temporal context)
 
@@ -123,8 +178,31 @@ HER2 IHC 0 OR negative → HER2-negative
 |------------|---------|-----------|
 | CDK4/6 inhibitor | 1L mBC | palbociclib, ribociclib, abemaciclib |
 | CDK4/6 inhibitor | Adjuvant | abemaciclib, ribociclib (post-2024) |
-| Antibody-drug conjugate (ADC) | HER2 | trastuzumab deruxtecan, trastuzumab emtansine |
+| Antibody-drug conjugate (ADC) | HER2+ | trastuzumab deruxtecan, trastuzumab emtansine |
+| Antibody-drug conjugate (ADC) | HER2-low/ultralow | trastuzumab deruxtecan |
+| Antibody-drug conjugate (ADC) | TNBC | sacituzumab govitecan, datopotamab deruxtecan |
+| Antibody-drug conjugate (ADC) | HR+/HER2- | sacituzumab govitecan (post-TROPiCS-02) |
 | PARP inhibitor | gBRCA+ mBC | olaparib, talazoparib |
+| Oral SERD | ESR1-mutated | elacestrant, imlunestrant |
+| PI3K inhibitor | PIK3CA-mutated | alpelisib, inavolisib |
+| AKT inhibitor | HR+/HER2- | capivasertib |
+
+### Breast Cancer-Specific drug_class Mappings (use these exact values)
+
+| Drug | drug_class |
+|------|-----------|
+| trastuzumab, pertuzumab, margetuximab | `"Monoclonal antibody"` |
+| trastuzumab deruxtecan, trastuzumab emtansine, sacituzumab govitecan, datopotamab deruxtecan, disitamab vedotin, patritumab deruxtecan, sacituzumab tirumotecan, raludotutag deruxtecan | `"ADC"` |
+| tucatinib, neratinib, lapatinib | `"HER2 TKI"` |
+| palbociclib, ribociclib, abemaciclib | `"CDK4/6 inhibitor"` |
+| elacestrant, imlunestrant, lasofoxifene, camizestrant, amcenestrant | `"Oral SERD"` |
+| alpelisib, inavolisib | `"PI3K inhibitor"` |
+| capivasertib | `"AKT inhibitor"` |
+| everolimus | `"mTOR inhibitor"` |
+| olaparib, talazoparib | `"PARP inhibitor"` |
+| pembrolizumab, atezolizumab | `"Anti-PD-1/PD-L1"` |
+| durvalumab | `"Anti-PD-L1"` |
+| goserelin, leuprolide | `"GnRH agonist"` |
 
 ---
 
@@ -139,9 +217,60 @@ HER2 IHC 0 OR negative → HER2-negative
 **Non-redundant biomarkers to tag when relevant:**
 - `"PD-L1"` - for immunotherapy eligibility (TNBC)
 - `"PIK3CA"` - for alpelisib/inavolisib
-- `"ESR1"` - for elacestrant
+- `"ESR1"` - for elacestrant/imlunestrant (ESR1 mutation via ctDNA)
 - `"BRCA1/2"` - for PARP inhibitors
-- `"Oncotype DX"`, `"MammaPrint"` - prognostic assays
+- `"PALB2"` - PARP inhibitor eligibility, genetic risk
+- `"ATM"`, `"CHEK2"` - moderate-penetrance genes (genetic risk counseling)
+- `"TP53"` - Li-Fraumeni syndrome, genetic risk
+- `"MSI-H"` / `"TMB-high"` - rare but actionable (pembrolizumab)
+
+**Genomic Assays — tag as biomarker when the assay/score is discussed:**
+
+**Oncotype DX (21-gene recurrence score):**
+- `"Oncotype DX"` - GENERIC: Use when the question is about the test itself (what it measures, when to order, clinical utility)
+- `"Oncotype DX RS-high"` - When the question specifies or implies a HIGH recurrence score (RS ≥26) driving a treatment decision (chemotherapy benefit)
+- `"Oncotype DX RS-low"` - When the question specifies or implies a LOW recurrence score (RS ≤25) and the decision is to omit chemotherapy
+- `"Oncotype DX RS-intermediate"` - When the question specifically discusses the intermediate range (RS 16-25) and age-based decision-making (TAILORx/RxPONDER context)
+- Key trials: TAILORx (node-negative), RxPONDER (1-3 positive nodes)
+
+**MammaPrint (70-gene signature):**
+- `"MammaPrint"` - GENERIC: Use when the question is about the test itself
+- `"MammaPrint high-risk"` - When clinical significance of high genomic risk is discussed
+- `"MammaPrint low-risk"` - When low genomic risk drives omission of chemotherapy
+- Key trial: MINDACT (can identify clinical high-risk/genomic low-risk patients who can safely omit chemo)
+
+**Breast Cancer Index (BCI):**
+- `"BCI"` - GENERIC: Use when the question is about the test itself
+- `"BCI-high"` - When BCI result drives decision for EXTENDED adjuvant endocrine therapy (beyond 5 years)
+- `"BCI-low"` - When BCI result supports stopping endocrine therapy at 5 years
+- BCI is unique: it predicts benefit of EXTENDED endocrine therapy (years 5-10), not chemotherapy
+
+**Prosigna / PAM50 (risk of recurrence score + intrinsic subtype):**
+- `"Prosigna"` - GENERIC: Use when discussing the test
+- Provides both a risk of recurrence (ROR) score AND intrinsic subtype (Luminal A/B, HER2-enriched, basal-like)
+- Key context: Used in node-negative and node-positive early BC for prognosis
+
+**EndoPredict (EPclin):**
+- `"EndoPredict"` - 12-gene molecular score combined with clinical features (tumor size, nodal status)
+- Predicts late recurrence risk (years 5-15), helps guide extended endocrine therapy decisions
+
+**Other genomic/molecular assays:**
+- `"FoundationOne CDx"` - Comprehensive genomic profiling (CGP) — used for identifying actionable mutations (PIK3CA, ESR1, BRCA, TMB)
+- `"Guardant360"` - Liquid biopsy CGP — ctDNA-based mutation detection
+- `"Signatera"` - Personalized ctDNA MRD (minimal residual disease) assay for recurrence monitoring
+
+**Ki-67 — Use specific values when clinical significance is discussed:**
+- `"Ki-67"` - GENERIC: Use when the question is about Ki-67 as a test (what it measures, interpretation, IHC methodology)
+- `"Ki-67-high"` - When the question states or implies HIGH Ki-67 (≥20-30%) driving a treatment decision (e.g., CDK4/6i adjuvant eligibility in monarchE, Luminal B classification)
+- `"Ki-67-low"` - When the question states or implies LOW Ki-67 (<20%) suggesting favorable biology (Luminal A, may omit chemotherapy)
+
+**ctDNA/Liquid Biopsy — tag when discussed:**
+- `"ctDNA"` - circulating tumor DNA (ESR1 mutation detection, minimal residual disease, treatment monitoring)
+
+**CRITICAL: Where to tag genomic assay results:**
+- Tag the ASSAY NAME in `biomarker_1-5` fields (e.g., `"Oncotype DX RS-high"`)
+- Tag the CLINICAL IMPLICATION in `disease_specific_factor` when it drives staging/risk (e.g., `"High genomic risk"`, `"Low genomic risk"`)
+- Do NOT duplicate: if Oncotype DX RS-high is in biomarker, do not also put "Oncotype DX" generically
 
 ---
 
@@ -153,15 +282,19 @@ HER2 IHC 0 OR negative → HER2-negative
 | Trastuzumab + pertuzumab + chemo in 1L HER2+ mBC | `"CLEOPATRA"` |
 | T-DXd vs T-DM1 in HER2+ mBC | `"DESTINY-Breast03"` |
 | T-DXd in HER2+ 2L+ mBC | `"DESTINY-Breast01"` |
-| Tucatinib + trastuzumab in HER2+ brain mets | `"HER2CLIMB"` |
-| T-DM1 adjuvant in HER2+ residual disease | `"KATHERINE"` |
+| T-DXd in HER2+ mBC (pooled analysis) | `"DESTINY-Breast02"` |
+| Tucatinib + trastuzumab + capecitabine in HER2+ (incl brain mets) | `"HER2CLIMB"` |
+| T-DM1 adjuvant in HER2+ residual disease after neoadjuvant | `"KATHERINE"` |
 | Pertuzumab adjuvant in HER2+ early BC | `"APHINITY"` |
+| T-DM1 vs paclitaxel + trastuzumab in HER2+ early BC | `"ATEMPT"` |
+| T-DM1 + tucatinib in HER2+ mBC | `"CompassHER2"` |
 
-### HER2-low Disease
+### HER2-low / HER2-ultralow Disease
 | Drug + Context | Trial |
 |----------------|-------|
-| T-DXd in HER2-low mBC | `"DESTINY-Breast04"` |
-| T-DXd in HER2-ultralow | `"DESTINY-Breast06"` |
+| T-DXd in HER2-low mBC (HR+ and TNBC) | `"DESTINY-Breast04"` |
+| T-DXd in HER2-ultralow (IHC 0 with faint staining) | `"DESTINY-Breast06"` |
+| T-DXd HER2 expression level analysis | `"DAISY"` |
 
 ### HR+/HER2- Disease
 | Drug + Context | Trial |
@@ -176,21 +309,40 @@ HER2 IHC 0 OR negative → HER2-negative
 | Palbociclib + letrozole in 1L HR+/HER2- mBC | `"PALOMA-2"` |
 | Palbociclib + fulvestrant in 2L+ HR+/HER2- mBC | `"PALOMA-3"` |
 | Elacestrant in ESR1-mutated HR+/HER2- | `"EMERALD"` |
+| Imlunestrant in HR+/HER2- mBC | `"EMBER-3"` |
+| Imlunestrant adjuvant in HR+/HER2- early BC | `"EMBER-4"` |
+| Lasofoxifene in ESR1-mutated HR+/HER2- | `"ELAINE 3"` |
+| Lasofoxifene + abemaciclib in ESR1-mutated | `"ELECTRA"` |
+| CDK4/6i + ET combinations (elacestrant, lasofoxifene) | `"ELEVATE"` |
+| Ribociclib + ET in 1L (CDK4/6i-eligible) | `"RIGHT Choice"` |
 | Alpelisib + fulvestrant in PIK3CA-mutated | `"SOLAR-1"` |
+| Alpelisib in PIK3CA-mutated (after CDK4/6i) | `"BYLieve"` |
 | Capivasertib + fulvestrant in HR+/HER2- | `"CAPItello-291"` |
 | Inavolisib + palbociclib + fulvestrant in PIK3CA-mutated | `"INAVO120"` |
+| Pembrolizumab + chemo neoadjuvant in high-risk HR+/HER2- | `"KEYNOTE-756"` |
 
 ### Triple-Negative Disease
 | Drug + Context | Trial |
 |----------------|-------|
 | Pembrolizumab + chemo in 1L mTNBC (PD-L1+) | `"KEYNOTE-355"` |
 | Pembrolizumab neoadjuvant in early TNBC | `"KEYNOTE-522"` |
-| SG + pembrolizumab in 1L mTNBC | `"ASCENT-04"` |
+| Sacituzumab govitecan + pembrolizumab in 1L mTNBC | `"ASCENT-04"` |
 | Atezolizumab + nab-paclitaxel in 1L mTNBC | `"IMpassion130"` |
 | Sacituzumab govitecan in 2L+ mTNBC | `"ASCENT"` |
+| Sacituzumab govitecan in HR+/HER2- mBC | `"TROPiCS-02"` |
 | Datopotamab deruxtecan in mTNBC | `"TROPION-Breast02"` |
+| Dato-DXd + durvalumab in 1L mTNBC | `"BEGONIA"` |
+| Dato-DXd in HR+/HER2- mBC | `"TROPION-Breast01"` |
 | Olaparib in BRCA-mutated mBC | `"OlympiAD"` |
+| Olaparib adjuvant in gBRCA+ high-risk early BC | `"OlympiA"` |
 | Talazoparib in BRCA-mutated mBC | `"EMBRACA"` |
+| SG adjuvant in early TNBC with residual disease | `"SASCIA"` |
+
+### Cross-Subtype / Novel Mechanism Trials
+| Drug + Context | Trial |
+|----------------|-------|
+| Adaptive platform neoadjuvant trial (multiple agents) | `"I-SPY 2"` |
+| Amcenestrant in HR+/HER2- mBC | `"AMEERA-3"` |
 
 ---
 
@@ -199,29 +351,142 @@ HER2 IHC 0 OR negative → HER2-negative
 | Trial | Inferred disease_type | Inferred treatment_line | Inferred disease_stage |
 |-------|----------------------|------------------------|----------------------|
 | DESTINY-Breast04 | HER2-low | 2L+ | Metastatic |
+| DESTINY-Breast06 | HER2-ultralow | 2L+ | Metastatic |
 | DESTINY-Breast03 | HER2+ | 2L+ | Metastatic |
+| DESTINY-Breast01 | HER2+ | 2L+ | Metastatic |
 | CLEOPATRA | HER2+ | 1L | Metastatic |
+| HER2CLIMB | HER2+ | 2L+ | Metastatic |
+| KATHERINE | HER2+ | Adjuvant | Early-stage |
+| APHINITY | HER2+ | Adjuvant | Early-stage |
 | monarchE | HR+/HER2- | Adjuvant | Early-stage |
 | NATALEE | HR+/HER2- | Adjuvant | Early-stage |
+| MONALEESA-2 | HR+/HER2- | 1L | Metastatic |
+| MONALEESA-7 | HR+/HER2- | 1L | Metastatic |
+| PALOMA-2 | HR+/HER2- | 1L | Metastatic |
+| EMERALD | HR+/HER2- | 2L+ | Metastatic |
+| EMBER-3 | HR+/HER2- | 2L+ | Metastatic |
+| CAPItello-291 | HR+/HER2- | 2L+ | Metastatic |
+| SOLAR-1 | HR+/HER2- | 2L+ | Metastatic |
+| INAVO120 | HR+/HER2- | 2L+ | Metastatic |
+| KEYNOTE-756 | HR+/HER2- | Neoadjuvant | Early-stage |
 | KEYNOTE-522 | Triple-negative | Neoadjuvant | Early-stage |
 | KEYNOTE-355 | Triple-negative | 1L | Metastatic |
 | ASCENT-04 | Triple-negative | 1L | Metastatic |
-| CAPItello-291 | HR+/HER2- | 2L+ | Metastatic |
-| SOLAR-1 | HR+/HER2- | 2L+ | Metastatic |
-| EMERALD | HR+/HER2- | 2L+ | Metastatic |
+| ASCENT | Triple-negative | 2L+ | Metastatic |
+| TROPiCS-02 | HR+/HER2- | 2L+ | Metastatic |
+| TROPION-Breast01 | HR+/HER2- | 2L+ | Metastatic |
+| OlympiA | Triple-negative | Adjuvant | Early-stage |
+| OlympiAD | Triple-negative | 2L+ | Metastatic |
+| BEGONIA | Triple-negative | 1L | Metastatic |
+
+---
+
+## Breast Cancer Topic-Specific Guidance
+
+### Surgical Management Questions
+**Tag as topic: `"Surgical management"`** for questions about:
+- **Breast surgery type:** Breast-conserving surgery (BCS/lumpectomy) vs mastectomy (total, modified radical, skin-sparing, nipple-sparing)
+- **Axillary surgery:** Sentinel lymph node biopsy (SLNB) vs axillary lymph node dissection (ALND), targeted axillary dissection (TAD), number of nodes for staging
+- **Surgical margins:** Re-excision criteria, margin width definitions, "no ink on tumor"
+- **Reconstruction:** Implant-based (prepectoral vs submuscular/subpectoral), autologous (DIEP flap, TRAM flap, latissimus dorsi), timing (immediate vs delayed), oncoplastic surgery
+- **Anesthesia for breast surgery:** PECS I/II blocks, paravertebral blocks, enhanced recovery protocols
+- **Surgical timing:** Surgery relative to neoadjuvant therapy, interval to adjuvant treatment
+- **Benign/borderline tumors:** Phyllodes tumor excision (wide local excision, margin requirements), fibroadenoma management, desmoid fibromatosis resection
+- **Contralateral prophylactic mastectomy:** Risk reduction in BRCA carriers, bilateral mastectomy decisions
+
+**Tagging rules for Surgical management:**
+- treatment_1-5: Tag the SURGICAL PROCEDURE when it is the focus (e.g., `"mastectomy"`, `"lumpectomy"`, `"SLNB"`, `"ALND"`, `"DIEP flap"`)
+- If the question also discusses adjuvant systemic therapy, tag the systemic drug in treatment fields and use topic: `"Treatment selection"` (not Surgical management)
+- drug_class for surgical questions: typically `null` unless a systemic agent is also discussed
+
+### Radiation Therapy Management Questions
+**Tag as topic: `"Radiation therapy management"`** for questions about:
+- **Post-BCS radiation:** Whole breast irradiation (WBI), hypofractionated WBI, boost to tumor bed
+- **Post-mastectomy radiation (PMRT):** Indications (T3/T4, ≥4 positive nodes, positive margins), chest wall + regional nodal fields
+- **Regional nodal irradiation (RNI):** Axillary, supraclavicular, internal mammary node coverage
+- **Accelerated partial breast irradiation (APBI):** Eligibility criteria, techniques (brachytherapy, IORT, external beam)
+- **Dose/fractionation:** Conventional (50 Gy/25 fx), hypofractionated (40-42.5 Gy/15-16 fx), ultra-hypofractionated (26 Gy/5 fx per FAST-Forward)
+- **Radiation side effects:** Skin toxicity, pneumonitis, cardiac risk (left-sided), lymphedema, rib fractures
+- **Omission of radiation:** Low-risk elderly patients (PRIME II, LUMINA criteria), DCIS management
+- **Radiation + systemic therapy sequencing:** Concurrent vs sequential with chemotherapy, timing with immunotherapy
+
+**Tagging rules for Radiation therapy management:**
+- treatment_1-5: Tag `"radiation therapy"` or specific technique (e.g., `"APBI"`, `"PMRT"`) when radiation is the focus
+- If the question is about radiation as part of a multimodal approach where systemic therapy is the focus, use the systemic therapy topic instead
+
+### Pathological Classification Questions
+**Tag as topic: `"Pathological classification"`** for questions about:
+- **Histologic typing:** IDC (no special type/NST), ILC, tubular, mucinous, papillary, medullary-like, micropapillary, metaplastic, adenoid cystic
+- **Grading:** Nottingham histologic grade (tubule formation + nuclear pleomorphism + mitotic count), Bloom-Richardson equivalent
+- **Molecular subtyping:** Luminal A, Luminal B, HER2-enriched, basal-like, normal-like (PAM50/intrinsic subtypes)
+- **Ki-67 interpretation:** Cutoff values, prognostic significance, role in treatment decisions
+- **Special pathologic features:** Lymphovascular invasion (LVI), tumor-infiltrating lymphocytes (TILs), perineural invasion, extensive intraductal component (EIC)
+- **pCR assessment:** Definition of pathologic complete response (ypT0/is ypN0), residual cancer burden (RCB) scoring
+- **Pre-malignant lesions:** ADH, ALH, flat epithelial atypia (FEA), LCIS (classic, pleomorphic, florid), DCIS (low/intermediate/high grade, comedo vs non-comedo)
+- **Staging pathology:** TNM staging components, number of positive nodes, extranodal extension
+
+### Screening and Prevention Questions
+**Tag as topic: `"Screening and prevention"`** for questions about:
+- **Risk assessment models:** Tyrer-Cuzick (IBIS), Gail model, BRCAPRO, CanRisk — when to use each, inputs, limitations
+- **Screening guidelines:** Mammography initiation/frequency (ACR, ACS, USPSTF), supplemental screening with MRI (high-risk), DBT, contrast-enhanced mammography
+- **Genetic testing/counseling:** BRCA1/2, PALB2, ATM, CHEK2, TP53, germline panel testing candidacy, cascade testing, VUS interpretation
+- **Preventive therapy:** Tamoxifen (pre/postmenopausal), raloxifene (postmenopausal), aromatase inhibitors (postmenopausal high-risk), exemestane (MAP.3 trial)
+- **Risk-reducing surgery:** Prophylactic bilateral mastectomy, bilateral salpingo-oophorectomy (BSO), timing in BRCA carriers
+- **High-risk management:** Enhanced surveillance protocols, breast MRI alternating with mammography every 6 months
+
+### Imaging Questions
+**Tag as topic: `"Imaging"`** for questions about:
+- **Diagnostic imaging:** Mammography (diagnostic vs screening), ultrasound (solid vs cystic), breast MRI (indications: high-risk screening, extent of disease, ILC workup, occult primary)
+- **Staging imaging:** CT chest/abdomen/pelvis, bone scan, FDG PET/CT (when to use, false positives)
+- **Novel imaging:** FES PET (fluoroestradiol — for ER+ disease, heterogeneity assessment), contrast-enhanced mammography (CEM), molecular breast imaging (MBI)
+- **Surveillance imaging:** Post-treatment follow-up, when to image vs clinical monitoring
+- **BI-RADS classification:** Category interpretation (0-6), management recommendations per category
+
+### Survivorship Questions
+**Tag as topic: `"Survivorship"`** for questions about:
+- **Surveillance strategies:** Follow-up schedule, when to discontinue mammography, role of tumor markers (CA 15-3, CA 27.29 — limited utility)
+- **Cardiotoxicity:** Anthracycline-related (cumulative, irreversible), trastuzumab-related (reversible, LVEF monitoring), radiation-associated cardiac disease
+- **Bone health:** AI-associated bone loss, DEXA screening, bisphosphonates/denosumab for bone protection, adjuvant bone-modifying agents
+- **Fertility preservation:** Pre-treatment options (embryo/oocyte cryopreservation, GnRH agonist ovarian suppression), post-treatment fertility, pregnancy after breast cancer
+- **Sexual health/GSM:** Genitourinary syndrome of menopause (vaginal dryness, dyspareunia), vaginal estrogen safety in HR+ disease, non-hormonal options (ospemifene, fezolinetant for vasomotor symptoms)
+- **Neurotoxicity:** Chemotherapy-induced peripheral neuropathy (CIPN) — taxane-related, management (duloxetine), cognitive impairment ("chemo brain")
+- **Lymphedema:** Risk factors, prevention, early detection, management
+- **Psychosocial:** Distress screening, body image, return to work, cancer-related fatigue
 
 ---
 
 ## Special Cases
 
 ### BIA-ALCL (Breast Implant-Associated ALCL)
-- Classified under "Breast cancer" for disease_state
-- For tagging: topic = "AE management" (complication of breast reconstruction)
-- disease_type = `null`
+- disease_state: `"Breast cancer"` (classified under breast for our system)
+- topic: `"Surgical management"` (complication requiring surgical management — implant removal + capsulectomy)
+- disease_type: `null` (not a standard breast cancer subtype)
+- toxicity_type_1: `"BIA-ALCL"` (tag as a toxicity/complication of breast implants)
+- Tag implant removal procedure in treatment fields if discussed
 
 ### DCIS
-- disease_type = `"DCIS"`
-- disease_stage = `"Early-stage"` (always - stage 0)
+- disease_type: `"DCIS"`
+- disease_stage: `"Early-stage"` (always — stage 0)
+- Questions about DCIS management may be topic: `"Surgical management"` (excision decisions), `"Radiation therapy management"` (post-lumpectomy RT), or `"Treatment selection"` (endocrine therapy for risk reduction)
+
+### Benign Breast Conditions (Still Tagged as Breast Cancer)
+These conditions should still use disease_state: `"Breast cancer"` but with appropriate disease_type:
+- **Phyllodes tumor:** disease_type: `"Phyllodes"`, topic typically `"Surgical management"`
+- **Desmoid fibromatosis:** disease_type: `"Desmoid"`, topic typically `"Surgical management"`
+- **ADH/ALH:** disease_type: `"ADH"`, topic typically `"Pathological classification"` or `"Screening and prevention"`
+- **LCIS:** disease_type: `"LCIS"`, topic varies (pathology, screening, surgical)
+- **Fibroadenoma:** disease_type: `null`, topic typically `"Diagnosis"` or `"Surgical management"`
+
+### Pregnancy and Breast Cancer
+- special_population_1: `"Pregnant"`
+- Treatment modifications: Avoid trastuzumab, taxanes generally safe in 2nd/3rd trimester, no endocrine therapy during pregnancy
+- If question is about treatment during pregnancy → topic: `"Treatment selection"` with special_population tagged
+
+### Supportive Care in Breast Cancer Context
+Questions about supportive care (anti-emetics, pain, CIPN, vasomotor symptoms) that are in a breast cancer CE activity:
+- Tag disease_state: `"Breast cancer"` (it's within a breast cancer educational context)
+- Topic: `"AE management"` (if managing a treatment side effect) or `"Survivorship"` (if about long-term symptom management)
+- Tag the supportive care drug in treatment fields (e.g., `"fezolinetant"`, `"duloxetine"`, `"olanzapine"`)
 
 ---
 
@@ -686,6 +951,42 @@ You must assign values for all 66 fields below. Use `null` for fields that are n
 | **Shared decision-making** | Patient-provider communication, discussing treatment options with patients, addressing patient concerns/preferences |
 | **Disparities in care** | Racial/ethnic disparities, inequities in access/outcomes |
 | **Barriers to care** | Obstacles to treatment (cost, access, adherence) |
+| **Surgical management** | Surgical approach and decision-making: BCS vs mastectomy, axillary surgery (SLNB vs ALND), surgical margins, reconstruction (implant vs autologous, prepectoral vs submuscular), anesthesia for breast surgery (PECS blocks), timing of surgery relative to systemic therapy |
+| **Radiation therapy management** | Radiation planning, dosing, sequencing: whole-breast RT, post-mastectomy RT (PMRT), hypofractionation, accelerated partial breast irradiation (APBI), regional nodal irradiation, boost techniques, radiation side effects |
+| **Pathological classification** | Histologic typing (IDC, ILC, tubular, mucinous, papillary, medullary, micropapillary), grading (Nottingham/Bloom-Richardson), molecular subtyping beyond receptor status (Luminal A/B, basal-like, normal-like), Ki-67 interpretation, lymphovascular invasion, tumor-infiltrating lymphocytes (TILs), pathologic complete response (pCR) assessment |
+| **Screening and prevention** | Risk assessment models (Tyrer-Cuzick, Gail), screening guidelines (mammography, MRI), preventive endocrine therapy (tamoxifen, raloxifene, AIs), prophylactic mastectomy/oophorectomy, genetic risk counseling, BRCA/germline panel testing candidacy |
+| **Imaging** | Diagnostic and staging imaging: mammography, digital breast tomosynthesis (DBT), breast MRI, ultrasound, FDG PET/CT, FES PET (ER+ disease), contrast-enhanced mammography, staging workup, surveillance imaging |
+| **Survivorship** | Long-term follow-up, surveillance strategies, cardiotoxicity monitoring (anthracycline/trastuzumab), AI-associated bone loss, fertility preservation, sexual health/GSM (genitourinary syndrome of menopause), lymphedema, CIPN, cognitive effects, psychosocial support |
+| **Genetic testing** | Indications for germline testing, genetic counseling referral criteria, panel testing (BRCA1/2, PALB2, ATM, CHEK2, TP53), cascade testing, VUS interpretation, implications for treatment (PARP inhibitors) and risk management (prophylactic surgery) |
+
+**Breast Cancer Topic Disambiguation:**
+- Lumpectomy vs mastectomy decision → **Surgical management** (not Treatment selection)
+- SLNB after neoadjuvant → **Surgical management**
+- Breast reconstruction timing/type → **Surgical management**
+- PECS block for breast surgery → **Surgical management**
+- Whole-breast RT after BCS → **Radiation therapy management**
+- Post-mastectomy RT criteria → **Radiation therapy management**
+- Regional nodal irradiation → **Radiation therapy management**
+- Histologic type identification → **Pathological classification**
+- Nottingham grade components → **Pathological classification**
+- pCR definition/assessment → **Pathological classification**
+- Risk model selection (Tyrer-Cuzick) → **Screening and prevention**
+- Mammography screening intervals → **Screening and prevention**
+- Prophylactic mastectomy candidacy → **Screening and prevention**
+- FES PET for ER+ disease → **Imaging**
+- Staging workup for new diagnosis → **Imaging** (or **Diagnosis** if broader)
+- Cardiotoxicity monitoring post-trastuzumab → **Survivorship**
+- AI-associated bone loss prevention → **Survivorship**
+- Fertility preservation discussion → **Survivorship**
+- BIA-ALCL (implant-associated lymphoma) → **Surgical management** (with toxicity fields for the complication)
+- Desmoid fibromatosis in breast → **Surgical management** (benign tumor, surgical question)
+- Phyllodes tumor management → **Surgical management**
+- "Which patients should get germline BRCA testing?" → **Genetic testing** (indications/ordering)
+- "What does a PALB2 mutation mean for treatment?" → **Genetic testing** (implications)
+- Cascade testing after finding BRCA mutation → **Genetic testing**
+- VUS interpretation → **Genetic testing**
+- BRCA status driving PARP inhibitor selection → **Treatment selection** (treatment focus, not testing focus)
+- Oncotype DX result interpretation → **Biomarker testing** (it's a molecular test result)
 
 ### 2. disease_stage
 **OPTIONAL** - Can be null, but try hard to infer before accepting null.
