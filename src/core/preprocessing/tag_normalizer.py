@@ -281,6 +281,16 @@ class TagNormalizer:
 
         return normalized
 
+    # Solid tumor disease states where treatment_line should be "1L" not "Newly diagnosed"
+    _SOLID_TUMOR_DISEASES = {
+        "breast cancer", "nsclc", "sclc", "crc", "colorectal cancer",
+        "prostate cancer", "ovarian cancer", "bladder cancer", "urothelial carcinoma",
+        "renal cell carcinoma", "hepatocellular carcinoma", "gastric cancer",
+        "esophageal cancer", "head and neck cancer", "melanoma", "cervical cancer",
+        "endometrial cancer", "pancreatic cancer", "cholangiocarcinoma",
+        "thyroid cancer", "mesothelioma", "sarcoma", "glioma",
+    }
+
     def _apply_cross_field_rules(self, tags: Dict[str, Any], result: Dict[str, Any]) -> None:
         """Apply cross-field normalization rules that depend on multiple tag values.
 
@@ -289,7 +299,12 @@ class TagNormalizer:
         Rules:
         - If answer_length_pattern is null/conflict AND distractor_homogeneity is
           "Homogeneous", default answer_length_pattern to "Uniform"
+        - If treatment_line is "Newly diagnosed" AND disease is a solid tumor,
+          normalize to "1L" (solid tumors use line-of-therapy, not diagnosis timing)
         """
+        qid = result.get('question_id', '?')
+
+        # Rule 1: Homogeneous distractors → Uniform answer length
         distractor = tags.get("distractor_homogeneity")
         answer_length = tags.get("answer_length_pattern")
 
@@ -297,8 +312,20 @@ class TagNormalizer:
             if not answer_length or answer_length.strip() == "":
                 tags["answer_length_pattern"] = "Uniform"
                 logger.info(
-                    f"Q{result.get('question_id', '?')}: Normalized answer_length_pattern to 'Uniform' "
+                    f"Q{qid}: Normalized answer_length_pattern to 'Uniform' "
                     f"(conflict resolved by homogeneous distractor rule)"
+                )
+
+        # Rule 2: "Newly diagnosed" → "1L" for solid tumors
+        treatment_line = tags.get("treatment_line")
+        disease_state = (tags.get("disease_state") or "").strip().lower()
+
+        if treatment_line and treatment_line.strip().lower() == "newly diagnosed":
+            if disease_state in self._SOLID_TUMOR_DISEASES:
+                tags["treatment_line"] = "1L"
+                logger.info(
+                    f"Q{qid}: Normalized treatment_line 'Newly diagnosed' -> '1L' "
+                    f"(solid tumor: {tags.get('disease_state')})"
                 )
 
     def normalize_result(self, result: Dict[str, Any]) -> Dict[str, Any]:

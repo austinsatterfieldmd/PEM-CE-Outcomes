@@ -208,28 +208,30 @@ Key test: What is the educational focus?
 
 **⚠️ CRITICAL: Treatment line rules differ by disease stage in SCLC**
 
-**Valid values:**
+**The ONLY valid treatment_line values for SCLC are:**
+| Value | When to Use |
+|-------|-------------|
+| `"1L"` | First-line systemic therapy for ES-SCLC (platinum-etoposide ± immunotherapy) |
+| `"Maintenance"` | Continuation immunotherapy after completing chemo cycles (ES-SCLC: durvalumab/atezolizumab; LS-SCLC: durvalumab after CRT per ADRIATIC) |
+| `"2L+"` | Second-line or later therapy (topotecan, lurbinectedin, tarlatamab) |
+| `"Consolidation"` | PCI after chemoradiation (radiation prophylaxis) |
+| `null` | Limited-stage concurrent chemoradiation (definitive treatment, not a "line"), or questions without treatment line context |
 
-**Limited-Stage SCLC (concurrent chemoradiation):**
-- `null` - **PREFERRED for limited-stage concurrent chemoradiation** (this is definitive treatment, not a "line" of therapy)
-- `"Consolidation"` - PCI after chemoradiation (prophylactic, NOT a treatment line)
+**⚠️⚠️⚠️ ABSOLUTE PROHIBITION: "Newly diagnosed" is NEVER a valid treatment_line value in SCLC ⚠️⚠️⚠️**
+- "Newly diagnosed" describes DIAGNOSIS TIMING, not treatment sequence
+- If the question says "newly diagnosed ES-SCLC starting carboplatin-etoposide-atezolizumab" → treatment_line: `"1L"` (NEVER "Newly diagnosed")
+- If the question says "newly diagnosed LS-SCLC starting concurrent chemoradiation" → treatment_line: `null` (NEVER "Newly diagnosed")
+- **ANY output of "Newly diagnosed" for treatment_line is WRONG and will be automatically corrected by the normalizer**
 
-**Extensive-Stage SCLC (systemic therapy):**
-- `"1L"` - First-line systemic therapy (platinum-etoposide ± immunotherapy)
-- `"Maintenance"` - Continuation immunotherapy after completing platinum-etoposide (durvalumab, atezolizumab)
-- `"2L+"` - Second-line or later therapy (topotecan, lurbinectedin, tarlatamab)
-
-**⚠️ CRITICAL VALIDATION - Common Errors to Avoid:**
-- **"Newly diagnosed" is NOT a valid treatment_line value**
-  - If question mentions "newly diagnosed ES-SCLC starting carboplatin-etoposide-atezolizumab" → treatment_line: `"1L"` (NOT "Newly diagnosed")
-  - If question mentions "newly diagnosed LS-SCLC starting concurrent chemoradiation" → treatment_line: `null` (NOT "Newly diagnosed")
-- **Treatment lines describe SEQUENCE, not diagnosis timing**
-- **PCI is NOT a treatment line** - PCI is radiation prophylaxis, tag as treatment_line: `"Consolidation"` only if explicitly described as consolidation
+**Maintenance in Limited-Stage SCLC (ADRIATIC trial paradigm):**
+- Durvalumab maintenance after completing concurrent chemoradiation in LS-SCLC → treatment_line: `"Maintenance"`
+- This is the PD-L1 inhibitor continuation phase AFTER CRT, distinct from consolidation PCI
+- Example: "LS-SCLC patient completed CRT, now receiving durvalumab" → treatment_line: "Maintenance"
 
 **When to infer:**
-- Trial context: IMpower133, CASPIAN → 1L extensive-stage; DeLLphi-300, ATLANTIS → 2L+
+- Trial context: IMpower133, CASPIAN → 1L extensive-stage; DeLLphi-300, ATLANTIS → 2L+; ADRIATIC → Maintenance (LS-SCLC)
 - Keywords: "newly diagnosed ES-SCLC", "first-line therapy" → 1L; "after progression on platinum", "post-platinum" → 2L+
-- Drug context: Atezolizumab or durvalumab with chemo → 1L; Lurbinectedin or tarlatamab alone → 2L+
+- Drug context: Atezolizumab or durvalumab with chemo → 1L; Lurbinectedin or tarlatamab alone → 2L+; Durvalumab after CRT → Maintenance
 
 **When null is appropriate:**
 - Limited-stage SCLC receiving concurrent chemoradiation (this is definitive treatment)
@@ -240,6 +242,7 @@ Key test: What is the educational focus?
 **Examples:**
 - "Newly diagnosed extensive-stage SCLC starting carboplatin-etoposide-durvalumab" → treatment_line: "1L"
 - "Patient with ES-SCLC completed 4 cycles carboplatin-etoposide-atezolizumab, now continuing atezolizumab" → treatment_line: "Maintenance"
+- "LS-SCLC patient completed chemoradiation, now receiving durvalumab maintenance" → treatment_line: "Maintenance"
 - "Limited-stage SCLC receiving concurrent carboplatin-etoposide and thoracic radiation" → treatment_line: null
 - "Patient with LS-SCLC after completing chemoradiation, now receiving PCI" → treatment_line: "Consolidation" (or null if PCI is just prophylaxis)
 - "SCLC relapse 4 months after completing platinum-etoposide, starting lurbinectedin" → treatment_line: "2L+"
@@ -252,6 +255,18 @@ Key test: What is the educational focus?
 **MULTI-VALUE FIELD:** Use `treatment_1`, `treatment_2`, etc. for multiple drugs (up to 5). Use `null` for unused slots.
 
 **When to tag:** Question discusses specific fundable drug(s) in question, answer, or inferable from trial.
+
+**⚠️ CRITICAL: Treatment Inference from Trials**
+When you infer a clinical trial, you MUST also infer the corresponding fundable treatment(s). Trials and treatments go together:
+| Inferred Trial | You MUST Also Infer Treatment |
+|----------------|-------------------------------|
+| IMpower133 | treatment_1: "Atezolizumab" |
+| CASPIAN | treatment_1: "Durvalumab" |
+| DeLLphi-300 | treatment_1: "Tarlatamab" |
+| ATLANTIS | treatment_1: "Lurbinectedin" |
+| ADRIATIC | treatment_1: "Durvalumab" |
+
+**It is WRONG to infer a trial but leave treatment_1 as null.** If you know the trial, you know the drug.
 
 **When null is appropriate:** Imaging/staging questions; diagnosis questions; prognosis questions where no fundable drug is mentioned; questions about platinum-etoposide backbone only (these are NOT fundable).
 
@@ -315,18 +330,31 @@ When extensive-stage SCLC is treated with carboplatin-etoposide-immunotherapy:
 
 Most SCLC questions will have biomarker fields as `null`. SCLC does NOT routinely undergo molecular testing like NSCLC (no EGFR, ALK, ROS1, PD-L1 routine testing).
 
+**⚠️⚠️⚠️ CRITICAL: Drug Targets Are NOT Biomarkers ⚠️⚠️⚠️**
+A drug's molecular target does NOT belong in the biomarker field unless the question is specifically about TESTING for that marker as an actionable alteration for treatment selection.
+
+| Scenario | Biomarker? | Reasoning |
+|----------|-----------|-----------|
+| "Tarlatamab targets DLL3 in SCLC" | biomarker_1: **null** | DLL3 is the drug TARGET, not being tested |
+| "B7-H3-targeting agent in SCLC" | biomarker_1: **null** | B7-H3 is the drug TARGET, not an actionable alteration |
+| "Patient tested DLL3-high, eligible for tarlatamab" | biomarker_1: **"DLL3"** | DLL3 is being TESTED to determine treatment eligibility |
+| "Should we test for SLFN11 before starting lurbinectedin?" | biomarker_1: **"SLFN11"** | Asking about a BIOMARKER TEST |
+
+**The test:** Is the question about TESTING/SELECTING based on the marker? → Biomarker. Is the question about a DRUG that happens to target something? → NOT a biomarker (use drug_target field instead).
+
 **When to tag biomarkers in SCLC:**
 1. **Questions ABOUT a biomarker test** (indications, when to order, prognostic value):
-   - "What is the role of DLL3 expression in SCLC?" → `biomarker_1: "DLL3"`
+   - "What is the role of DLL3 expression testing in SCLC?" → `biomarker_1: "DLL3"`
    - "Which patients should have SLFN11 testing?" → `biomarker_1: "SLFN11"`
    - "Does PD-L1 predict benefit from immunotherapy in SCLC?" → `biomarker_1: "PD-L1"`
 
-2. **Clinical vignettes WITH a biomarker result** (patient has specific status):
-   - "Patient with DLL3-high SCLC..." → `biomarker_1: "DLL3"`
+2. **Clinical vignettes WITH a biomarker result driving treatment** (patient has specific status):
+   - "Patient tested DLL3-high, which targeted therapy?" → `biomarker_1: "DLL3"`
    - "SLFN11-positive SCLC patient..." → `biomarker_1: "SLFN11"`
 
 **When null is appropriate (MOST SCLC QUESTIONS):**
 - General treatment questions without biomarker context
+- Questions where a drug target is mentioned but NOT being tested for (DLL3 as target of tarlatamab, B7-H3 as target of investigational agents)
 - Questions where biomarker is irrelevant
 - Newly diagnosed SCLC (no routine molecular testing)
 
@@ -1143,10 +1171,11 @@ Do NOT tag this field. It will be computed automatically.
 - `"Correct longest"` - Correct answer is noticeably longest
 - `"Correct shortest"` - Correct answer is noticeably shortest
 
-**⚠️ CRITICAL DEFAULT RULE:**
-If `distractor_homogeneity` = "Homogeneous", you MUST tag `answer_length_pattern` = "Uniform" UNLESS the length difference is EGREGIOUS (see examples below).
+**⚠️⚠️⚠️ MANDATORY DEFAULT RULE ⚠️⚠️⚠️:**
+If `distractor_homogeneity` = "Homogeneous", then `answer_length_pattern` MUST be "Uniform". Period.
+The ONLY exception is an EGREGIOUS length disparity (single word vs full sentence). If you have to think about it, it's "Uniform".
 
-**Rule of thumb:** If you're debating whether it's "Variable", it's probably "Uniform". Only use "Variable" when the difference is obvious and extreme.
+**Rule of thumb:** Homogeneous distractors = Uniform answer length. Always. Do not overthink this.
 
 **When to override to "Variable":**
 Override ONLY when there is an EXTREME disparity in answer length or detail level:
