@@ -1197,36 +1197,270 @@ Use the disease-specific drug table above to map class → individual drugs.
 **Valid values:**
 `"ECOG 0"`, `"ECOG 1"`, `"ECOG 0-1"`, `"ECOG 2"`, `"ECOG 3-4"`
 
-**Note:** For fitness categories (Fit/Unfit/Frail), use `fitness_status` in the Patient Characteristics group instead.
+**Note:** For fitness categories (Fit/Unfit/Frail), use `fitness_status` below instead.
+
+### 39. fitness_status
+**OPTIONAL** - Overall patient fitness level.
+
+**Valid values:**
+- `"Fit"` - Good performance status, can tolerate intensive therapy (anthracycline-based, dose-dense regimens)
+- `"Frail"` - Poor functional status, requires dose reductions or modified regimens (e.g., weekly paclitaxel instead of dose-dense AC-T)
+
+**When to tag:**
+- Explicitly mentioned ("frail patient", "fit for intensive therapy")
+- ECOG/performance status implies frailty (ECOG >=2)
+- Geriatric assessment mentioned (CGA, G8 screening)
+
+**When null is appropriate:**
+- Fitness not mentioned or implied
+- General mechanism/efficacy questions
+
+**Examples:**
+- "Frail 82-year-old with HR+/HER2- metastatic breast cancer" → fitness_status: "Frail"
+- "Fit patient with ECOG 0 eligible for dose-dense AC-T" → fitness_status: "Fit"
+
+### 40. organ_dysfunction
+**OPTIONAL** - Relevant organ impairment affecting treatment selection.
+
+**Valid values:**
+- `"Cardiac"` - Heart failure, reduced LVEF, arrhythmia (affects anthracycline/trastuzumab eligibility)
+- `"Hepatic"` - Liver dysfunction (affects CDK4/6 inhibitor dosing, capecitabine metabolism)
+- `"Renal"` - Renal insufficiency, CKD (affects carboplatin dosing, methotrexate clearance)
+
+**When to tag:**
+- Explicitly mentioned in vignette
+- Dose adjustment discussion due to organ function
+- Organ function affects drug selection (e.g., LVEF <50% and trastuzumab)
+
+**When null is appropriate:**
+- Organ function not mentioned
+- General treatment questions
+
+**Examples:**
+- "Patient with LVEF 45% considering trastuzumab" → organ_dysfunction: "Cardiac"
+- "CrCl 30 mL/min, needs dose adjustment" → organ_dysfunction: "Renal"
+- "Elevated transaminases on ribociclib" → organ_dysfunction: "Hepatic"
+
+### 41. disease_specific_factor
+**OPTIONAL** - Disease-specific factors not captured elsewhere.
+
+**For Breast Cancer - valid values:**
+- `"Hereditary breast cancer"` - Germline BRCA1/2, PALB2, ATM, CHEK2, TP53 (Li-Fraumeni), CDH1
+- `"Male breast cancer"` - Rare (<1%), unique hormonal considerations
+- `"Inflammatory breast cancer"` - Aggressive subtype requiring specific treatment sequencing
+- `"Pregnancy-associated"` - Diagnosed during or within 1 year of pregnancy
+- `"Oligometastatic disease"` - Limited metastatic burden, potentially curable with local therapy
+- `"CNS-only progression"` - Isolated brain/leptomeningeal progression on systemic therapy
+- `"Bilateral breast cancer"` - Synchronous or metachronous bilateral disease
+- `null` - Default for most questions
+
+**When to tag:**
+- Question specifically mentions or tests knowledge about these factors
+- Clinical vignette includes these conditions as relevant context
+
+**Examples:**
+- "Germline BRCA1 mutation carrier" → disease_specific_factor: "Hereditary breast cancer"
+- "Male patient with ER+ breast cancer" → disease_specific_factor: "Male breast cancer"
+- "Rapidly progressing inflammatory breast cancer" → disease_specific_factor: "Inflammatory breast cancer"
+
+### 42-44. comorbidity_1, comorbidity_2, comorbidity_3
+**OPTIONAL** - Patient comorbidities that affect treatment decisions.
+
+**CRITICAL: Only tag comorbidities explicitly stated in the question stem.** Comorbidities are medical conditions SEPARATE from the primary disease. Do NOT infer comorbidities from age, disease stage, or treatment history alone.
+
+**MULTI-VALUE FIELD:** Use `comorbidity_1`, `comorbidity_2`, etc. for multiple comorbidities (up to 3). Use `null` for unused slots.
+
+**Common breast cancer-relevant comorbidities:**
+- `"Heart failure"` / `"CHF"` - Affects anthracycline/trastuzumab eligibility, requires LVEF monitoring
+- `"Reduced LVEF"` - Borderline cardiac function, may preclude HER2-targeted therapy
+- `"Atrial fibrillation"` - Anticoagulation considerations, cardiovascular risk
+- `"Myocardial infarction"` / `"MI history"` - Cardiovascular risk, anthracycline contraindication
+- `"Hypertension"` - Cardiovascular risk, common with bevacizumab
+- `"Diabetes"` - Metabolic considerations, steroid complications
+- `"Osteoporosis"` - Bone health with aromatase inhibitors, fracture risk
+- `"VTE history"` - Thrombosis risk with tamoxifen, hormonal therapy selection
+- `"Endometrial hyperplasia"` / `"Uterine pathology"` - Tamoxifen risk, favors aromatase inhibitor
+- `"Autoimmune disease"` - Affects immunotherapy eligibility (pembrolizumab in TNBC)
+- `"Chronic kidney disease"` / `"CKD"` - Dose adjustments, drug selection
+- `"Hepatitis B/C"` - Reactivation risk with immunotherapy, monitoring required
+- `"Prior malignancy"` - History of other cancers, radiation field considerations
+- `"Lymphedema"` - Post-surgical complication, affects QoL and ipsilateral procedures
+
+**When to tag:**
+- Clinical vignette mentions specific comorbidities
+- Comorbidity affects treatment choice being discussed
+- Question focuses on managing patient with comorbidities
+
+**When null is appropriate:**
+- General treatment/efficacy questions without patient context
+- No comorbidities mentioned in vignette
+
+**Examples:**
+- "Patient with LVEF 40% and HER2+ breast cancer" → comorbidity_1: "Reduced LVEF"
+- "History of DVT, considering adjuvant endocrine therapy" → comorbidity_1: "VTE history"
+- "Diabetic patient on AI with worsening bone density" → comorbidity_1: "Diabetes", comorbidity_2: "Osteoporosis"
 
 ---
 
 ## Group C: Safety/Toxicity (7 fields)
 
-### 39-43. toxicity_type_1 through toxicity_type_5
-**OPTIONAL** - Specific toxicities mentioned.
+### 45-49. toxicity_type_1 through toxicity_type_5
+**OPTIONAL** - Can be null. Tag when specific adverse events are discussed.
 
-**Common values (use these when applicable, but may use other values if confident):**
-- Immune-related: `"Immune-related colitis"`, `"Immune-related hepatitis"`, `"Immune-related pneumonitis"`, `"Immune-related thyroiditis"`, `"Immune-related myocarditis"`
-- Hematologic: `"Neutropenia"`, `"Febrile neutropenia"`, `"Thrombocytopenia"`, `"Anemia"`, `"Pancytopenia"`
-- GI: `"Diarrhea"`, `"Nausea/vomiting"`, `"Mucositis/stomatitis"`, `"Hepatotoxicity"`
-- Cardiac: `"QT prolongation"`, `"Cardiomyopathy"`, `"Hypertension"`
-- Pulmonary: `"Interstitial lung disease (ILD)"`, `"Pneumonitis"`
-- Neurologic: `"Peripheral neuropathy"`, `"ICANS"`, `"Neurotoxicity"`
-- CAR-T specific: `"Cytokine release syndrome (CRS)"`, `"Tumor lysis syndrome (TLS)"`
-- Dermatologic: `"Rash"`, `"Hand-foot syndrome"`
+**MULTI-VALUE FIELD:** Use separate slots for multiple toxicity types.
 
-### 44. toxicity_organ
-**OPTIONAL** - Organ system affected by toxicity.
+**When to tag:**
+- AE explicitly mentioned in question, answer, or patient vignette
+- Safety profile question asks "what AEs to expect?"
+- AE management question describes specific toxicity
+
+**When null is appropriate:**
+- No toxicities discussed
+- Efficacy-only questions
+
+**Common Breast Cancer Treatment Toxicities:**
+
+**Anthracycline-related (doxorubicin, epirubicin):**
+- `"Cardiomyopathy"` - Cumulative dose-dependent, IRREVERSIBLE (lifetime limit ~450-550 mg/m² doxorubicin)
+- `"Neutropenia"` - Dose-limiting, especially with dose-dense regimens
+- `"Febrile neutropenia"` - Risk with dose-dense AC, G-CSF prophylaxis
+- `"Nausea/vomiting"` - Highly emetogenic
+- `"Alopecia"` - Very common (near universal)
+- `"Mucositis/stomatitis"` - Oral/GI mucosal inflammation
+
+**Taxane-related (paclitaxel, docetaxel, nab-paclitaxel):**
+- `"Peripheral neuropathy"` - Cumulative, dose-limiting (paclitaxel > docetaxel)
+- `"Neutropenia"` - Common with docetaxel; less with weekly paclitaxel
+- `"Myalgia/arthralgia"` - Muscle and joint pain (common with paclitaxel)
+- `"Fluid retention"` - Docetaxel-specific (edema, pleural effusion, weight gain)
+- `"Nail changes"` - Docetaxel-specific (onycholysis, discoloration)
+- `"Alopecia"` - Very common
+- `"Hypersensitivity reaction"` - Paclitaxel (Cremophor-based), requires premedication
+
+**HER2-targeted therapy-related (trastuzumab, pertuzumab, T-DM1, margetuximab):**
+- `"Cardiomyopathy"` - Trastuzumab-related, REVERSIBLE (unlike anthracycline), LVEF monitoring required
+- `"Diarrhea"` - Pertuzumab (most common AE, especially with trastuzumab + docetaxel)
+- `"Infusion reactions"` - First infusion risk with trastuzumab
+- `"Thrombocytopenia"` - T-DM1 specific (dose-limiting)
+- `"Hepatotoxicity"` - T-DM1 specific (transaminase elevation, nodular regenerative hyperplasia)
+- `"Peripheral neuropathy"` - T-DM1 specific
+
+**ADC-related (T-DXd, sacituzumab govitecan, other Trop-2/HER2 ADCs):**
+- `"Interstitial lung disease (ILD)"` - T-DXd CRITICAL toxicity (potentially fatal, any grade requires attention)
+- `"Neutropenia"` - Common with sacituzumab govitecan (dose-limiting)
+- `"Diarrhea"` - Sacituzumab govitecan (early-onset, irinotecan metabolite SN-38)
+- `"Nausea/vomiting"` - Common with both T-DXd and sacituzumab govitecan
+- `"Alopecia"` - Common with ADCs
+- `"Fatigue"` - Common systemic toxicity
+
+**CDK4/6 inhibitor-related (palbociclib, ribociclib, abemaciclib):**
+- `"Neutropenia"` - Palbociclib/ribociclib (most common, dose-limiting, usually manageable)
+- `"Diarrhea"` - Abemaciclib-specific (most common AE, dose-limiting)
+- `"QT prolongation"` - Ribociclib-specific (requires ECG monitoring)
+- `"Hepatotoxicity"` - All CDK4/6i (transaminase elevation, monitor LFTs)
+- `"VTE"` / `"Pulmonary embolism"` - All CDK4/6i (increased thromboembolic risk)
+- `"Fatigue"` - Common across class
+
+**Endocrine therapy-related (tamoxifen, aromatase inhibitors, fulvestrant):**
+- `"Hot flashes"` - Very common with all endocrine therapies
+- `"Arthralgias"` - Aromatase inhibitor-specific (joint pain/stiffness, common reason for discontinuation)
+- `"Osteoporosis"` / `"Bone loss"` - Aromatase inhibitor-specific (requires bone density monitoring)
+- `"Endometrial cancer risk"` - Tamoxifen-specific (increased risk, requires monitoring)
+- `"VTE"` / `"Thromboembolism"` - Tamoxifen-specific (DVT, PE risk)
+- `"Vaginal dryness"` / `"Sexual dysfunction"` - Common with all endocrine therapies
+- `"Mood changes"` / `"Depression"` - Common with endocrine therapies
+
+**Immunotherapy-related (pembrolizumab in TNBC):**
+- `"Immune-related pneumonitis"` - Lung toxicity requiring steroids
+- `"Immune-related colitis"` - GI toxicity
+- `"Immune-related hepatitis"` - Liver toxicity
+- `"Immune-related thyroiditis"` - Thyroid dysfunction (hypothyroidism, hyperthyroidism)
+- `"Immune-related myocarditis"` - Rare but serious cardiac toxicity
+- `"Adrenal insufficiency"` - Immune-related endocrine toxicity
+- `"Rash"` - Immune-related dermatologic toxicity
+
+**PARP inhibitor-related (olaparib, talazoparib):**
+- `"Anemia"` - Most common hematologic toxicity (talazoparib > olaparib)
+- `"Nausea"` - Common GI toxicity
+- `"Fatigue"` - Common
+- `"Thrombocytopenia"` - Talazoparib (more myelosuppressive than olaparib)
+- `"MDS/AML"` - Rare but serious long-term risk
+
+**PI3K/AKT inhibitor-related (alpelisib, capivasertib):**
+- `"Hyperglycemia"` - Alpelisib CRITICAL toxicity (on-target, PI3K pathway), requires monitoring
+- `"Diarrhea"` - Common with both alpelisib and capivasertib
+- `"Rash"` - Alpelisib-specific (maculopapular, can be severe)
+- `"Stomatitis"` - Common oral toxicity
+
+**Capecitabine-related:**
+- `"Hand-foot syndrome"` - Palmar-plantar erythrodysesthesia (dose-limiting, characteristic AE)
+- `"Diarrhea"` - GI toxicity
+- `"Nausea/vomiting"` - GI toxicity
+
+**Radiation therapy-related:**
+- `"Radiation dermatitis"` - Skin erythema, desquamation
+- `"Radiation pneumonitis"` - Lung toxicity (especially left-sided, concurrent with systemic therapy)
+- `"Lymphedema"` - Post-axillary radiation (especially with axillary dissection)
+- `"Cardiac toxicity"` - Left-sided radiation (long-term coronary artery disease risk)
+- `"Rib fracture"` - Post-radiation bone fragility
+
+**Examples:**
+- "LVEF decline on trastuzumab" → toxicity_type_1: "Cardiomyopathy"
+- "ILD on T-DXd" → toxicity_type_1: "Interstitial lung disease (ILD)"
+- "Grade 3 diarrhea on abemaciclib" → toxicity_type_1: "Diarrhea"
+- "Hyperglycemia requiring insulin on alpelisib" → toxicity_type_1: "Hyperglycemia"
+
+### 50. toxicity_organ
+**OPTIONAL** - Can be null. Tag when organ system affected by toxicity is relevant.
+
+**When to tag:**
+- Organ-specific toxicity discussed
+- AE management question where organ system guides intervention
+
+**When null is appropriate (MOST CASES):**
+- No toxicities discussed
+- Toxicity type is sufficient without organ specification
+
+**Common Organ Systems:**
+- `"Cardiac"` - Cardiomyopathy, LVEF decline, QT prolongation (anthracyclines, trastuzumab, ribociclib)
+- `"Pulmonary"` - ILD, pneumonitis (T-DXd, immunotherapy, radiation)
+- `"Hepatic"` - Transaminase elevation, hepatotoxicity (T-DM1, CDK4/6i)
+- `"Hematologic"` - Neutropenia, anemia, thrombocytopenia (chemotherapy, CDK4/6i, PARP inhibitors)
+- `"Gastrointestinal"` - Diarrhea, nausea, colitis (abemaciclib, sacituzumab govitecan, immunotherapy)
+- `"Neurologic"` - Peripheral neuropathy (taxanes, T-DM1)
+- `"Dermatologic"` - Hand-foot syndrome, rash (capecitabine, alpelisib)
+- `"Endocrine"` - Thyroid dysfunction, adrenal insufficiency (immunotherapy), hyperglycemia (alpelisib)
+- `"Renal"` - Nephrotoxicity (rare in breast cancer, carboplatin)
+- `"Musculoskeletal"` - Arthralgias, bone loss (aromatase inhibitors)
+
+**Examples:**
+- "Trastuzumab-related LVEF decline" → toxicity_organ: "Cardiac"
+- "T-DXd-related ILD" → toxicity_organ: "Pulmonary"
+- "Alpelisib hyperglycemia" → toxicity_organ: "Endocrine"
+
+### 51. toxicity_grade
+**OPTIONAL** - Can be null. Tag when CTCAE grade is explicitly mentioned.
+
+**When to tag:**
+- Grade explicitly stated (e.g., "Grade 3 neutropenia")
+- Grade is relevant to management decision (e.g., dose reduction, hold, discontinue)
+
+**When null is appropriate (MOST CASES):**
+- Grade not mentioned
+- General safety profile questions without specific grades
 
 **Valid values:**
-`"Cardiac"`, `"Pulmonary"`, `"Hepatic"`, `"Renal"`, `"Gastrointestinal"`, `"Dermatologic"`, `"Neurologic"`, `"Ocular"`, `"Hematologic"`, `"Endocrine"`
+- `"Grade 1"` - Mild
+- `"Grade 2"` - Moderate (e.g., Grade 2 ILD on T-DXd → permanent discontinuation)
+- `"Grade 3"` - Severe (e.g., Grade 3 neutropenia → dose reduction or G-CSF)
+- `"Grade 4"` - Life-threatening
+- `"Grade 5"` - Death
+- `"Grade 1-2"` - Mild to moderate range
+- `"Grade >=3"` - Severe or worse
 
-### 45. toxicity_grade
-**OPTIONAL** - Grade of toxicity if mentioned.
-
-**Valid values:**
-`"Grade 1"`, `"Grade 2"`, `"Grade 3"`, `"Grade 4"`, `"Grade 5"`, `"Grade 1-2"`, `"Grade >=3"`, `"Any grade"`, `"Serious"`, `"Dose-limiting"`
+**Examples:**
+- "Patient develops Grade 3 neutropenia on dose-dense AC" → toxicity_grade: "Grade 3"
+- "Grade 2 ILD requiring T-DXd discontinuation" → toxicity_grade: "Grade 2"
 
 ---
 
