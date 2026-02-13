@@ -1160,3 +1160,20 @@ export async function setUserRole(userId: string, role: string): Promise<any> {
   if (error) throw new Error(`Set role failed: ${error.message}`)
   return data
 }
+
+// ============================================================
+// LLM Evaluation Metrics
+// ============================================================
+
+export async function getEvalMetrics(): Promise<any> {
+  const supabase = getSupabaseClient()
+  const { data, error } = await supabase
+    .from('eval_metrics')
+    .select('metrics')
+    .order('generated_at', { ascending: false })
+    .limit(1)
+    .single()
+
+  if (error) throw new Error(`Failed to load eval metrics: ${error.message}`)
+  return data?.metrics || null
+}

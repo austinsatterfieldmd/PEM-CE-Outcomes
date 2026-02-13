@@ -30,8 +30,7 @@ import {
   Layers,
   RefreshCw,
 } from 'lucide-react'
-
-const API_BASE = 'http://localhost:8002/api'
+import { getEvalMetrics } from '../services/apiRouter'
 
 // Types for eval metrics
 interface BatchStats {
@@ -182,11 +181,7 @@ export default function LLMEvalTab() {
     setLoading(true)
     setError(null)
     try {
-      const response = await fetch(`${API_BASE}/eval/metrics`)
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-      const data = await response.json()
+      const data = await getEvalMetrics()
       setMetrics(data)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load metrics')

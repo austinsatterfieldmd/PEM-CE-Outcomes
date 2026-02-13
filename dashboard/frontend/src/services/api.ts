@@ -1375,3 +1375,15 @@ export async function createDedupCluster(data: {
   }
   return response.json()
 }
+
+// ============================================================
+// LLM Evaluation Metrics
+// ============================================================
+
+export async function getEvalMetrics(): Promise<any> {
+  const response = await authFetch(`${API_BASE}/eval/metrics`)
+  if (!response.ok) {
+    throw new Error(`Failed to load eval metrics: ${response.statusText}`)
+  }
+  return response.json()
+}

@@ -80,6 +80,11 @@ export const searchDuplicateCandidates = useSupabase ? supabaseApi.searchDuplica
 export const createDedupCluster = useSupabase ? supabaseApi.createDedupCluster : restApi.createDedupCluster
 
 // ============================================================
+// LLM Evaluation Metrics
+// ============================================================
+export const getEvalMetrics = useSupabase ? supabaseApi.getEvalMetrics : restApi.getEvalMetrics
+
+// ============================================================
 // Supabase-only functions (no FastAPI equivalent)
 // ============================================================
 export const getUserRole = supabaseApi.getUserRole
