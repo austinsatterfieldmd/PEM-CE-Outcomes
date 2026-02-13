@@ -298,6 +298,9 @@ def sync_bundle(supabase_client, supa_db, bundle: QuestionBundle, stats: SyncSta
     # Step 2: Insert tags (raw upsert with all fields)
     if bundle.tags_row:
         t_cleaned = clean_row(bundle.tags_row, 'tags')
+        # Ensure flagged_at is set for questions needing review (drives review queue sort)
+        if t_cleaned.get('needs_review') and not t_cleaned.get('flagged_at'):
+            t_cleaned['flagged_at'] = datetime.utcnow().isoformat()
         supabase_client.table('tags').upsert(t_cleaned, on_conflict='question_id').execute()
         stats.tags_added += 1
 
