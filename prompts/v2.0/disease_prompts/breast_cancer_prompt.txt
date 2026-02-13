@@ -1874,13 +1874,14 @@ If a trial is mentioned but you don't recognize it:
 
 # Output Format
 
-Respond with ONLY a JSON object containing all 66 fields. Use `null` for fields that are not applicable or cannot be determined with confidence.
+Respond with ONLY a JSON object containing all 73 fields. Use `null` for fields that are not applicable or cannot be determined with confidence.
 
 ```json
 {
     "topic": "Treatment selection",
     "disease_stage": "Metastatic",
-    "disease_type": "HER2+",
+    "disease_type_1": "HER2+",
+    "disease_type_2": null,
     "treatment_line": "2L+",
     "treatment_1": "trastuzumab deruxtecan",
     "treatment_2": null,
@@ -1897,6 +1898,14 @@ Respond with ONLY a JSON object containing all 66 fields. Use `null` for fields 
     "trial_3": null,
     "trial_4": null,
     "trial_5": null,
+    "treatment_eligibility": null,
+    "age_group": null,
+    "organ_dysfunction": null,
+    "fitness_status": null,
+    "disease_specific_factor": null,
+    "comorbidity_1": null,
+    "comorbidity_2": null,
+    "comorbidity_3": null,
     "drug_class_1": "Antibody-drug conjugate (ADC)",
     "drug_class_2": null,
     "drug_class_3": null,
@@ -1913,8 +1922,6 @@ Respond with ONLY a JSON object containing all 66 fields. Use `null` for fields 
     "symptom_1": null,
     "symptom_2": null,
     "symptom_3": null,
-    "special_population_1": null,
-    "special_population_2": null,
     "performance_status": null,
     "toxicity_type_1": null,
     "toxicity_type_2": null,
@@ -1949,12 +1956,13 @@ Respond with ONLY a JSON object containing all 66 fields. Use `null` for fields 
 
 ## Key Rules for Output
 
-1. **All 66 fields must be present** - Never omit a field; use `null` for inapplicable fields
+1. **All 73 fields must be present** - Never omit a field; use `null` for inapplicable fields
 2. **Exact canonical values** - Use values exactly as specified in field definitions
-3. **No extra fields** - Only include the 66 defined fields
+3. **No extra fields** - Only include the 73 defined fields
 4. **Valid JSON** - Ensure proper JSON formatting (double quotes, no trailing commas)
 5. **One topic only** - Topic is the only required field; never null
 6. **Boolean flaw fields** - Use `true` or `false` (not strings, not null) for the 6 flaw_ fields
+7. **Use numbered field names exactly** - `disease_type_1` not `disease_type`, `treatment_1` not `treatment`
 
 
 
