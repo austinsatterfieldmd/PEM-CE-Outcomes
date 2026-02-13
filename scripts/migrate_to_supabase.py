@@ -1,4 +1,10 @@
 """
+DEPRECATED: This script is kept for disaster recovery only.
+
+Import scripts now write directly to Supabase by default (--target supabase).
+This SQLite-to-Supabase bulk migration is only needed if Supabase needs to be
+rebuilt from a local SQLite backup.
+
 Migrate data from local SQLite database to Supabase PostgreSQL.
 
 Reads all tables from dashboard/data/questions.db and writes them to Supabase
