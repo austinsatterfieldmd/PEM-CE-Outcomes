@@ -284,8 +284,11 @@ The disease_type field captures **castration status**, NOT molecular subtypes (u
 - **DO NOT tag ADT/LHRH agonists** (leuprolide, goserelin) or first-gen antiandrogens (bicalutamide, flutamide) UNLESS they are the primary focus
 - For combinations, tag ALL fundable drugs in separate slots
 - Use proper case: "Abiraterone" not "abiraterone", "Enzalutamide" not "enzalutamide"
+- **If a drug is NOT in the fundable list OR the "do not tag" exclusions, you MUST STILL TAG IT.** Any drug mentioned by name — including investigational agents, pipeline drugs, and novel therapies — should be tagged. When in doubt, TAG the drug.
 
-**Fundable Prostate Cancer Treatments:**
+**Fundable Prostate Cancer Treatments (EXAMPLES - not exhaustive):**
+
+**NOTE:** The lists below are representative examples. If a question mentions a drug, drug class, or mechanism of action not listed here, STILL tag it using the appropriate fields (treatment_1-5, drug_class_1-3, drug_target_1-3). Always tag what the question discusses, even if the drug is not in this table. New drugs and investigational agents are constantly entering prostate cancer treatment — tag them by name.
 
 **Androgen Receptor Signaling Inhibitors (ARSIs):**
 - `"Abiraterone"` - ARSI + CYP17 inhibitor
@@ -542,7 +545,7 @@ For biomarkers with specific thresholds or scores, include the value/result when
 - No treatments discussed
 - Diagnosis/prognosis questions without treatment context
 
-**Prostate Cancer Drug Classes:**
+**Prostate Cancer Drug Classes (common examples - NOT exhaustive):**
 
 | Drug Class | Drugs in This Class | Use |
 |------------|---------------------|-----|
@@ -552,6 +555,8 @@ For biomarkers with specific thresholds or scores, include the value/result when
 | `"Radioligand therapy"` | Lu-177-PSMA-617, Radium-223 | PSMA+ mCRPC, bone-predominant mCRPC |
 | `"Immune checkpoint inhibitor (PD-1)"` | Pembrolizumab, Nivolumab | MSI-H/dMMR mCRPC |
 | `"Cellular immunotherapy"` | Sipuleucel-T | Minimally symptomatic mCRPC |
+
+**This table is NOT exhaustive.** If a question mentions a drug class or mechanism not listed here, STILL tag it. Use your pharmacology knowledge to determine the drug class for any drug mentioned.
 
 **Examples:**
 - treatment_1: "Abiraterone" → drug_class_1: "Androgen receptor signaling inhibitor (ARSI)"

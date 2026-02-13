@@ -278,7 +278,9 @@ When you infer a clinical trial, you MUST also infer the corresponding fundable 
 - **DO NOT TAG G-CSF** unless it's the primary focus of the question
 - For combinations, tag ALL fundable drugs in separate slots (e.g., carboplatin-etoposide-durvalumab → treatment_1: "Durvalumab" ONLY)
 
-**Fundable SCLC Treatments:**
+**Fundable SCLC Treatments (EXAMPLES - not exhaustive):**
+
+**NOTE:** The lists below are representative examples. If a question mentions a drug, drug class, or mechanism of action not listed here, STILL tag it using the appropriate fields (treatment_1-5, drug_class_1-3, drug_target_1-3). Always tag what the question discusses, even if the drug is not in this table. New drugs and investigational agents are constantly entering SCLC treatment — tag them by name. Examples of unlisted drugs you must still tag: plinabulin, ifinatamab deruxtecan, sacituzumab govitecan, trilaciclib, etc.
 
 **Immunotherapy (PD-L1 inhibitors):**
 - `"Atezolizumab"` - PD-L1 inhibitor (IMpower133: 1L extensive-stage with platinum-etoposide)
@@ -299,6 +301,8 @@ When you infer a clinical trial, you MUST also infer the corresponding fundable 
 - ❌ PCI (prophylactic cranial irradiation) - Radiation, not a drug
 - ❌ Thoracic radiation - Radiation, not a drug
 - ❌ G-CSF, pegfilgrastim - Supportive care agents (unless primary focus)
+
+**⚠️ CRITICAL: If a drug is NOT in either the fundable list above OR the "do not tag" list above, you MUST STILL TAG IT.** The lists above are not exhaustive. Any drug mentioned by name in the question — including investigational agents, pipeline drugs, and novel therapies — should be tagged. When in doubt, TAG the drug. The only drugs you should omit are the specific backbone/supportive agents listed in the "DO NOT TAG" section above.
 
 **Multi-drug examples:**
 - "Carboplatin-etoposide-durvalumab for ES-SCLC" → treatment_1: "Durvalumab" (platinum-etoposide NOT tagged)
@@ -451,7 +455,7 @@ If the question is about **neuroendocrine tumors (NETs)** or **extrapulmonary ne
 - No treatments discussed
 - Only platinum-etoposide backbone discussed (not tagged in SCLC)
 
-**SCLC Drug Classes:**
+**SCLC Drug Classes (common examples - NOT exhaustive):**
 
 | Drug Class | Drugs in This Class | Use |
 |------------|---------------------|-----|
@@ -459,6 +463,8 @@ If the question is about **neuroendocrine tumors (NETs)** or **extrapulmonary ne
 | `"Topoisomerase I inhibitor"` | Topotecan, Irinotecan | 2L+ relapsed SCLC |
 | `"RNA polymerase II inhibitor"` | Lurbinectedin | 2L+ relapsed SCLC post-platinum |
 | `"Bispecific T-cell engager"` | Tarlatamab | 2L+ relapsed SCLC (DLL3-targeted) |
+
+**This table is NOT exhaustive.** If a question mentions a drug class or mechanism not listed here, STILL tag it. Use your pharmacology knowledge to determine the drug class for any drug mentioned. For example, plinabulin is a tubulin-binding agent — tag it as such even though it's not in this table.
 
 **DO NOT TAG (Not Fundable):**
 - ❌ `"Platinum chemotherapy"` - Carboplatin, Cisplatin (universal backbone, not fundable)
