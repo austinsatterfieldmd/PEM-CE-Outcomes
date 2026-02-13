@@ -403,20 +403,27 @@ Q: "Patient achieves MRD negativity after blinatumomab. What does this predict?"
 - Trial subgroup analysis by eligibility status
 
 ### 10. age_group
-**CRITICAL for ALL** - Age significantly impacts treatment approach.
+**CRITICAL for ALL** - Age significantly impacts treatment approach. **DO NOT return null if an age is mentioned.**
 
 **Valid values:**
-- `"Pediatric"` - Under 18 years
-- `"AYA"` - Adolescent/Young Adult, 15-39 years (CRITICAL category for ALL)
-- `"Young"` - Adults under 65 years
-- `"Transitional"` - 65-75 years (may or may not tolerate intensive therapy)
-- `"Elderly"` - 75 years or older
+- `"Pediatric"` - Under 15 years (age < 15)
+- `"AYA"` - Adolescent/Young Adult, ages 15 to 39 (15 <= age <= 39) - CRITICAL category for ALL
+- `"Young"` - Ages 40 to 64 (40 <= age <= 64)
+- `"Transitional"` - Ages 65 to 75 (65 <= age <= 75)
+- `"Elderly"` - Age 76 and older (age >= 76)
 
-**When to tag:**
-- Age explicitly stated
-- "Pediatric-inspired regimen" → implies AYA or younger adult
-- Trial with age-based eligibility
-- Discussion of age-adapted therapy
+**This is a DETERMINISTIC field - no clinical judgment needed.** Simply read the age and apply the cutoffs:
+- Age < 15 -> `"Pediatric"`
+- Age 15-39 -> `"AYA"`
+- Age 40-64 -> `"Young"`
+- Age 65-75 -> `"Transitional"`
+- Age >= 76 -> `"Elderly"`
+
+**Boundary examples (memorize these):**
+- Age 14 -> Pediatric | Age 15 -> AYA | Age 39 -> AYA | Age 40 -> Young
+- Age 64 -> Young | Age 65 -> Transitional | Age 75 -> Transitional | Age 76 -> Elderly
+
+**CRITICAL:** When a patient age is stated in the question stem, you MUST tag age_group.
 
 **AYA-specific considerations:**
 - AYA patients often treated with pediatric-inspired regimens

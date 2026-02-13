@@ -1129,16 +1129,19 @@ This exception applies ONLY when the scenario-to-trial mapping is unambiguous (1
 **REQUIRED when patient age is stated** - Tag the age category whenever a specific age (e.g., "68-year-old") appears in the question stem. **DO NOT return null if an age is mentioned.**
 
 **Valid values:**
-- `"Pediatric"` - Under 18 years
-- `"Young"` - Adults under 65 years (e.g., 45, 52, 58, 62, 64)
-- `"Transitional"` - 65 to 75 years (e.g., 65, 67, 70, 72, 75)
-- `"Elderly"` - Over 75 years (e.g., 76, 78, 80, 85)
+- `"Pediatric"` - Under 18 years (age < 18)
+- `"Young"` - Ages 18 to 64 (18 <= age <= 64)
+- `"Transitional"` - Ages 65 to 75 (65 <= age <= 75)
+- `"Elderly"` - Age 76 and older (age >= 76)
 
-**This is a DETERMINISTIC field — no clinical judgment needed.** Simply read the age and apply the cutoffs. There should NEVER be disagreement on this field:
-- Age < 18 → `"Pediatric"`
-- Age 18-64 → `"Young"`
-- Age 65-75 → `"Transitional"`
-- Age > 75 → `"Elderly"`
+**This is a DETERMINISTIC field - no clinical judgment needed.** Simply read the age and apply the cutoffs:
+- Age < 18 -> `"Pediatric"`
+- Age 18-64 -> `"Young"`
+- Age 65-75 -> `"Transitional"`
+- Age >= 76 -> `"Elderly"`
+
+**Boundary examples (memorize these):**
+- Age 64 -> Young | Age 65 -> Transitional | Age 75 -> Transitional | Age 76 -> Elderly
 
 **CRITICAL:** When a patient age is stated in the question stem, you MUST tag age_group. This is one of the most commonly missed fields. A "55-year-old" = Young. A "65-year-old" = Transitional. A "78-year-old" = Elderly. If you see ANY age in the stem (e.g., "A 40-year-old man..."), there is ZERO reason for age_group to be null.
 

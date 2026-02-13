@@ -371,15 +371,24 @@ TP53 mutation/del(17p) in MCL indicates aggressive disease with poor response to
 **MCL-specific note:** Age and fitness significantly affect treatment approach in MCL. Young, fit patients often receive intensive cytarabine-based induction + ASCT.
 
 ### 10. age_group
-**REQUIRED when patient age is stated** - Tag the age category whenever a specific age (e.g., "57-year-old") appears in the question stem.
+**REQUIRED when patient age is stated** - Tag the age category whenever a specific age appears in the question stem. **DO NOT return null if an age is mentioned.**
 
 **Valid values:**
-- `"Pediatric"` - Under 18 years (extremely rare in MCL)
-- `"Young"` - Adults under 65 years (often ASCT-eligible)
-- `"Transitional"` - 65-75 years
-- `"Elderly"` - 75 years or older
+- `"Pediatric"` - Under 18 years (age < 18)
+- `"Young"` - Ages 18 to 64 (18 <= age <= 64)
+- `"Transitional"` - Ages 65 to 75 (65 <= age <= 75)
+- `"Elderly"` - Age 76 and older (age >= 76)
 
-**MCL-specific note:** MCL is predominantly a disease of older adults. Median age at diagnosis is ~68 years.
+**This is a DETERMINISTIC field - no clinical judgment needed.** Simply read the age and apply the cutoffs:
+- Age < 18 -> `"Pediatric"`
+- Age 18-64 -> `"Young"`
+- Age 65-75 -> `"Transitional"`
+- Age >= 76 -> `"Elderly"`
+
+**Boundary examples (memorize these):**
+- Age 64 -> Young | Age 65 -> Transitional | Age 75 -> Transitional | Age 76 -> Elderly
+
+**CRITICAL:** When a patient age is stated in the question stem, you MUST tag age_group. If the stem says "elderly" without a specific age, tag "Elderly". If it says "young patient" without a specific age, tag "Young".
 
 ### 11. organ_dysfunction
 **OPTIONAL** - Relevant organ impairment.

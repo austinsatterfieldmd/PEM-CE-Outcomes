@@ -466,22 +466,24 @@ Use this value ONLY when the question involves patient eligibility context, NOT 
 - **Drug comparison questions** - Comparing drugs without patient eligibility context → null
 
 ### 10. age_group
-**REQUIRED when patient age is stated** - Tag the age category whenever a specific age (e.g., "72-year-old") appears in the question stem.
+**REQUIRED when patient age is stated** - Tag the age category whenever a specific age appears in the question stem. **DO NOT return null if an age is mentioned.**
 
 **Valid values:**
-- `"Pediatric"` - Under 18 years (rare in MM)
-- `"Young"` - Adults under 65 years
-- `"Transitional"` - 65-75 years (transitional fitness, may or may not be transplant-eligible)
-- `"Elderly"` - 75 years or older
+- `"Pediatric"` - Under 18 years (age < 18)
+- `"Young"` - Ages 18 to 64 (18 <= age <= 64)
+- `"Transitional"` - Ages 65 to 75 (65 <= age <= 75)
+- `"Elderly"` - Age 76 and older (age >= 76)
 
-**When to tag:**
-- Age explicitly stated in vignette
-- Trial with age-based eligibility (e.g., fit elderly trial)
-- "Elderly" or "young" patient explicitly mentioned
+**This is a DETERMINISTIC field - no clinical judgment needed.** Simply read the age and apply the cutoffs:
+- Age < 18 -> `"Pediatric"`
+- Age 18-64 -> `"Young"`
+- Age 65-75 -> `"Transitional"`
+- Age >= 76 -> `"Elderly"`
 
-**When null is appropriate:**
-- Age not mentioned or implied
-- General treatment questions
+**Boundary examples (memorize these):**
+- Age 64 -> Young | Age 65 -> Transitional | Age 75 -> Transitional | Age 76 -> Elderly
+
+**CRITICAL:** When a patient age is stated in the question stem, you MUST tag age_group. If the stem says "elderly" without a specific age, tag "Elderly". If it says "young patient" without a specific age, tag "Young".
 
 ### 11. organ_dysfunction
 **OPTIONAL** - Relevant organ impairment affecting treatment selection.

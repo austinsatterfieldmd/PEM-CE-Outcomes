@@ -261,15 +261,24 @@ Usually null for CMML (hematologic malignancy).
 
 
 ### age_group
-**REQUIRED when patient age is stated** - Tag the age category whenever a specific age (e.g., "68-year-old") appears in the question stem.
+**REQUIRED when patient age is stated** - Tag the age category whenever a specific age appears in the question stem. **DO NOT return null if an age is mentioned.**
 
 **Valid values:**
-- `"Pediatric"` - Under 18 years
-- `"Young"` - Adults under 65 years
-- `"Transitional"` - 65-75 years
-- `"Elderly"` - 75 years or older
+- `"Pediatric"` - Under 18 years (age < 18)
+- `"Young"` - Ages 18 to 64 (18 <= age <= 64)
+- `"Transitional"` - Ages 65 to 75 (65 <= age <= 75)
+- `"Elderly"` - Age 76 and older (age >= 76)
 
-**CRITICAL:** When a patient age is stated in the question stem, you MUST tag age_group. This is one of the most commonly missed fields. A "52-year-old" = Young. A "72-year-old" = Transitional. A "78-year-old" = Elderly.
+**This is a DETERMINISTIC field - no clinical judgment needed.** Simply read the age and apply the cutoffs:
+- Age < 18 -> `"Pediatric"`
+- Age 18-64 -> `"Young"`
+- Age 65-75 -> `"Transitional"`
+- Age >= 76 -> `"Elderly"`
+
+**Boundary examples (memorize these):**
+- Age 64 -> Young | Age 65 -> Transitional | Age 75 -> Transitional | Age 76 -> Elderly
+
+**CRITICAL:** When a patient age is stated in the question stem, you MUST tag age_group. If the stem says "elderly" without a specific age, tag "Elderly". If it says "young patient" without a specific age, tag "Young".
 
 ### 40. performance_status
 **ONLY tag when ECOG score is explicitly stated.**
