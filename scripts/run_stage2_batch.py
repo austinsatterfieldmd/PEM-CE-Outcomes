@@ -520,7 +520,7 @@ def main():
         results = normalize_results(results)
 
         # Enrich with QCore and performance data
-        print("\n📊 Enriching with QCore scores and performance data...")
+        print("\nEnriching with QCore scores and performance data...")
         from src.core.preprocessing.qcore_scorer import calculate_qcore_score
 
         # Try to find raw data file if not specified
@@ -691,7 +691,7 @@ def main():
         import_script = PROJECT_ROOT / "dashboard" / "scripts" / "import_stage2_results.py"
         if import_script.exists():
             import subprocess
-            print("\n📥 Importing to SQLite dashboard database...")
+            print("\nImporting to SQLite dashboard database...")
             result = subprocess.run(
                 ["python", str(import_script), "--file", str(output_path), "--upsert"],
                 cwd=str(PROJECT_ROOT / "dashboard"),
@@ -830,7 +830,7 @@ def update_remaining_file(results: List[Dict[str, Any]], input_file: str):
         with open(manifest_path, 'w', encoding='utf-8') as f:
             json.dump(manifest, f, indent=2)
 
-        print(f"\n📊 Remaining file updated:")
+        print(f"\nRemaining file updated:")
         print(f"   Previous: {current_remaining_file} ({original_count} questions)")
         print(f"   New:      {new_remaining_filename} ({new_count} questions)")
         print(f"   Removed:  {removed_count} tagged QGDs")
