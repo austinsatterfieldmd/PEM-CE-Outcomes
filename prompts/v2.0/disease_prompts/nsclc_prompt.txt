@@ -87,7 +87,22 @@ Do NOT use "Molecular testing" as a topic value. Questions about NGS, liquid bio
 | disease_type Value | When to Use |
 |-------------------|-------------|
 | `null` | **DEFAULT** - Use for most NSCLC questions |
-| `"Squamous"` | Only when squamous histology is explicitly stated AND relevant to treatment |
+| `"Squamous"` | When squamous histology is stated or clearly implied (see rules below) |
+
+**⚠️ CRITICAL: Squamous Histology Must ALWAYS Be Tagged**
+If the question stem, activity name, or clinical context mentions "squamous", "squamous cell", "squamous NSCLC", or "squamous cell carcinoma of the lung", you **MUST** tag `disease_type: "Squamous"`. This is NOT optional.
+
+**Why squamous matters for NSCLC:**
+- Squamous histology changes treatment selection (e.g., bevacizumab contraindicated, pemetrexed less effective)
+- Different 1L chemo-IO regimens: KEYNOTE-407 (squamous) vs KEYNOTE-189 (non-squamous)
+- Some targeted therapies have histology-specific data
+- Squamous patients are less likely to harbor EGFR/ALK/ROS1 alterations
+
+**Tag squamous in these scenarios:**
+- "metastatic squamous NSCLC" → disease_type: `"Squamous"`
+- "squamous cell carcinoma of the lung" → disease_type: `"Squamous"`
+- KEYNOTE-407 context (squamous-specific trial) → disease_type: `"Squamous"`
+- Carboplatin-paclitaxel-pembrolizumab (squamous regimen) → disease_type: `"Squamous"` if stated
 
 **Leptomeningeal disease is NOT a disease_type.** Tag it as `metastatic_site_1: "Leptomeningeal disease"` instead. Leptomeningeal disease describes a site of metastatic spread, not a molecular or histologic subtype.
 
@@ -171,6 +186,17 @@ HER2 mutations in NSCLC (distinct from HER2 amplification in breast cancer) are 
 - Zongertinib - HER2-selective TKI
 - Sevabertinib - HER2-mutant targeted TKI
 - For generalized "HER2-mutant NSCLC" questions, infer ALL approved/available HER2-targeting agents at STARTDATE.
+
+**⚠️ CRITICAL: Biomarker Priority in Post-Progression Settings**
+When a patient has a known driver mutation (e.g., EGFR mutation) BUT the question is about treatment directed at a DIFFERENT biomarker after progression, prioritize the **treatment-selection biomarker** (the one guiding the current treatment decision) in `biomarker_1`:
+
+| Scenario | biomarker_1 (PRIMARY) | biomarker_2 (BACKGROUND) |
+|----------|----------------------|-------------------------|
+| EGFR-mutated patient, post-osimertinib, now c-MET overexpressing → telisotuzumab vedotin | `"c-MET overexpression"` | `"EGFR mutation"` |
+| EGFR-mutated patient, post-osimertinib, now HER2 amplified → T-DXd | `"HER2 amplification"` | `"EGFR mutation"` |
+| ALK+ patient, post-lorlatinib, MET amplification detected | `"MET amplification"` | `"ALK"` |
+
+**Rule:** `biomarker_1` = the biomarker driving the CURRENT treatment decision. Background driver mutations go in `biomarker_2` (or `prior_therapy` / `resistance_mechanism` as appropriate). Do NOT let the original driver mutation crowd out the actionable biomarker for the question being asked.
 
 **"No AGA" Convention:**
 When a question discusses immunotherapy eligibility for patients WITHOUT actionable alterations:
@@ -1083,15 +1109,19 @@ Use the disease-specific drug table above to map class → individual drugs.
 
 
 ### age_group
-**REQUIRED when patient age is stated** - Tag the age category whenever a specific age (e.g., "68-year-old") appears in the question stem.
+**REQUIRED when patient age is stated** - Tag the age category whenever a specific age (e.g., "68-year-old") appears in the question stem. **DO NOT return null if an age is mentioned.**
 
 **Valid values:**
 - `"Pediatric"` - Under 18 years
-- `"Young"` - Adults under 65 years
-- `"Transitional"` - 65-75 years
-- `"Elderly"` - 75 years or older
+- `"Young"` - Adults under 65 years (e.g., 45, 52, 58, 62, 64)
+- `"Transitional"` - 65 to 75 years (e.g., 65, 67, 70, 72, 75)
+- `"Elderly"` - Over 75 years (e.g., 76, 78, 80, 85)
 
-**CRITICAL:** When a patient age is stated in the question stem, you MUST tag age_group. A "52-year-old" = Young. A "72-year-old" = Transitional. A "78-year-old" = Elderly.
+**This is a DETERMINISTIC field — no clinical judgment needed.** Simply read the age and apply the cutoffs. There should NEVER be disagreement on this field:
+- Age < 18 → `"Pediatric"`
+- Age 18-64 → `"Young"`
+- Age 65-75 → `"Transitional"`
+- Age > 75 → `"Elderly"`
 
 ### 38. performance_status
 **OPTIONAL** - ECOG performance status if mentioned.
@@ -1113,9 +1143,16 @@ Use the disease-specific drug table above to map class → individual drugs.
 - `"Never-smoker"` - Higher probability of driver mutations (EGFR, ALK, ROS1)
 - `"Oligometastatic disease"` - Limited metastatic burden, may be eligible for local consolidative therapy
 - `"CNS-only progression"` - Isolated CNS progression while systemic disease controlled
-- `"Liquid biopsy"` - Question focuses on ctDNA/cell-free DNA testing approach
-- `"Tissue biopsy"` - Question focuses on tissue-based molecular testing approach
+- `"Liquid biopsy"` - Question mentions ctDNA/cell-free DNA/liquid biopsy testing
+- `"Tissue biopsy"` - Question mentions tissue-based molecular testing
 - `"Concurrent liquid and tissue biopsy"` - Question discusses or recommends both liquid AND tissue biopsy approaches together
+
+**⚠️ AUTO-DETECTION RULE:** If ANY of these terms appear in the question stem, correct answer, or clinical context, you MUST tag `disease_specific_factor` accordingly — even if biopsy method is not the primary topic:
+- "liquid biopsy", "ctDNA", "cell-free DNA", "circulating tumor DNA", "blood-based testing" → `"Liquid biopsy"`
+- "tissue biopsy", "tissue sample", "core biopsy", "tissue NGS" → `"Tissue biopsy"`
+- Both liquid AND tissue mentioned → `"Concurrent liquid and tissue biopsy"`
+
+This is important for tracking how biopsy methods appear across different clinical contexts (resistance testing, initial diagnosis, monitoring, etc.).
 
 ### comorbidity_1 through comorbidity_3
 **OPTIONAL** - Comorbidities explicitly stated in the question stem that affect treatment decisions.
@@ -1590,6 +1627,19 @@ If a trial is mentioned but you don't recognize it:
 
 ---
 
+
+## ⚠️ PRE-OUTPUT CHECKLIST (Verify Before Responding)
+
+Before generating your JSON response, verify these NSCLC-specific checks:
+
+1. **age_group**: Is a patient age stated? If yes, did you tag age_group? (Young <65, Transitional 65-75, Elderly >75)
+2. **disease_type "Squamous"**: Does the stem mention "squamous"? If yes, did you set disease_type: "Squamous"?
+3. **disease_specific_factor**: Does the stem mention "liquid biopsy", "ctDNA", "tissue biopsy"? If yes, did you tag it?
+4. **biomarker_1 priority**: In a post-progression setting, is biomarker_1 the biomarker driving the CURRENT treatment decision (not the original driver)?
+5. **topic**: Did you use "Biomarker testing" (not "Molecular testing") for any testing-related question?
+6. **treatment_line**: Did you avoid "Newly diagnosed" for NSCLC? (Use 1L, Neoadjuvant, Adjuvant, Perioperative, Consolidation instead)
+
+---
 
 # Output Format
 
