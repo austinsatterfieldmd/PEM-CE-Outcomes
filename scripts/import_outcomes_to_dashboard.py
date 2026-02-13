@@ -11,18 +11,25 @@ It imports:
 
 Usage:
     python scripts/import_outcomes_to_dashboard.py [--input INPUT_FILE] [--dry-run]
+    python scripts/import_outcomes_to_dashboard.py --target supabase       # Write directly to Supabase
+
+Note: For full performance data rebuild with demographic breakdowns, prefer
+      comprehensive_data_overhaul.py --phase 2 --target supabase
 """
 
+import os
+import sys
 import argparse
 import sqlite3
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, Any, Optional, Set
 
-import pandas as pd
-
-# Project root directory
+# Add project root to path
 PROJECT_ROOT = Path(__file__).parent.parent
+sys.path.insert(0, str(PROJECT_ROOT))
+
+import pandas as pd
 
 # Default paths
 DEFAULT_INPUT = PROJECT_ROOT / "data" / "raw" / "FullColumnsSample_v2_012026.xlsx"
@@ -47,22 +54,26 @@ def get_quarter_from_date(date_str: str) -> Optional[str]:
 def import_outcomes(
     input_path: Path,
     db_path: Path,
-    dry_run: bool = False
+    dry_run: bool = False,
+    target: str = 'sqlite'
 ) -> Dict[str, Any]:
     """
     Import outcomes data from Excel file into dashboard database.
 
     Args:
         input_path: Path to Excel file with outcomes data
-        db_path: Path to SQLite database
+        db_path: Path to SQLite database (only used when target='sqlite')
         dry_run: If True, don't write to database
+        target: 'sqlite' or 'supabase'
 
     Returns:
         Dict with import statistics
     """
+    from dashboard.backend.services.import_service import get_import_db
+
     print(f"\n=== Import Outcomes to Dashboard ===")
     print(f"Input:  {input_path}")
-    print(f"DB:     {db_path}")
+    print(f"Target: {target}")
     print(f"Mode:   {'DRY RUN' if dry_run else 'WRITE'}")
 
     # Load Excel file
@@ -70,14 +81,19 @@ def import_outcomes(
     df = pd.read_excel(input_path)
     print(f"  Rows: {len(df)}")
 
-    # Connect to database
-    conn = sqlite3.connect(db_path)
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
+    # Get QGD-to-question_id mapping
+    db = get_import_db(target)
+    if target == 'supabase':
+        result = db.client.table('questions').select('id, source_id').not_.is_('source_id', 'null').execute()
+        db_questions = {r['source_id']: r['id'] for r in result.data}
+    else:
+        conn = sqlite3.connect(str(db_path))
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, source_id FROM questions WHERE source_id IS NOT NULL")
+        db_questions = {row["source_id"]: row["id"] for row in cursor.fetchall()}
+        conn.close()  # Read-only; writes go through service layer
 
-    # Get existing questions by source_id (QGD)
-    cursor.execute("SELECT id, source_id FROM questions WHERE source_id IS NOT NULL")
-    db_questions = {row["source_id"]: row["id"] for row in cursor.fetchall()}
     print(f"  Questions in DB: {len(db_questions)}")
 
     # Track statistics
@@ -131,7 +147,8 @@ def import_outcomes(
         quarter = None
         if not pd.isna(start_date):
             try:
-                activity_date = pd.to_datetime(start_date).strftime("%Y-%m-%d")
+                dt = pd.to_datetime(start_date)
+                activity_date = dt.date() if target == 'supabase' else dt.strftime("%Y-%m-%d")
                 quarter = get_quarter_from_date(start_date)
             except:
                 pass
@@ -140,28 +157,19 @@ def import_outcomes(
         activity_key = f"{course_id}|{course_name}"
         if activity_key not in activities_seen:
             if not dry_run:
-                # Check if activity exists
-                cursor.execute(
-                    "SELECT id FROM activities WHERE activity_name = ?",
-                    (course_name,)
+                activity_id = db.upsert_activity_metadata(
+                    activity_name=course_name,
+                    activity_date=activity_date if target == 'supabase' else None,
                 )
-                existing = cursor.fetchone()
-
-                if existing:
-                    activities_seen[activity_key] = existing["id"]
-                    stats["activities_updated"] += 1
-                else:
-                    cursor.execute("""
-                        INSERT INTO activities (activity_name, activity_date, quarter)
-                        VALUES (?, ?, ?)
-                    """, (course_name, activity_date, quarter))
-                    activities_seen[activity_key] = cursor.lastrowid
+                if activity_id:
+                    activities_seen[activity_key] = activity_id
                     stats["activities_created"] += 1
+                # For SQLite upsert_activity_metadata with date string
+                if target == 'sqlite' and activity_date and activity_id:
+                    pass  # upsert_activity_metadata handles date
             else:
-                # Dry run - just count
-                if activity_key not in activities_seen:
-                    activities_seen[activity_key] = len(activities_seen) + 1
-                    stats["activities_created"] += 1
+                activities_seen[activity_key] = len(activities_seen) + 1
+                stats["activities_created"] += 1
 
         activity_id = activities_seen.get(activity_key)
 
@@ -171,63 +179,49 @@ def import_outcomes(
             question_activities_seen.add(qa_key)
 
             # Get performance scores
-            pre_score = row.get("PRESCORECALC")
-            post_score = row.get("POSTSCORECALC")
+            pre_score_raw = row.get("PRESCORECALC")
+            post_score_raw = row.get("POSTSCORECALC")
             pre_n = row.get("PRESCOREN")
             post_n = row.get("POSTSCOREN")
 
+            pre_score = float(pre_score_raw) if not pd.isna(pre_score_raw) else None
+            post_score = float(post_score_raw) if not pd.isna(post_score_raw) else None
+            pre_n_val = int(pre_n) if not pd.isna(pre_n) else None
+            post_n_val = int(post_n) if not pd.isna(post_n) else None
+
             if not dry_run:
-                # Check if link exists
-                cursor.execute("""
-                    SELECT id FROM question_activities
-                    WHERE question_id = ? AND activity_name = ?
-                """, (question_id, course_name))
-                existing = cursor.fetchone()
+                db.insert_question_activity(
+                    question_id=question_id,
+                    activity_name=course_name,
+                    activity_id=activity_id,
+                    activity_date=activity_date,
+                    quarter=quarter,
+                    pre_score=pre_score,
+                    post_score=post_score,
+                    pre_n=pre_n_val,
+                    post_n=post_n_val,
+                )
+                stats["question_activities_created"] += 1
 
-                if not existing:
-                    cursor.execute("""
-                        INSERT INTO question_activities
-                        (question_id, activity_id, activity_name, activity_date, quarter,
-                         pre_score, post_score, pre_n, post_n)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    """, (
-                        question_id, activity_id, course_name, activity_date, quarter,
-                        pre_score if not pd.isna(pre_score) else None,
-                        post_score if not pd.isna(post_score) else None,
-                        int(pre_n) if not pd.isna(pre_n) else None,
-                        int(post_n) if not pd.isna(post_n) else None
-                    ))
-                    stats["question_activities_created"] += 1
-
-                    # Also create aggregate performance record
-                    if not pd.isna(pre_score) or not pd.isna(post_score):
-                        cursor.execute("""
-                            INSERT OR REPLACE INTO performance
-                            (question_id, segment, pre_score, post_score, pre_n, post_n)
-                            VALUES (?, ?, ?, ?, ?, ?)
-                        """, (
-                            question_id,
-                            course_name,  # Use activity name as segment
-                            pre_score if not pd.isna(pre_score) else None,
-                            post_score if not pd.isna(post_score) else None,
-                            int(pre_n) if not pd.isna(pre_n) else None,
-                            int(post_n) if not pd.isna(post_n) else None
-                        ))
-                        stats["performance_records_created"] += 1
+                # Also create aggregate performance record
+                if pre_score is not None or post_score is not None:
+                    db.insert_performance(
+                        question_id=question_id,
+                        segment=course_name,
+                        pre_score=pre_score,
+                        post_score=post_score,
+                        pre_n=pre_n_val,
+                        post_n=post_n_val,
+                    )
+                    stats["performance_records_created"] += 1
             else:
                 stats["question_activities_created"] += 1
-                if not pd.isna(row.get("PRESCORECALC")) or not pd.isna(row.get("POSTSCORECALC")):
+                if pre_score is not None or post_score is not None:
                     stats["performance_records_created"] += 1
 
         # Progress indicator
         if stats["rows_processed"] % 50000 == 0:
             print(f"  Processed {stats['rows_processed']:,} rows...")
-
-    # Commit if not dry run
-    if not dry_run:
-        conn.commit()
-
-    conn.close()
 
     # Print summary
     print(f"\n=== Import Summary ===")
@@ -242,7 +236,7 @@ def import_outcomes(
     if dry_run:
         print(f"\n[DRY RUN] No changes written to database")
     else:
-        print(f"\n[SUCCESS] Data imported to database")
+        print(f"\n[SUCCESS] Data imported to {target}")
 
     return stats
 
@@ -264,6 +258,13 @@ def main():
         help=f"SQLite database path (default: {DEFAULT_DB})"
     )
     parser.add_argument(
+        "--target",
+        type=str,
+        choices=["sqlite", "supabase"],
+        default=os.environ.get("IMPORT_TARGET", "sqlite"),
+        help="Write target: sqlite or supabase (default: IMPORT_TARGET env var or sqlite)"
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Show what would be imported without writing to database"
@@ -276,7 +277,7 @@ def main():
         print(f"Error: Input file not found: {args.input}")
         return 1
 
-    if not args.db.exists():
+    if args.target == 'sqlite' and not args.db.exists():
         print(f"Error: Database not found: {args.db}")
         return 1
 
@@ -284,7 +285,8 @@ def main():
     stats = import_outcomes(
         input_path=args.input,
         db_path=args.db,
-        dry_run=args.dry_run
+        dry_run=args.dry_run,
+        target=args.target
     )
 
     return 0

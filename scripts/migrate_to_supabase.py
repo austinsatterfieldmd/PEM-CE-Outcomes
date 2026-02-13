@@ -123,11 +123,13 @@ def clean_row(row: dict, table_name: str) -> dict:
 
     # Columns in SQLite but NOT in the PostgreSQL target table
     skip_columns = {
+        # QCore columns live on tags table, not questions table in Supabase
         "questions": {"qcore_score", "qcore_grade", "qcore_breakdown", "qcore_scored_at"},
-        "tags": {"qpulse_score", "qpulse_grade", "qpulse_breakdown", "qpulse_scored_at"},
-        "question_activities": {"pre_score", "post_score", "pre_n", "post_n", "activity_id"},
-        "demographic_performance": {"pre_n", "post_n"},
+        # tags: qcore_* columns exist in both SQLite and Supabase — no skip needed
+        "tags": set(),
     }
+    # Note: question_activities and demographic_performance columns were added
+    # in migration 011 — no longer need to be skipped
     table_skip = skip_columns.get(table_name, set())
 
     for key, value in row.items():

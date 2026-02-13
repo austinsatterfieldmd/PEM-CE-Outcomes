@@ -484,10 +484,25 @@ class DatabaseService:
                 ("activity_id", "INTEGER"),
                 ("activity_date", "DATE"),
                 ("quarter", "TEXT"),
+                ("pre_score", "REAL"),
+                ("post_score", "REAL"),
+                ("pre_n", "INTEGER"),
+                ("post_n", "INTEGER"),
             ]
             for col_name, col_type in qa_migration_columns:
                 try:
                     cursor.execute(f"ALTER TABLE question_activities ADD COLUMN {col_name} {col_type}")
+                except sqlite3.OperationalError:
+                    pass  # Column already exists
+
+            # Migration: Add pre_n/post_n to demographic_performance
+            dp_migration_columns = [
+                ("pre_n", "INTEGER"),
+                ("post_n", "INTEGER"),
+            ]
+            for col_name, col_type in dp_migration_columns:
+                try:
+                    cursor.execute(f"ALTER TABLE demographic_performance ADD COLUMN {col_name} {col_type}")
                 except sqlite3.OperationalError:
                     pass  # Column already exists
 
@@ -1008,7 +1023,36 @@ class DatabaseService:
                 VALUES (?, ?, ?, ?, ?)
             """, (question_id, activity_name, activity_id, activity_date, quarter))
             conn.commit()
-    
+
+    def insert_question_activity(
+        self,
+        question_id: int,
+        activity_name: str,
+        activity_id: Optional[int] = None,
+        activity_date=None,
+        quarter: Optional[str] = None,
+        pre_score: Optional[float] = None,
+        post_score: Optional[float] = None,
+        pre_n: Optional[int] = None,
+        post_n: Optional[int] = None,
+    ) -> None:
+        """Insert a question-activity association with optional performance data.
+
+        Uses INSERT OR REPLACE on the UNIQUE(question_id, activity_name) constraint.
+        """
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT OR REPLACE INTO question_activities
+                (question_id, activity_name, activity_id, activity_date, quarter,
+                 pre_score, post_score, pre_n, post_n)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (question_id, activity_name, activity_id, activity_date, quarter,
+                  round(pre_score, 2) if pre_score is not None else None,
+                  round(post_score, 2) if post_score is not None else None,
+                  pre_n, post_n))
+            conn.commit()
+
     # ============== Activity Metadata Operations ==============
     
     def upsert_activity_metadata(
