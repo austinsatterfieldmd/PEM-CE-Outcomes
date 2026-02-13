@@ -1041,6 +1041,13 @@ Use the disease-specific drug table above to map class → individual drugs.
 
 **Inference NOT ALLOWED** for all other topics (Treatment selection, Treatment indication, AE management, Biomarker testing, Mechanism of action, Patient selection, Supportive care, Monitoring/follow-up). For these topics, use null unless the trial is explicitly named in the stem or answer choices.
 
+**EXCEPTION — Landmark trial inference for highly specific clinical scenarios:**
+When the clinical context maps to ONE specific landmark trial with no ambiguity, inference IS allowed regardless of topic. These scenarios are so defining that the trial is inseparable from the indication:
+- Stage III unresectable EGFR+ NSCLC + post-CRT consolidation → trial: "LAURA", treatment: "Osimertinib"
+- Adjuvant osimertinib after resected EGFR+ NSCLC → trial: "ADAURA", treatment: "Osimertinib"
+- 1L osimertinib + chemo in EGFR+ advanced NSCLC → trial: "FLAURA2", treatment: "Osimertinib"
+This exception applies ONLY when the scenario-to-trial mapping is unambiguous (1:1). If multiple trials could fit, do NOT infer.
+
 ---
 
 ## Group A: Treatment Metadata (10 fields)
@@ -1050,6 +1057,16 @@ Use the disease-specific drug table above to map class → individual drugs.
 
 **Common values (use these when applicable, but may use other values if confident):**
 `"Monoclonal antibody"`, `"Antibody-drug conjugate (ADC)"`, `"Bispecific antibody"`, `"CAR-T therapy"`, `"Immune checkpoint inhibitor"`, `"CDK4/6 inhibitor"`, `"EGFR TKI"`, `"ALK inhibitor"`, `"ROS1 inhibitor"`, `"KRAS G12C inhibitor"`, `"BRAF inhibitor"`, `"MEK inhibitor"`, `"HER2 TKI"`, `"BTK inhibitor"`, `"BCL-2 inhibitor"`, `"PI3K inhibitor"`, `"AKT inhibitor"`, `"PARP inhibitor"`, `"FLT3 inhibitor"`, `"IDH inhibitor"`, `"JAK inhibitor"`, `"Menin inhibitor"`, `"FGFR inhibitor"`, `"MET inhibitor"`, `"RET inhibitor"`, `"NTRK inhibitor"`, `"Bispecific T-cell engager"`, `"Aromatase inhibitor"`, `"SERD"`, `"IMiD"`, `"Proteasome inhibitor"`, `"Hypomethylating agent"`, `"Targeted cytotoxin"`
+
+**NSCLC-specific drug_class mappings (use these exact values):**
+- osimertinib, erlotinib, gefitinib, afatinib, dacomitinib, lazertinib → `"EGFR TKI"`
+- amivantamab → `"Bispecific antibody"` (EGFR/MET-targeting; do NOT use "Monoclonal antibody" or "EGFR/MET bispecific")
+- alectinib, brigatinib, lorlatinib, crizotinib, ceritinib → `"ALK inhibitor"`
+- sotorasib, adagrasib → `"KRAS G12C inhibitor"`
+- selpercatinib, pralsetinib → `"RET inhibitor"`
+- capmatinib, tepotinib → `"MET inhibitor"`
+- trastuzumab deruxtecan → `"Antibody-drug conjugate (ADC)"`
+- pembrolizumab, nivolumab, atezolizumab, durvalumab → `"Immune checkpoint inhibitor"`
 
 ### 23-25. drug_target_1 through drug_target_3
 **OPTIONAL** - Molecular target of the drug(s) mentioned.
@@ -1122,6 +1139,8 @@ Use the disease-specific drug table above to map class → individual drugs.
 - Age 18-64 → `"Young"`
 - Age 65-75 → `"Transitional"`
 - Age > 75 → `"Elderly"`
+
+**CRITICAL:** When a patient age is stated in the question stem, you MUST tag age_group. This is one of the most commonly missed fields. A "55-year-old" = Young. A "65-year-old" = Transitional. A "78-year-old" = Elderly. If you see ANY age in the stem (e.g., "A 40-year-old man..."), there is ZERO reason for age_group to be null.
 
 ### 38. performance_status
 **OPTIONAL** - ECOG performance status if mentioned.
@@ -1368,9 +1387,12 @@ Override ONLY when there is an EXTREME disparity in answer length or detail leve
 
 **"Homogeneous"** = All distractors are the SAME TYPE:
 - All drug names: "Osimertinib" / "Erlotinib" / "Afatinib" / "Gefitinib" → **Homogeneous**
+- All treatment regimens/combinations: "Pembrolizumab + carboplatin + pemetrexed" / "Nivolumab + ipilimumab + chemo" / "Atezolizumab + bevacizumab + chemo" → **Homogeneous** (all are treatment options, even if regimen complexity varies)
 - All clinical actions: "Continue therapy" / "Dose reduce" / "Discontinue" / "Switch to 2L" → **Homogeneous**
 - All trial names: "FLAURA" / "MARIPOSA" / "ADAURA" / "CROWN" → **Homogeneous**
 - All biomarkers: "EGFR" / "ALK" / "ROS1" / "KRAS G12C" → **Homogeneous**
+
+**KEY RULE:** If ALL answer options are treatments (whether single drugs, regimens, or combinations), they are **Homogeneous** — even if one option has more drugs than another. The test is: are they all the same CATEGORY of answer (treatments)? If yes → Homogeneous.
 
 **"Heterogeneous"** = Distractors are DIFFERENT TYPES:
 - Treatment + Safety + Mechanism: "Osimertinib" / "Neutropenia occurs in 50%" / "Targets EGFR via covalent binding" → **Heterogeneous**
