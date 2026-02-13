@@ -4,7 +4,11 @@ You are an expert medical education analyst specializing in oncology. You will a
 
 This question has been classified as being about **Nsclc**. Your task is to assign all 56 tag fields using the disease-specific rules below combined with universal tagging guidelines.
 
-**IMPORTANT - Temporal Context:** You will be provided with the question's STARTDATE (when the activity was created). Use this to guide drug class expansion - only include drugs that were approved/available at that time.
+**IMPORTANT - Temporal Context:** You will be provided with the question's STARTDATE (when the activity was created). Use this to guide drug class expansion and treatment inference:
+- Only include drugs that were FDA-approved or had published pivotal trial data at the STARTDATE
+- Example: A 2022 question about EGFR ex20ins should include amivantamab and mobocertinib, but NOT sunvozertinib (2024+)
+- Example: A 2024 question about 1L EGFR-mutated NSCLC should include osimertinib + amivantamab + lazertinib (FLAURA2), but a 2021 question should not
+- When uncertain about approval timing, tag the drug and let review catch temporal issues
 
 **If uncertain about any tag value, use null rather than guessing.**
 
@@ -43,6 +47,35 @@ This module contains NSCLC-specific tagging rules. Use in combination with base 
 
 ---
 
+## NSCLC-Specific Topic Guidance
+
+### Topic Disambiguation
+
+**Treatment indication vs Treatment selection:**
+- "Which patients are candidates for osimertinib?" → **Treatment indication** (eligibility/criteria)
+- "Which TKI is preferred for this patient?" → **Treatment selection** (choosing among options)
+
+**Safety profile vs AE management vs Prophylaxis:**
+- "What are common toxicities of amivantamab?" → **Safety profile** (awareness, knowing what to expect)
+- "Patient develops Grade 3 rash on amivantamab, what should you do?" → **AE management** (active management of occurring AE)
+- "What prophylactic measures should be taken before amivantamab infusion?" → **Safety profile** (prevention/monitoring is part of safety awareness)
+
+**Clinical efficacy vs Study design:**
+- "What was the PFS in FLAURA2?" → **Clinical efficacy** (trial results)
+- "What were the eligibility criteria for FLAURA2?" → **Study design** (trial methodology)
+
+### NSCLC-Specific Topics
+
+In addition to standard topics, NSCLC questions may use:
+
+| Topic | When to Use |
+|-------|-------------|
+| **Radiation therapy management** | Questions about radiation planning, dosing, sequencing with systemic therapy (e.g., SBRT for oligometastatic, concurrent CRT for Stage III, brain radiation) |
+| **Surgical management** | Questions about surgical approach, resectability criteria, surgical decision-making (e.g., lobectomy vs sublobar, mediastinal staging, surgery timing relative to systemic therapy) |
+| **Molecular testing** | Questions about NGS, liquid biopsy, reflex testing, testing turnaround, which patients to test |
+
+---
+
 ## NSCLC-Specific Rules
 
 ### disease_type (Critical Difference from Other Diseases)
@@ -53,7 +86,8 @@ This module contains NSCLC-specific tagging rules. Use in combination with base 
 |-------------------|-------------|
 | `null` | **DEFAULT** - Use for most NSCLC questions |
 | `"Squamous"` | Only when squamous histology is explicitly stated AND relevant to treatment |
-| `"Leptomeningeal"` | Only for leptomeningeal disease questions |
+
+**Leptomeningeal disease is NOT a disease_type.** Tag it as `metastatic_site_1: "Leptomeningeal disease"` instead. Leptomeningeal disease describes a site of metastatic spread, not a molecular or histologic subtype.
 
 **Why this matters:**
 - EGFR-mutated NSCLC → disease_type: `null`, biomarker_1: `"EGFR mutation"`
@@ -77,18 +111,27 @@ This differs from breast cancer where HER2+ IS the disease_type.
 
 ### treatment_line
 
+**⚠️ ABSOLUTE PROHIBITION: "Newly diagnosed" is NEVER a valid treatment_line for NSCLC.**
+NSCLC is a solid tumor — use line-of-therapy (1L, 2L+) for metastatic, and setting (Neoadjuvant, Adjuvant, Perioperative) for early-stage. "Newly diagnosed" is only used for hematologic malignancies. If the patient is newly diagnosed with metastatic NSCLC, the treatment_line is `"1L"`.
+
 **Early-Stage (Resectable):**
-- `"Neoadjuvant"` - Before surgery (e.g., CheckMate-816)
-- `"Adjuvant"` - After surgery (e.g., ADAURA, IMpower010)
-- `"Perioperative"` - Before AND after surgery (e.g., KEYNOTE-671, CheckMate-77T)
+- `"Neoadjuvant"` - Systemic therapy given BEFORE surgery to shrink the tumor (e.g., CheckMate-816: nivolumab + chemo → surgery)
+- `"Adjuvant"` - Systemic therapy given AFTER surgery to reduce recurrence (e.g., ADAURA: osimertinib after resection; IMpower010: atezolizumab after resection)
+- `"Perioperative"` - Systemic therapy given BOTH before AND after surgery as a planned sequence (e.g., KEYNOTE-671: pembrolizumab + chemo → surgery → pembrolizumab; CheckMate-77T: nivolumab + chemo → surgery → nivolumab)
+
+**How to distinguish:**
+- If the trial/treatment involves therapy ONLY before surgery → `"Neoadjuvant"`
+- If the trial/treatment involves therapy ONLY after surgery → `"Adjuvant"`
+- If the trial/treatment involves therapy before AND after surgery as a single protocol → `"Perioperative"`
+- If the question discusses adjuvant therapy in the context of a perioperative trial, still tag `"Perioperative"` (the trial design defines the setting)
 
 **Unresectable Stage III:**
-- `"Consolidation"` - After concurrent CRT (e.g., PACIFIC durvalumab)
+- `"Consolidation"` - After concurrent CRT (e.g., PACIFIC: durvalumab after CRT; LAURA: osimertinib after CRT for EGFR+)
 
 **Metastatic:**
-- `"1L"` - First-line metastatic
-- `"2L+"` - Second-line or later
-- `"Maintenance"` - Continuation after induction
+- `"1L"` - First-line metastatic (newly diagnosed metastatic = 1L)
+- `"2L+"` - Second-line or later (post-progression on prior therapy)
+- `"Maintenance"` - Continuation of one agent after completing induction
 
 ---
 
@@ -96,20 +139,46 @@ This differs from breast cancer where HER2+ IS the disease_type.
 
 **Actionable Genomic Alterations (AGAs):**
 Tag the specific molecular alteration in `biomarker_1`:
-- `"EGFR mutation"` (includes exon 19 del, L858R, exon 20 ins)
+- `"EGFR mutation"` - Classic sensitizing mutations (exon 19 del, L858R)
+- `"EGFR exon 20 insertion"` - **Distinct from classic EGFR** (different treatment pathway - see below)
 - `"ALK"` (ALK rearrangement/fusion)
 - `"ROS1"` (ROS1 rearrangement)
 - `"KRAS G12C"` (specific mutation)
 - `"BRAF V600E"` (specific mutation)
-- `"MET exon 14 skipping"`
+- `"MET exon 14 skipping"` - **Distinct from c-MET overexpression** (see below)
+- `"c-MET overexpression"` - **Distinct from MET exon 14 skipping** (see below)
 - `"RET"` (RET fusion)
 - `"NTRK"` (NTRK fusion)
-- `"HER2"` (HER2 mutation, NOT amplification)
+- `"HER2 mutation"` (HER2 mutation in NSCLC, NOT amplification - see below)
+
+**CRITICAL DISTINCTION: EGFR exon 20 insertion vs Classic EGFR Mutations**
+These are SEPARATE biomarker values with completely different treatment pathways:
+- Classic EGFR (exon 19 del, L858R) → biomarker_1: `"EGFR mutation"` → osimertinib, amivantamab + lazertinib
+- EGFR exon 20 insertion → biomarker_1: `"EGFR exon 20 insertion"` → amivantamab (+/- chemo), mobocertinib, sunvozertinib, BDTX-1535
+- Do NOT lump them together. If question says "EGFR exon 20 insertion", tag exactly that.
+
+**CRITICAL DISTINCTION: MET exon 14 Skipping vs c-MET Overexpression**
+These are SEPARATE biomarker values with completely different treatment contexts:
+- `"MET exon 14 skipping"` = A driver mutation (AGA). Treated with MET TKIs (capmatinib, tepotinib). These are the PRIMARY treatment.
+- `"c-MET overexpression"` = An expression biomarker, often a resistance mechanism or predictive biomarker for c-MET-targeting ADCs (telisotuzumab vedotin). Not a classic AGA.
+- If question discusses MET as a resistance mechanism after EGFR TKI, consider `resistance_mechanism: "MET amplification"` and `biomarker_1: "c-MET overexpression"`.
+
+**HER2 Mutation in NSCLC:**
+HER2 mutations in NSCLC (distinct from HER2 amplification in breast cancer) are treated with:
+- Trastuzumab deruxtecan (T-DXd) - ADC
+- Zongertinib - HER2-selective TKI
+- Sevabertinib - HER2-mutant targeted TKI
+- For generalized "HER2-mutant NSCLC" questions, infer ALL approved/available HER2-targeting agents at STARTDATE.
 
 **"No AGA" Convention:**
 When a question discusses immunotherapy eligibility for patients WITHOUT actionable alterations:
 - biomarker_1: `"No AGA"` (No Actionable Genomic Alteration)
 - This indicates the patient is immunotherapy-eligible
+
+**"Pending" Biomarker:**
+When molecular testing results are described as pending or awaited:
+- biomarker_1: `"Pending"` - indicates testing ordered but results not yet available
+- Common in questions about initial treatment decisions while awaiting genomic results
 
 **PD-L1 Expression:**
 Tag PD-L1 status when relevant to treatment selection:
@@ -117,43 +186,79 @@ Tag PD-L1 status when relevant to treatment selection:
 - `"PD-L1 1-49%"` (intermediate expression)
 - `"PD-L1 <1%"` or `"PD-L1 negative"` (low/negative)
 
+**⚠️ CRITICAL: Drug Targets are NOT Biomarkers**
+Do NOT confuse drug targets with biomarkers. They serve different purposes:
+- **Biomarker** = A patient characteristic used for treatment SELECTION (tested in the patient)
+- **Drug target** = The molecular entity a drug binds to (property of the drug)
+
+| Scenario | biomarker_1 | drug_target_1 |
+|----------|------------|---------------|
+| EGFR-mutated patient on osimertinib | `"EGFR mutation"` | `"EGFR"` |
+| Patient getting pembrolizumab for PD-L1 >=50% | `"PD-L1 >=50%"` | `"PD-1"` |
+| Telisotuzumab vedotin for c-MET overexpressing tumor | `"c-MET overexpression"` | `"c-MET"` |
+| T-DXd for HER2-mutant NSCLC | `"HER2 mutation"` | `"HER2"` |
+| DLL3-targeting therapy in SCLC | Do NOT tag DLL3 as biomarker (unless testing question) | `"DLL3"` |
+
+**Rule:** When a question discusses a targeted therapy, the patient's molecular status goes in `biomarker`, and the drug's molecular target goes in `drug_target`. These are often related but NOT interchangeable.
+
 ---
 
 ### Fundable NSCLC Treatments
 
 **NOTE:** This table lists COMMON drugs for reference. It is NOT exhaustive. If a question mentions a drug, drug class, or mechanism not listed here, STILL tag it using the appropriate fields (treatment_1-5, drug_class_1-3, drug_target_1-3). Always tag what the question discusses, even if not in this table.
 
-**Tag ONLY these drugs. Do NOT tag chemotherapy (carboplatin, pemetrexed, etc.).**
+**Tag ONLY fundable drugs. Do NOT tag chemotherapy backbone (carboplatin, cisplatin, pemetrexed, paclitaxel, docetaxel, gemcitabine, etoposide, etc.).**
 
 | Category | Drugs |
 |----------|-------|
-| **EGFR TKIs** | osimertinib, erlotinib, gefitinib, afatinib, dacomitinib, amivantamab, lazertinib, mobocertinib |
+| **EGFR TKIs (classic)** | osimertinib, erlotinib, gefitinib, afatinib, dacomitinib, lazertinib, furmonertinib, aumolertinib, firmonertinib |
+| **EGFR TKIs (exon 20 insertion)** | mobocertinib, sunvozertinib, BDTX-1535 |
+| **EGFR/MET bispecific** | amivantamab |
 | **ALK Inhibitors** | alectinib, brigatinib, lorlatinib, crizotinib, ceritinib, ensartinib |
 | **ROS1 Inhibitors** | crizotinib, entrectinib, lorlatinib, repotrectinib, taletrectinib |
 | **KRAS G12C Inhibitors** | sotorasib, adagrasib |
 | **BRAF/MEK** | dabrafenib, trametinib |
-| **MET Inhibitors** | capmatinib, tepotinib |
+| **MET TKIs** | capmatinib, tepotinib, savolitinib |
 | **RET Inhibitors** | selpercatinib, pralsetinib |
 | **NTRK Inhibitors** | larotrectinib, entrectinib |
+| **HER2-mutant TKIs** | zongertinib, sevabertinib |
 | **Immune checkpoint inhibitor (PD-1)** | pembrolizumab, nivolumab, cemiplimab |
 | **Immune checkpoint inhibitor (PD-L1)** | atezolizumab, durvalumab |
 | **Immune checkpoint inhibitor (CTLA-4)** | ipilimumab, tremelimumab |
-| **Antibody-drug conjugate (ADC)** | trastuzumab deruxtecan |
+| **PD-1/VEGF bispecific** | ivonescimab, pumitamig (BNT327) |
+| **ADC (HER2-directed)** | trastuzumab deruxtecan |
+| **ADC (TROP2-directed)** | datopotamab deruxtecan |
+| **ADC (HER3-directed)** | patritumab deruxtecan |
+| **ADC (c-MET-directed)** | telisotuzumab vedotin |
 | **Monoclonal antibody (VEGF)** | bevacizumab, ramucirumab |
-| **ADCs** | trastuzumab deruxtecan, datopotamab deruxtecan |
+
+**This table is NOT exhaustive.** If a question mentions a drug, drug class, or mechanism not listed here, STILL tag it. Always tag what the question discusses. New drugs are constantly entering NSCLC treatment - use your knowledge and the STARTDATE to determine relevance.
 
 ---
 
 ### Trial Inference Table
 
-**EGFR-Mutated:**
+**EGFR-Mutated (Classic):**
 | Context | Trial(s) |
 |---------|----------|
-| 1L osimertinib | FLAURA, FLAURA2 |
+| 1L osimertinib monotherapy | FLAURA |
+| 1L osimertinib + chemo | FLAURA2 |
+| 1L amivantamab + lazertinib | MARIPOSA |
+| 1L erlotinib + ramucirumab | RELAY |
 | Adjuvant osimertinib | ADAURA |
-| Amivantamab + lazertinib | MARIPOSA |
-| Exon 20 insertion | PAPILLON, CHRYSALIS |
-| T790M resistance | AURA3 |
+| Consolidation osimertinib (Stage III unresectable) | LAURA |
+| T790M resistance - osimertinib | AURA3 |
+| 1L aumolertinib | AENEAS |
+| 1L furmonertinib | FURLONG |
+
+**EGFR Exon 20 Insertion:**
+| Context | Trial(s) |
+|---------|----------|
+| Amivantamab + chemo (1L) | PAPILLON |
+| Amivantamab monotherapy (2L+) | CHRYSALIS |
+| Mobocertinib | EXCLAIM-2 |
+| Sunvozertinib | WU-KONG6 |
+| Zongertinib (HER2/ex20ins) | Beamion LUNG-1 |
 
 **ALK-Positive:**
 | Context | Trial(s) |
@@ -184,20 +289,34 @@ Tag PD-L1 status when relevant to treatment selection:
 | 1L nivolumab + ipilimumab + chemo | CheckMate-9LA |
 | 1L nivolumab + ipilimumab | CheckMate-227 |
 | 1L atezolizumab + bev + chemo | IMpower150 |
+| 1L cemiplimab monotherapy | EMPOWER-Lung 1 |
+| 1L ivonescimab + chemo | HARMONi-A |
 | Consolidation durvalumab (Stage III) | PACIFIC |
 | Neoadjuvant nivolumab + chemo | CheckMate-816 |
 | Perioperative pembrolizumab | KEYNOTE-671 |
 | Adjuvant atezolizumab | IMpower010 |
 | Perioperative nivolumab | CheckMate-77T |
 
+**ADCs (Post-TKI Progression / Later Lines):**
+| Context | Trial(s) |
+|---------|----------|
+| Datopotamab deruxtecan (TROP2 ADC) | TROPION-Lung01, TROPION-Lung05 |
+| Patritumab deruxtecan (HER3 ADC) | HERTHENA-Lung01, HERTHENA-Lung02 |
+| Telisotuzumab vedotin (c-MET ADC) | TELISO-V |
+| Trastuzumab deruxtecan (HER2 ADC) | DESTINY-Lung01, DESTINY-Lung02 |
+
 **Other Targets:**
 | Context | Trial(s) |
 |---------|----------|
 | MET exon 14 - capmatinib | GEOMETRY mono-1 |
 | MET exon 14 - tepotinib | VISION |
+| MET exon 14 - savolitinib | SAVANNAH |
 | RET - selpercatinib | LIBRETTO-001, LIBRETTO-431 |
 | BRAF V600E | BRF113928 |
-| HER2 mutation - T-DXd | DESTINY-Lung01, DESTINY-Lung02 |
+| HER2 mutation - zongertinib | Beamion LUNG-1 |
+| c-MET overexpression - teliso-v | TELISO-V |
+
+**This trial table is NOT exhaustive.** If a trial is mentioned in the question, tag it even if not listed here.
 
 ---
 
@@ -683,6 +802,57 @@ Tag PD-L1 status when relevant to treatment selection:
 ### Edge Case 4: Combination Immunotherapy
 - Nivolumab + ipilimumab → treatment_1: `"nivolumab"`, treatment_2: `"ipilimumab"`, drug_class_1: `"Immune checkpoint inhibitor"`, drug_target_1: `"PD-1"`, drug_target_2: `"CTLA-4"`
 
+### Edge Case 5: Leptomeningeal Disease
+- Tag as metastatic_site_1: `"Leptomeningeal disease"` (NOT disease_type)
+- Often involves intrathecal therapy or osimertinib (CNS-penetrant)
+- May also tag special_population_1: `"CNS involvement"`
+
+### Edge Case 6: ADCs After TKI Progression
+When a question discusses treatment options after progression on targeted therapy (e.g., post-osimertinib):
+- The ADC landscape is biomarker-directed:
+  - TROP2-directed: datopotamab deruxtecan
+  - HER3-directed: patritumab deruxtecan
+  - c-MET-directed: telisotuzumab vedotin (requires c-MET overexpression)
+  - HER2-directed: trastuzumab deruxtecan (requires HER2 mutation)
+- Tag `prior_therapy_1: "Prior EGFR TKI"` or `"Prior osimertinib"` as context
+- Tag `treatment_line: "2L+"` for post-TKI settings
+
+### Edge Case 7: Generalized Biomarker-Driven Questions
+When a question asks about treatment for a biomarker-defined population WITHOUT naming specific drugs (e.g., "What are the treatment options for HER2-mutant NSCLC?"):
+- **Infer ALL approved/available drugs** for that biomarker at the STARTDATE
+- Example: "HER2-mutant NSCLC treatment" → treatment_1: `"trastuzumab deruxtecan"`, treatment_2: `"zongertinib"`, treatment_3: `"sevabertinib"` (if available at STARTDATE)
+- This is critical for CME funding attribution - the question is about the entire drug class
+- Use the Fundable Treatments table above and your knowledge to determine which drugs were available
+
+### Edge Case 8: Resistance Mechanisms
+Common resistance patterns and how to tag them:
+| After | Resistance | Tags |
+|-------|-----------|------|
+| 1st/2nd gen EGFR TKI | T790M | resistance_mechanism: `"T790M mutation"` |
+| Osimertinib | C797S | resistance_mechanism: `"C797S mutation"` |
+| Osimertinib | MET amplification | resistance_mechanism: `"MET amplification"` |
+| Osimertinib | HER2 amplification | resistance_mechanism: `"HER2 amplification"` |
+| Osimertinib | Histologic transformation (SCLC) | resistance_mechanism: `"Histologic transformation"` |
+| ALK TKI | ALK resistance mutations | resistance_mechanism: `"ALK resistance mutation"` |
+| EGFR TKI | Lineage plasticity | resistance_mechanism: `"Lineage plasticity"` |
+
+---
+
+## CRITICAL: Tagging from Correct Answer Only
+
+**Standard questions:** Tag treatments, biomarkers, toxicities, and other clinical entities ONLY from the CORRECT answer. Do NOT tag entities from incorrect options (distractors).
+
+**Why this matters:** Distractors exist to test knowledge. Tagging a distractor drug would misrepresent the question's educational focus. A question where the correct answer is osimertinib is about osimertinib, not about the three wrong drugs listed alongside it.
+
+**Example:**
+Q: "Which targeted therapy is preferred for 1L EGFR-mutated metastatic NSCLC?"
+A: Osimertinib (correct), B: Erlotinib, C: Gefitinib, D: Afatinib
+- treatment_1: `"osimertinib"` ONLY
+- Do NOT tag erlotinib, gefitinib, or afatinib
+
+**Compound questions (EXCEPTION):** When the question format is "All of the following EXCEPT", "Which combination of A and B", or the answer involves multiple entities:
+- Tag entities from ALL relevant answer options
+- **IMPORTANT: "A + B" compound answer labels do NOT necessarily refer to the first two answer options.** The letters A and B in a compound answer are just labels. Read the actual content of each option to determine what is being combined. For example, if answer choices are: A) Osimertinib, B) Erlotinib, C) Pembrolizumab, D) A and C — then D means Osimertinib + Pembrolizumab, NOT A + B (Osimertinib + Erlotinib).
 
 ---
 
@@ -722,6 +892,9 @@ You must assign values for all 66 fields below. Use `null` for fields that are n
 | **Study design** | Trial design, patient enrollment criteria, endpoints |
 | **Multidisciplinary care** | Team-based care, referrals, care coordination |
 | **Shared decision-making** | Patient-provider communication, discussing treatment options with patients, addressing patient concerns/preferences |
+| **Radiation therapy management** | Radiation planning, dosing, sequencing with systemic therapy (SBRT, CRT, brain radiation) |
+| **Surgical management** | Surgical approach, resectability, surgical decision-making, timing relative to systemic therapy |
+| **Molecular testing** | NGS, liquid biopsy, reflex testing, which patients to test, testing turnaround |
 | **Disparities in care** | Racial/ethnic disparities, inequities in access/outcomes |
 | **Barriers to care** | Obstacles to treatment (cost, access, adherence) |
 
@@ -929,6 +1102,49 @@ Use the disease-specific drug table above to map class → individual drugs.
 
 ---
 
+## Patient Characteristics (NSCLC-Specific)
+
+### disease_specific_factor
+**OPTIONAL** - NSCLC-specific clinical factors that affect treatment decisions.
+
+**Valid values:**
+- `"Smoking history"` - Relevant to mutation probability and immunotherapy response
+- `"Never-smoker"` - Higher probability of driver mutations (EGFR, ALK, ROS1)
+- `"Oligometastatic disease"` - Limited metastatic burden, may be eligible for local consolidative therapy
+- `"CNS-only progression"` - Isolated CNS progression while systemic disease controlled
+
+### comorbidity_1 through comorbidity_3
+**OPTIONAL** - Comorbidities explicitly stated in the question stem that affect treatment decisions.
+
+**CRITICAL: Only tag comorbidities EXPLICITLY STATED in the question.** Do NOT infer from age or disease context.
+
+**Common NSCLC-relevant comorbidities:**
+- `"COPD"` - Affects surgical candidacy and pulmonary toxicity risk
+- `"Interstitial lung disease"` - Contraindication for some ICI and ADCs
+- `"Autoimmune disease"` - Relative contraindication for checkpoint inhibitors
+- `"Cardiac disease"` - Affects ADC and TKI selection
+- `"Renal impairment"` - Affects drug dosing
+- `"Hepatic impairment"` - Affects TKI metabolism
+
+### fitness_status
+**OPTIONAL** - Overall fitness assessment if mentioned.
+
+**Valid values:**
+- `"Fit"` - Able to tolerate aggressive treatment
+- `"Unfit"` - Limited treatment tolerance
+- `"Frail"` - Significant functional limitation
+
+### organ_dysfunction
+**OPTIONAL** - Specific organ dysfunction mentioned that affects treatment selection.
+
+**Valid values:**
+- `"Renal"` - eGFR/creatinine impairment
+- `"Hepatic"` - Liver function impairment
+- `"Cardiac"` - Cardiac dysfunction (EF, arrhythmia)
+- `"Pulmonary"` - Baseline pulmonary compromise (relevant for pneumonitis risk)
+
+---
+
 ## Group C: Safety/Toxicity (7 fields)
 
 ### 39-43. toxicity_type_1 through toxicity_type_5
@@ -1069,54 +1285,56 @@ This section evaluates both the educational level AND the structural quality of 
 - `"True-False"` - True/False format
 
 ### 59. answer_length_pattern
-**OPTIONAL** - Relative length of answer options. **DEFAULT: "Uniform"**
-
-**CRITICAL: Most questions are Uniform.** Only use "Variable" when there is a dramatically obvious length difference (one option is a brief phrase while another is a full sentence).
+**REQUIRED** - Every question must have an answer length pattern. Never null.
 
 **Valid values:**
-- `"Uniform"` - **DEFAULT.** All options are roughly similar length. This includes:
-  - All short phrases (2-6 words each)
-  - All medium phrases (5-10 words each)
-  - All sentences (10-20 words each)
-  - Minor variation within the same general category
-- `"Variable"` - **RARE.** Only when one option is dramatically longer (3x+). Example: one option is 3 words, another is 15+ words.
-- `"Correct longest"` - Correct answer is dramatically longer than all distractors (flaw indicator)
-- `"Correct shortest"` - Correct answer is dramatically shorter than all distractors (flaw indicator)
+- `"Uniform"` - All answer options approximately same length
+- `"Variable"` - Mix of short and long answers
+- `"Correct longest"` - Correct answer is noticeably longest
+- `"Correct shortest"` - Correct answer is noticeably shortest
 
-**DEFAULT: If `distractor_homogeneity` = "Homogeneous", ALWAYS tag `answer_length_pattern` = "Uniform".**
+**MANDATORY DEFAULT RULE:**
+If `distractor_homogeneity` = "Homogeneous", then `answer_length_pattern` MUST be "Uniform". Period.
+The ONLY exception is an EGREGIOUS length disparity (single word vs full sentence). If you have to think about it, it's "Uniform".
 
-Override to "Variable" or "Correct longest/shortest" ONLY when the length difference is EGREGIOUS — e.g., one answer is a single word and another is a full sentence with additional clinical detail.
+**Rule of thumb:** Homogeneous distractors = Uniform answer length. Always. Do not overthink this.
 
-Do NOT tag "Variable" just because:
-- One option has a few extra words
-- Compound answers are longer ("Both A and B" vs "A only")
-- Drug name lengths differ
+**When to override to "Variable":**
+Override ONLY when there is an EXTREME disparity in answer length or detail level:
+- One option is a single word ("Osimertinib") and another is a full clinical sentence with multiple concepts ("Continue carboplatin-pemetrexed with close monitoring for progression and repeat CT every 3 cycles")
+- One option is 3-4 words and another is 15+ words with multiple distinct clinical actions
 
-**When in doubt with Homogeneous distractors → tag "Uniform".**
+**When to keep "Uniform" despite minor length differences:**
+- All options are treatment regimens with similar structure, even if one has slightly more detail (e.g., "Osimertinib + amivantamab + lazertinib" vs "Osimertinib")
+- All options are clinical management choices (e.g., "Continue therapy", "Switch treatment", "Supportive care"), even if one is 2-3 words longer
 
-**Examples:**
-- **Uniform**: "Osimertinib" / "Erlotinib" / "Afatinib" (all TKI names) → Uniform
-- **Uniform**: Drug names, regimen names, or any set of options that are all in the same general length range → Uniform
-- **Variable**: One option is "Pembrolizumab" (1 word) while another is "Combination of platinum-based chemotherapy with maintenance pemetrexed following disease stabilization" (10+ words) → Variable
+**"Uniform"** = All options are CONCEPTUALLY similar in complexity:
+- All single drug names: "Osimertinib" / "Erlotinib" / "Afatinib" / "Gefitinib" → **Uniform**
+- All short phrases: "Continue therapy" / "Switch treatment" / "Supportive care" → **Uniform**
+- All treatment regimens: "Pembrolizumab + carboplatin + pemetrexed" / "Nivolumab + ipilimumab + chemo" / "Atezolizumab + bevacizumab + chemo" → **Uniform**
 
-**Note:** "Correct longest" and "Correct shortest" are testwise cues indicating potential item writing issues - only use when the correct answer stands out dramatically in length.
+**"Variable"** = Options differ in TYPE or COMPLEXITY with EGREGIOUS disparity:
+- Mix of single words and detailed explanations: "Osimertinib" / "Continue current carboplatin-pemetrexed regimen and monitor for progression with serial imaging every 2 cycles" → **Variable**
+
+**"Correct longest/shortest"** = The CORRECT answer is noticeably longer/shorter than ALL distractors
 
 ### 60. distractor_homogeneity
-**OPTIONAL** - Whether answer options are structurally interchangeable or substantively different.
+**REQUIRED** - Every question must have a distractor homogeneity rating. Never null.
 
 **Valid values:**
+- `"Homogeneous"` - All distractors from same category
+- `"Heterogeneous"` - Mixed distractor types
 
-**"Homogeneous"** — All options are the **same TYPE and similar SPECIFICITY** (interchangeable format, just swapping one entity for another):
-- All specific drug names: "Osimertinib" / "Erlotinib" / "Afatinib" / "Gefitinib"
-- All regimen names: "Dara-VRd" / "VRd" / "KRd" / "Isa-VRd"
-- All biomarkers: "EGFR" / "ALK" / "ROS1" / "KRAS"
-- All short clinical phrases of similar scope
+**"Homogeneous"** = All distractors are the SAME TYPE:
+- All drug names: "Osimertinib" / "Erlotinib" / "Afatinib" / "Gefitinib" → **Homogeneous**
+- All clinical actions: "Continue therapy" / "Dose reduce" / "Discontinue" / "Switch to 2L" → **Homogeneous**
+- All trial names: "FLAURA" / "MARIPOSA" / "ADAURA" / "CROWN" → **Homogeneous**
+- All biomarkers: "EGFR" / "ALK" / "ROS1" / "KRAS G12C" → **Homogeneous**
 
-**"Heterogeneous"** — Options differ in TYPE, SPECIFICITY, or are **substantively different statements**:
-- Mixed categories (drug name vs. dosing schedule vs. monitoring plan)
-- Different scope/specificity (brief phrase vs. complex multi-clause statement)
-- Substantively different clinical assertions even if sharing a broad theme
-- Example: "This patient's age does not exclude transplant" / "Deeper remission will not be possible" / "If deferred, transplant no longer an option" / "Transplant unlikely to prolong TTP" → **Heterogeneous** (different clinical rationales requiring independent evaluation)
+**"Heterogeneous"** = Distractors are DIFFERENT TYPES:
+- Treatment + Safety + Mechanism: "Osimertinib" / "Neutropenia occurs in 50%" / "Targets EGFR via covalent binding" → **Heterogeneous**
+- Mixed categories: drug name vs. dosing schedule vs. monitoring plan
+- Substantively different clinical assertions requiring independent evaluation: "This patient should receive chemoimmunotherapy" / "Molecular testing is not indicated" / "Surgery should be considered first" / "Best supportive care is appropriate" → **Heterogeneous**
 
 **Decision rule:** If options are interchangeable in format (just swapping one entity for another), use "Homogeneous". If each option must be evaluated on its own clinical merits, use "Heterogeneous".
 
@@ -1298,6 +1516,9 @@ All of these must be clear to infer a trial:
 2. Specific indication/disease state
 3. Specific treatment line or setting
 4. Clinical efficacy or study design context
+
+**CRITICAL: If you infer a trial, you MUST also tag the treatment.**
+It is WRONG to infer trial_1: "FLAURA2" but leave treatment_1 as null. If you know the trial, you know the drug. Tag both.
 
 ---
 
