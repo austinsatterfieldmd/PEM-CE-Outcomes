@@ -226,8 +226,9 @@ When a question specifically discusses intrinsic/PAM50 subtypes, tag in `disease
 
 **Non-redundant biomarkers to tag when relevant:**
 - `"PD-L1"` - for immunotherapy eligibility (TNBC)
-- `"PIK3CA"` - for alpelisib/inavolisib
-- `"ESR1"` - for elacestrant/imlunestrant (ESR1 mutation via ctDNA)
+- `"PIK3CA mutation"` - for alpelisib/inavolisib (use "PIK3CA mutation", not just "PIK3CA")
+- `"ESR1 mutation"` - for elacestrant/imlunestrant (ESR1 mutation via ctDNA; use "ESR1 mutation", not just "ESR1")
+- `"FES F18 PET"` - for FES PET imaging questions (functional imaging biomarker for ER expression)
 - `"BRCA1/2"` - for PARP inhibitors
 - `"PALB2"` - PARP inhibitor eligibility, genetic risk
 - `"ATM"`, `"CHEK2"` - moderate-penetrance genes (genetic risk counseling)
@@ -277,6 +278,11 @@ When a question specifically discusses intrinsic/PAM50 subtypes, tag in `disease
 
 **ctDNA/Liquid Biopsy — tag when discussed:**
 - `"ctDNA"` - circulating tumor DNA (ESR1 mutation detection, minimal residual disease, treatment monitoring)
+
+**NORMALIZATION REMINDER:** In clinical vignettes, always normalize mutation biomarkers:
+- Tag `"PIK3CA mutation"` (not `"PIK3CA"`) when the question discusses PIK3CA mutation status
+- Tag `"ESR1 mutation"` (not `"ESR1"`) when the question discusses ESR1 mutation status
+- These normalized forms ensure consistent downstream analysis
 
 **CRITICAL: Where to tag genomic assay results:**
 - Tag the ASSAY NAME in `biomarker_1-5` fields (e.g., `"Oncotype DX RS-high"`)
@@ -450,6 +456,7 @@ When a question specifically discusses intrinsic/PAM50 subtypes, tag in `disease
 - **Diagnostic imaging:** Mammography (diagnostic vs screening), ultrasound (solid vs cystic), breast MRI (indications: high-risk screening, extent of disease, ILC workup, occult primary)
 - **Staging imaging:** CT chest/abdomen/pelvis, bone scan, FDG PET/CT (when to use, false positives)
 - **Novel imaging:** FES PET (fluoroestradiol — for ER+ disease, heterogeneity assessment), contrast-enhanced mammography (CEM), molecular breast imaging (MBI)
+  - **FES F18 PET tagging:** When a question discusses FES PET / FES F18 PET imaging, ALWAYS tag `"FES F18 PET"` in a biomarker field (biomarker_1-5) in addition to setting topic to "Imaging". FES PET is a functional imaging biomarker for ER expression.
 - **Surveillance imaging:** Post-treatment follow-up, when to image vs clinical monitoring
 - **BI-RADS classification:** Category interpretation (0-6), management recommendations per category
 
@@ -1107,9 +1114,14 @@ Use the disease-specific drug table above to map class → individual drugs.
 **EXCEPTION:** If topic is "Biomarker testing", you MAY tag the biomarker being tested
 
 **Common values (use these when applicable, but may use other values if confident):**
-- Predictive: `"PD-L1"`, `"EGFR mutation"`, `"ALK"`, `"HER2"`, `"BRCA1/2"`, `"MSI-H"`, `"TMB"`, `"PIK3CA"`, `"ESR1"`
+- Predictive: `"PD-L1"`, `"EGFR mutation"`, `"ALK"`, `"HER2"`, `"BRCA1/2"`, `"MSI-H"`, `"TMB"`, `"PIK3CA mutation"`, `"ESR1 mutation"`, `"FES F18 PET"`
 - Prognostic: `"Ki-67"`, `"Oncotype DX"`, `"MammaPrint"`
-- Resistance: `"T790M"`, `"ESR1"`, `"C797S"`
+- Resistance: `"T790M"`, `"ESR1 mutation"`, `"C797S"`
+
+**NORMALIZATION: Always use the full mutation name in biomarker fields:**
+- Use `"PIK3CA mutation"` (NOT just `"PIK3CA"`) — the mutation status is what's clinically actionable
+- Use `"ESR1 mutation"` (NOT just `"ESR1"`) — ESR1 mutation via ctDNA drives oral SERD selection
+- This applies to both the biomarker fields AND the resistance_mechanism field
 
 ### 15-19. trial_1 through trial_5
 **CONDITIONAL** — Tag behavior depends on topic:
@@ -1162,9 +1174,14 @@ Use the disease-specific drug table above to map class → individual drugs.
 **Breast cancer-specific regimen abbreviations to recognize:**
 - **THP** = trastuzumab + pertuzumab + taxane (standard 1L HER2+ regimen) → tag as `"Prior THP"` or `"Prior anti-HER2"`
 - **T-DM1** = trastuzumab emtansine → tag as `"Prior ADC"` or `"Prior T-DM1"`
-- **TC** = docetaxel + cyclophosphamide → prior chemotherapy (not tagged, not fundable)
-- **AC** = doxorubicin + cyclophosphamide → prior chemotherapy (not tagged, not fundable)
+- **TC** = docetaxel + cyclophosphamide → prior chemotherapy → tag as `"Prior chemotherapy"`
+- **AC** = doxorubicin + cyclophosphamide → prior chemotherapy → tag as `"Prior chemotherapy"`
 - When the stem lists "treated with trastuzumab, pertuzumab, and trastuzumab emtansine", recognize this as TWO prior lines (1L: THP, 2L: T-DM1)
+
+**IMPORTANT: ADC questions and prior chemotherapy:**
+- For ADC questions (sacituzumab govitecan, trastuzumab deruxtecan, datopotamab deruxtecan), ALWAYS check whether prior chemotherapy is mentioned or implied in the clinical vignette.
+- If the patient received prior chemotherapy (taxane, capecitabine, eribulin, etc.) before the ADC, tag `"Prior chemotherapy"` in a prior_therapy slot.
+- This is critical because prior chemotherapy exposure is a key eligibility criterion and clinical context for ADC trials (e.g., ASCENT required prior taxane; TROPiCS-02 required prior chemo).
 
 ### 29. resistance_mechanism
 **OPTIONAL** - Specific resistance mechanism mentioned.
@@ -1279,7 +1296,8 @@ Use the disease-specific drug table above to map class → individual drugs.
 - `"Oligometastatic disease"` - Limited metastatic burden, potentially curable with local therapy
 - `"CNS-only progression"` - Isolated brain/leptomeningeal progression on systemic therapy
 - `"Bilateral breast cancer"` - Synchronous or metachronous bilateral disease
-- `"Fertility preservation"` - Question focuses on fertility counseling, embryo/oocyte cryopreservation, GnRH agonist ovarian suppression for fertility, or pregnancy planning after treatment
+- `"Fertility preservation"` - Question focuses on fertility counseling, embryo/oocyte cryopreservation, GnRH agonist ovarian suppression for fertility, or pregnancy planning after treatment. When this is the primary focus, treatment_line may be null (not about treatment line selection).
+- `"Liquid biopsy"` - Question involves ctDNA testing, liquid biopsy-based mutation detection (ESR1, PIK3CA), or circulating tumor DNA monitoring. Tag this whenever the question specifically discusses the liquid biopsy modality or ctDNA-based decision-making.
 - `null` - Default for most questions
 
 **When to tag:**
