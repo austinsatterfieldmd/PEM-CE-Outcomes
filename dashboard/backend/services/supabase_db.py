@@ -122,7 +122,8 @@ class SupabaseDatabaseService:
 
         if incorrect_answers:
             if isinstance(incorrect_answers, list):
-                data['incorrect_answers'] = '\n'.join(incorrect_answers)
+                import json as _json
+                data['incorrect_answers'] = _json.dumps(incorrect_answers)
             else:
                 data['incorrect_answers'] = str(incorrect_answers)
 
@@ -149,7 +150,8 @@ class SupabaseDatabaseService:
             data['correct_answer'] = correct_answer
         if incorrect_answers is not None:
             if isinstance(incorrect_answers, list):
-                data['incorrect_answers'] = '\n'.join(incorrect_answers)
+                import json as _json
+                data['incorrect_answers'] = _json.dumps(incorrect_answers)
             else:
                 data['incorrect_answers'] = str(incorrect_answers)
         if source_file is not None:
