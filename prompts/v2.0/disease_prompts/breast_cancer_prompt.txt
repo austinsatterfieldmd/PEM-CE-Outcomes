@@ -202,7 +202,7 @@ When a question specifically discusses intrinsic/PAM50 subtypes, tag in `disease
 | Drug | drug_class |
 |------|-----------|
 | trastuzumab, pertuzumab, margetuximab | `"Monoclonal antibody"` |
-| trastuzumab deruxtecan, trastuzumab emtansine, sacituzumab govitecan, datopotamab deruxtecan, disitamab vedotin, patritumab deruxtecan, sacituzumab tirumotecan, raludotutag deruxtecan | `"ADC"` |
+| trastuzumab deruxtecan, trastuzumab emtansine, sacituzumab govitecan, datopotamab deruxtecan, disitamab vedotin, patritumab deruxtecan, sacituzumab tirumotecan, raludotutag deruxtecan | `"Antibody-drug conjugate (ADC)"` |
 | tucatinib, neratinib, lapatinib | `"HER2 TKI"` |
 | palbociclib, ribociclib, abemaciclib | `"CDK4/6 inhibitor"` |
 | elacestrant, imlunestrant, lasofoxifene, camizestrant, amcenestrant | `"Oral SERD"` |
@@ -510,7 +510,7 @@ Questions about supportive care (anti-emetics, pain, CIPN, vasomotor symptoms) t
 **The same treatment-inference logic that applies to Treatment selection also applies to AE management and Survivorship questions.** When a patient is described as being ON a treatment and experiencing side effects, tag those causative treatments in the treatment fields.
 
 - Example: "Premenopausal patient on OFS (GnRH agonist) + AI complaining of joint pain and hot flashes" → tag `treatment_1: "Goserelin"`, `treatment_2: "Leuprolide"` (GnRH agonists), `drug_class_1: "GnRH agonist"`, `drug_class_2: "Aromatase inhibitor"`
-- Example: "Patient on T-DXd develops ILD" → tag `treatment_1: "Trastuzumab deruxtecan"`, `drug_class_1: "ADC"`
+- Example: "Patient on T-DXd develops ILD" → tag `treatment_1: "Trastuzumab deruxtecan"`, `drug_class_1: "Antibody-drug conjugate (ADC)"`
 - Do NOT leave treatment fields blank just because the topic is AE management — the causative treatment is clinically relevant
 
 ---
@@ -527,8 +527,8 @@ Questions about supportive care (anti-emetics, pain, CIPN, vasomotor symptoms) t
     "disease_stage": "Metastatic",
     "disease_type": "HER2+",
     "treatment_line": "1L",
-    "treatment_1": "trastuzumab",
-    "treatment_2": "pertuzumab",
+    "treatment_1": "Trastuzumab",
+    "treatment_2": "Pertuzumab",
     "treatment_3": null,
     "treatment_4": null,
     "treatment_5": null,
@@ -597,7 +597,7 @@ Questions about supportive care (anti-emetics, pain, CIPN, vasomotor symptoms) t
     "disease_stage": "Metastatic",
     "disease_type": "HER2-low",
     "treatment_line": "2L+",
-    "treatment_1": "trastuzumab deruxtecan",
+    "treatment_1": "Trastuzumab deruxtecan",
     "treatment_2": null,
     "treatment_3": null,
     "treatment_4": null,
@@ -667,7 +667,7 @@ Questions about supportive care (anti-emetics, pain, CIPN, vasomotor symptoms) t
     "disease_stage": "Metastatic",
     "disease_type": "HR+/HER2-",
     "treatment_line": "1L",
-    "treatment_1": "ribociclib",
+    "treatment_1": "Ribociclib",
     "treatment_2": null,
     "treatment_3": null,
     "treatment_4": null,
@@ -737,7 +737,7 @@ Questions about supportive care (anti-emetics, pain, CIPN, vasomotor symptoms) t
     "disease_stage": "Early-stage",
     "disease_type": "Triple-negative",
     "treatment_line": "Neoadjuvant",
-    "treatment_1": "pembrolizumab",
+    "treatment_1": "Pembrolizumab",
     "treatment_2": null,
     "treatment_3": null,
     "treatment_4": null,
@@ -807,7 +807,7 @@ Questions about supportive care (anti-emetics, pain, CIPN, vasomotor symptoms) t
     "disease_stage": "Metastatic",
     "disease_type": "HR+/HER2-",
     "treatment_line": "2L+",
-    "treatment_1": "alpelisib",
+    "treatment_1": "Alpelisib",
     "treatment_2": null,
     "treatment_3": null,
     "treatment_4": null,
@@ -1073,6 +1073,7 @@ Examples by disease (see disease-specific module for details):
 - For combinations with one fundable drug, tag ONLY the fundable drug
 - Put each drug in a separate field (treatment_1, treatment_2, etc.)
 - Use `null` for unused slots
+- **CAPITALIZATION:** Always capitalize the first letter of drug names in treatment fields. Use `"Trastuzumab deruxtecan"` (NOT `"trastuzumab deruxtecan"`), `"Sacituzumab govitecan"` (NOT `"sacituzumab govitecan"`), `"Pembrolizumab"` (NOT `"pembrolizumab"`), etc.
 
 **Fundable drug categories:**
 - Targeted therapies (TKIs, mAbs)
@@ -1177,6 +1178,12 @@ Use the disease-specific drug table above to map class → individual drugs.
 - **TC** = docetaxel + cyclophosphamide → prior chemotherapy → tag as `"Prior chemotherapy"`
 - **AC** = doxorubicin + cyclophosphamide → prior chemotherapy → tag as `"Prior chemotherapy"`
 - When the stem lists "treated with trastuzumab, pertuzumab, and trastuzumab emtansine", recognize this as TWO prior lines (1L: THP, 2L: T-DM1)
+
+**IMPORTANT: HER2+ disease and prior therapy tagging:**
+- For HER2+ 2L+ or later-line questions, ALWAYS check whether the patient received prior THP (trastuzumab + pertuzumab + taxane) as 1L therapy. This is the standard 1L HER2+ regimen, so most 2L+ HER2+ patients will have received it.
+- Tag `"Prior THP"` when prior trastuzumab + pertuzumab is stated or clearly implied (e.g., "after progression on first-line anti-HER2 therapy").
+- If the patient also received T-DM1 as 2L, tag `"Prior T-DM1"` in addition to `"Prior THP"`.
+- Example: HER2+ mBC, 3L setting → prior_therapy_1: `"Prior THP"`, prior_therapy_2: `"Prior T-DM1"`
 
 **IMPORTANT: ADC questions and prior chemotherapy:**
 - For ADC questions (sacituzumab govitecan, trastuzumab deruxtecan, datopotamab deruxtecan), ALWAYS check whether prior chemotherapy is mentioned or implied in the clinical vignette.
@@ -1936,7 +1943,7 @@ Respond with ONLY a JSON object containing all 73 fields. Use `null` for fields 
     "disease_type_1": "HER2+",
     "disease_type_2": null,
     "treatment_line": "2L+",
-    "treatment_1": "trastuzumab deruxtecan",
+    "treatment_1": "Trastuzumab deruxtecan",
     "treatment_2": null,
     "treatment_3": null,
     "treatment_4": null,
