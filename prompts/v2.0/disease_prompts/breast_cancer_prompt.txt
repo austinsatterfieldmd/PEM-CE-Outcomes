@@ -111,9 +111,11 @@ When the question focuses on **histologic type, grading, or molecular classifica
 | Desmoid fibromatosis | `"Desmoid"` |
 
 **When both receptor subtype AND histologic type are relevant:**
-- Prioritize receptor subtype (HER2+, HR+/HER2-, Triple-negative) for treatment-focused questions
-- Use histologic type for pathology-focused questions where histology drives the clinical scenario
-- Use `disease_specific_factor` to capture the histologic type when receptor subtype takes priority in disease_type
+- `disease_type_1`: Prioritize receptor subtype (HER2+, HR+/HER2-, Triple-negative) for treatment-focused questions. Use histologic type for pathology-focused questions where histology drives the clinical scenario.
+- `disease_type_2`: **ALWAYS tag the histologic subtype (IDC, ILC, Inflammatory) when explicitly stated in the question stem**, regardless of topic or what is in disease_type_1. This is unconditional — do NOT put histologic type in disease_specific_factor when it can go in disease_type_2.
+  - Example: Stem says "grade 2 IDC, ER+/HER2-" → disease_type_1: `"HR+/HER2-"`, disease_type_2: `"IDC"`
+  - Example: Stem says "ILC on core biopsy" → disease_type_1: `"HR+/HER2-"` (if inferable from correct answer), disease_type_2: `"ILC"`
+  - Example: Stem says "inflammatory breast cancer, ER60%, HER2 1+" → disease_type_1: `"HR+/HER2-"`, disease_type_2: `"Inflammatory"`
 
 ### Molecular Classification (Intrinsic Subtypes)
 When a question specifically discusses intrinsic/PAM50 subtypes, tag in `disease_specific_factor`:
@@ -145,8 +147,16 @@ When a question specifically discusses intrinsic/PAM50 subtypes, tag in `disease
 
 **Metastatic:**
 - `"1L"` - First-line, treatment-naive metastatic
-- `"2L+"` - Second-line or later, after progression
+- `"2L"` - Second-line (after progression on one prior line)
+- `"3L"` - Third-line (after progression on two prior lines)
+- `"4L+"` - Fourth-line or later
+- `"2L+"` - Second-line or later, **use ONLY when the exact line cannot be determined** (e.g., stem says "heavily pretreated" or "multiple prior lines" without listing them)
 - `"Maintenance"` - Continuation after response
+
+**Specificity rule:** When prior therapies are explicitly listed in the stem and you can count the lines, use the specific value ("2L", "3L", "4L+"). Fall back to "2L+" only when the exact count is ambiguous.
+- Example: "treated with trastuzumab + pertuzumab and trastuzumab emtansine" = 2 prior lines → current treatment is `"3L"`
+- Example: "after progression on first-line CDK4/6i + AI" = 1 prior line → current treatment is `"2L"`
+- Example: "heavily pretreated, multiple prior lines" → `"2L+"` (exact count unknown)
 
 ---
 
@@ -231,6 +241,7 @@ When a question specifically discusses intrinsic/PAM50 subtypes, tag in `disease
 - `"Oncotype DX RS-high"` - When the question specifies or implies a HIGH recurrence score (RS ≥26) driving a treatment decision (chemotherapy benefit)
 - `"Oncotype DX RS-low"` - When the question specifies or implies a LOW recurrence score (RS ≤25) and the decision is to omit chemotherapy
 - `"Oncotype DX RS-intermediate"` - When the question specifically discusses the intermediate range (RS 16-25) and age-based decision-making (TAILORx/RxPONDER context)
+- **IMPORTANT:** When a specific Oncotype DX score is given in the stem (e.g., "Oncotype Dx = 10"), ALWAYS tag the RS category, not the generic assay name. Score of 10 → `"Oncotype DX RS-low"`. Score of 30 → `"Oncotype DX RS-high"`.
 - Key trials: TAILORx (node-negative), RxPONDER (1-3 positive nodes)
 
 **MammaPrint (70-gene signature):**
@@ -487,6 +498,13 @@ Questions about supportive care (anti-emetics, pain, CIPN, vasomotor symptoms) t
 - Tag disease_state: `"Breast cancer"` (it's within a breast cancer educational context)
 - Topic: `"AE management"` (if managing a treatment side effect) or `"Survivorship"` (if about long-term symptom management)
 - Tag the supportive care drug in treatment fields (e.g., `"fezolinetant"`, `"duloxetine"`, `"olanzapine"`)
+
+### Treatment Inference for AE Management and Survivorship Topics
+**The same treatment-inference logic that applies to Treatment selection also applies to AE management and Survivorship questions.** When a patient is described as being ON a treatment and experiencing side effects, tag those causative treatments in the treatment fields.
+
+- Example: "Premenopausal patient on OFS (GnRH agonist) + AI complaining of joint pain and hot flashes" → tag `treatment_1: "Goserelin"`, `treatment_2: "Leuprolide"` (GnRH agonists), `drug_class_1: "GnRH agonist"`, `drug_class_2: "Aromatase inhibitor"`
+- Example: "Patient on T-DXd develops ILD" → tag `treatment_1: "Trastuzumab deruxtecan"`, `drug_class_1: "ADC"`
+- Do NOT leave treatment fields blank just because the topic is AE management — the causative treatment is clinically relevant
 
 ---
 
@@ -1098,6 +1116,8 @@ Use the disease-specific drug table above to map class → individual drugs.
 
 **Always tag** when a trial name is **explicitly mentioned** in the question stem or answer choices (any topic).
 
+**Tag ALL relevant trials, not just the most prominent one.** When a clinical scenario involves multiple trials (e.g., a patient treated per KEYNOTE-522 neoadjuvant regimen who then receives adjuvant olaparib per OlympiA), tag both trials. Use trial_1, trial_2, etc. for each.
+
 **Inference ALLOWED** only when topic is:
 - "Clinical efficacy" — Infer from drug + indication + efficacy context
 - "Study design" — Infer from drug + indication + study methodology context
@@ -1138,6 +1158,13 @@ Use the disease-specific drug table above to map class → individual drugs.
 - Example: `"Prior osimertinib"` is appropriate (unique 1L EGFR TKI in NSCLC)
 
 **Examples:** `"Prior CDK4/6 inhibitor"`, `"Prior platinum"`, `"Prior immunotherapy"`, `"Prior anti-HER2"`
+
+**Breast cancer-specific regimen abbreviations to recognize:**
+- **THP** = trastuzumab + pertuzumab + taxane (standard 1L HER2+ regimen) → tag as `"Prior THP"` or `"Prior anti-HER2"`
+- **T-DM1** = trastuzumab emtansine → tag as `"Prior ADC"` or `"Prior T-DM1"`
+- **TC** = docetaxel + cyclophosphamide → prior chemotherapy (not tagged, not fundable)
+- **AC** = doxorubicin + cyclophosphamide → prior chemotherapy (not tagged, not fundable)
+- When the stem lists "treated with trastuzumab, pertuzumab, and trastuzumab emtansine", recognize this as TWO prior lines (1L: THP, 2L: T-DM1)
 
 ### 29. resistance_mechanism
 **OPTIONAL** - Specific resistance mechanism mentioned.
@@ -1252,6 +1279,7 @@ Use the disease-specific drug table above to map class → individual drugs.
 - `"Oligometastatic disease"` - Limited metastatic burden, potentially curable with local therapy
 - `"CNS-only progression"` - Isolated brain/leptomeningeal progression on systemic therapy
 - `"Bilateral breast cancer"` - Synchronous or metachronous bilateral disease
+- `"Fertility preservation"` - Question focuses on fertility counseling, embryo/oocyte cryopreservation, GnRH agonist ovarian suppression for fertility, or pregnancy planning after treatment
 - `null` - Default for most questions
 
 **When to tag:**
@@ -1624,6 +1652,9 @@ Do NOT tag "Variable" just because:
 - Substantively different clinical assertions even if sharing a broad theme
 - Example: "This patient's age does not exclude transplant" / "Deeper remission will not be possible" / "If deferred, transplant no longer an option" / "Transplant unlikely to prolong TTP" → **Heterogeneous** (different clinical rationales requiring independent evaluation)
 
+**Cross-modality treatment options:** When ALL answer options are viable treatment approaches for the same clinical problem — even if they mix modalities (drug therapy, radiation, surgery) — classify as **"Homogeneous"**. They are all "treatments" and interchangeable in category.
+- Example: A: "SRS followed by tucatinib + trastuzumab + capecitabine", B: "SRS followed by trastuzumab + capecitabine", C: "Surgery followed by WBRT", D: "WBRT" → **Homogeneous** (all are viable treatment approaches for brain metastases)
+
 **Decision rule:** If options are interchangeable in format (just swapping one entity for another), use "Homogeneous". If each option must be evaluated on its own clinical merits, use "Heterogeneous".
 
 ---
@@ -1721,8 +1752,11 @@ These rules apply to ALL diseases. Disease-specific rules in the disease module 
 Only tag treatments, biomarkers, toxicities, and other clinical entities from the CORRECT answer. Do NOT tag entities from incorrect options (distractors).
 - **Standard questions ("Which of the following...")**: Tag ONLY entities from the correct answer
 - **Negative lead-ins ("All EXCEPT", "Which is NOT")**: Tag the INCORRECT options (distractors) instead, as they represent the true/factual statements. The correct answer is the exception and should NOT be tagged as a treatment/biomarker.
+- **"Which statement is FALSE/INCORRECT?"**: The correct answer is the false statement — do NOT treat it as the recommended approach. Tag clinical entities from the TRUE distractors instead.
 - **Compound answers ("A and B", "All of the above")**: Tag all components that make up the correct answer
-- **Example**: If Q asks "Which toxicity is most associated with X?" and A: CRS, B: ICANS, C: Neuropathy, D: Hepatotoxicity with correct answer A, ONLY tag CRS as toxicity, NOT the distractors.
+- **Example (standard)**: If Q asks "Which toxicity is most associated with X?" and A: CRS, B: ICANS, C: Neuropathy, D: Hepatotoxicity with correct answer A, ONLY tag CRS as toxicity, NOT the distractors.
+- **Example (EXCEPT — toxicity)**: Q asks "Which AE is NOT seen with sacituzumab govitecan or datopotamab deruxtecan?" with correct answer D. Tag toxicities from options A, B, C (the real AEs), NOT option D (which is the AE that does NOT occur).
+- **Example (FALSE — treatment)**: Q asks about DCIS: "Which statement is FALSE?" and correct answer mentions mastectomy. Do NOT tag mastectomy as the treatment of choice — it is the false statement. Tag clinical entities from the true distractors instead.
 
 ---
 
