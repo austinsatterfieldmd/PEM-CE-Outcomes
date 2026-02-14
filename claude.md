@@ -2,17 +2,23 @@
 
 This file provides context and guidelines for Claude Code when working on this project.
 
+## Dashboard Deployment
+
+**The production dashboard is deployed on Vercel and reads/writes directly to Supabase.**
+
+- **ALWAYS assume the user is viewing the Vercel deployment**, not a local server.
+- **Supabase is the single source of truth** for all dashboard data. SQLite is legacy/local-only.
+- When querying data to match what the user sees, query **Supabase** (not SQLite).
+- Import pipeline: Tag questions → Import directly to **Supabase** (`--target supabase` or `sync_new_to_supabase.py`)
+- No local backend is needed for normal operations. The user does NOT need to run uvicorn.
+
 ## 🚀 New Conversation Checklist
 
-**At the start of each new conversation, remind the user:**
+**At the start of each new conversation:**
 
-1. **Backend may not be running** - Background processes don't persist across conversations
-2. **Check if dashboard is working** - If showing stale data, backend needs restart
-3. **User should run backend in their own terminal** (so it persists):
-   ```powershell
-   cd "c:\Dev\CE-Outcomes-Dashboard\dashboard"
-   python -m uvicorn backend.main:app --reload --host 127.0.0.1 --port 8000
-   ```
+1. **Assume Vercel + Supabase** - The user views the dashboard on Vercel, which reads from Supabase directly
+2. **No local backend needed** - Do NOT ask the user to start uvicorn unless they are doing local frontend development
+3. **If data looks stale**, check whether the import to Supabase completed (not whether a local server is running)
 
 ---
 
