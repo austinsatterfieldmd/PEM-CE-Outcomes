@@ -621,6 +621,9 @@ Tag "Variable" with Homogeneous distractors ONLY when one answer contains **addi
 5. **Transplant is only cure** - But limited to younger, fit, higher-risk patients
 6. **Driver mutations matter** - JAK2/CALR/MPL for diagnosis, HMR mutations for prognosis
 7. **Tag from CORRECT answer only** - Don't tag distractors
+   - **Standard questions ("Which of the following...")**: Tag ONLY entities from the correct answer
+   - **Negative lead-ins ("All EXCEPT", "Which is NOT")**: Tag the INCORRECT options (distractors) instead, as they represent the true/factual statements. The correct answer is the exception and should NOT be tagged as a treatment/biomarker.
+   - **Compound answers ("A and B", "All of the above")**: Tag all components that make up the correct answer
 
 ---
 

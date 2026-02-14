@@ -148,6 +148,9 @@ Usually null for CTCL unless transplant discussed.
 
 **Rule 1: Tag from CORRECT ANSWER only**
 Do NOT tag drugs from distractors.
+- **Standard questions ("Which of the following...")**: Tag ONLY entities from the correct answer
+- **Negative lead-ins ("All EXCEPT", "Which is NOT")**: Tag the INCORRECT options (distractors) instead, as they represent the true/factual statements. The correct answer is the exception and should NOT be tagged as a treatment/biomarker.
+- **Compound answers ("A and B", "All of the above")**: Tag all components that make up the correct answer
 
 **Rule 2: Subject vs Comparator**
 Tag ONLY the drug that is the SUBJECT of the teaching point.
