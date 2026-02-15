@@ -277,7 +277,7 @@ export interface Stats {
 
 // Report types
 export type TagGroupBy =
-  | 'topic' | 'disease_state' | 'disease_stage' | 'disease_type' | 'treatment' | 'biomarker' | 'trial'
+  | 'topic' | 'disease_state' | 'disease_stage' | 'disease_type' | 'treatment_line' | 'treatment' | 'biomarker' | 'trial'
   // Patient Characteristics (new in 70-field schema)
   | 'treatment_eligibility' | 'age_group' | 'fitness_status' | 'organ_dysfunction'
   // Treatment Metadata

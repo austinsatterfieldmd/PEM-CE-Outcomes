@@ -51,15 +51,34 @@ const AUDIENCE_SEGMENTS: { value: AudienceSegment; label: string; color: string 
   { value: 'academic', label: 'Academic', color: '#ef4444' },
 ]
 
-// Group by options
-const GROUP_BY_OPTIONS: { value: TagGroupBy; label: string }[] = [
-  { value: 'topic', label: 'Topic' },
-  { value: 'disease_state', label: 'Disease State' },
-  { value: 'disease_stage', label: 'Disease Stage' },
-  { value: 'disease_type', label: 'Disease Type' },
-  { value: 'treatment', label: 'Treatment' },
-  { value: 'biomarker', label: 'Biomarker' },
-  { value: 'trial', label: 'Trial' },
+// Group by options organized by category
+const GROUP_BY_OPTIONS: { value: TagGroupBy; label: string; group: string }[] = [
+  // Core
+  { value: 'topic', label: 'Topic', group: 'Core' },
+  { value: 'disease_state', label: 'Disease State', group: 'Core' },
+  { value: 'disease_stage', label: 'Disease Stage', group: 'Core' },
+  { value: 'disease_type', label: 'Disease Type', group: 'Core' },
+  { value: 'treatment_line', label: 'Treatment Line', group: 'Core' },
+  { value: 'treatment', label: 'Treatment', group: 'Core' },
+  { value: 'biomarker', label: 'Biomarker', group: 'Core' },
+  { value: 'trial', label: 'Trial', group: 'Core' },
+  // Treatment Metadata
+  { value: 'drug_class', label: 'Drug Class', group: 'Treatment' },
+  { value: 'drug_target', label: 'Drug Target', group: 'Treatment' },
+  // Clinical Context
+  { value: 'metastatic_site', label: 'Metastatic Site', group: 'Clinical' },
+  { value: 'performance_status', label: 'Performance Status', group: 'Clinical' },
+  // Safety
+  { value: 'toxicity_type', label: 'Toxicity Type', group: 'Safety' },
+  { value: 'toxicity_organ', label: 'Toxicity Organ', group: 'Safety' },
+  // Efficacy
+  { value: 'efficacy_endpoint', label: 'Efficacy Endpoint', group: 'Efficacy' },
+  { value: 'clinical_benefit', label: 'Clinical Benefit', group: 'Efficacy' },
+  // Evidence
+  { value: 'guideline_source', label: 'Guideline Source', group: 'Evidence' },
+  { value: 'evidence_type', label: 'Evidence Type', group: 'Evidence' },
+  // Question Quality
+  { value: 'cme_outcome_level', label: 'CME Outcome Level', group: 'Quality' },
 ]
 
 // Chart format options
@@ -477,19 +496,26 @@ export default function ReportBuilder() {
               <p className="text-slate-400 text-sm mb-4">
                 Choose what to display on the X-axis of your chart.
               </p>
-              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
-                {GROUP_BY_OPTIONS.map(option => (
-                  <button
-                    key={option.value}
-                    onClick={() => setGroupBy(option.value)}
-                    className={`px-4 py-3 rounded-lg text-sm font-medium transition-all ${
-                      groupBy === option.value
-                        ? 'bg-indigo-500 text-white'
-                        : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                    }`}
-                  >
-                    {option.label}
-                  </button>
+              <div className="space-y-3">
+                {Array.from(new Set(GROUP_BY_OPTIONS.map(o => o.group))).map(group => (
+                  <div key={group}>
+                    <span className="text-xs text-slate-500 uppercase tracking-wider font-medium">{group}</span>
+                    <div className="flex flex-wrap gap-2 mt-1">
+                      {GROUP_BY_OPTIONS.filter(o => o.group === group).map(option => (
+                        <button
+                          key={option.value}
+                          onClick={() => setGroupBy(option.value)}
+                          className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                            groupBy === option.value
+                              ? 'bg-indigo-500 text-white'
+                              : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                          }`}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>

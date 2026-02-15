@@ -610,8 +610,11 @@ export async function aggregateByTag(
     p_topics: filters.topics?.length ? filters.topics : null,
     p_disease_states: filters.disease_states?.length ? filters.disease_states : null,
     p_disease_stages: filters.disease_stages?.length ? filters.disease_stages : null,
+    p_disease_types: filters.disease_types?.length ? filters.disease_types : null,
     p_treatment_lines: filters.treatment_lines?.length ? filters.treatment_lines : null,
     p_treatments: filters.treatments?.length ? filters.treatments : null,
+    p_biomarkers: filters.biomarkers?.length ? filters.biomarkers : null,
+    p_trials: filters.trials?.length ? filters.trials : null,
     p_activities: filters.activities?.length ? filters.activities : null,
     p_quarters: filters.quarters?.length ? filters.quarters : null
   })
@@ -622,12 +625,28 @@ export async function aggregateByTag(
 
 export async function aggregateByTagWithSegments(
   groupBy: TagGroupBy,
-  _segments: AudienceSegment[],
+  segments: AudienceSegment[],
   filters: ReportFilters
 ): Promise<AggregatedReportResponse> {
-  // Use the same aggregate_by_tag for now
-  // A dedicated with-segments RPC can be added later for cross-tab views
-  return aggregateByTag(groupBy, filters)
+  const supabase = getSupabaseClient()
+
+  const { data, error } = await supabase.rpc('aggregate_by_tag_with_segments', {
+    p_group_by: groupBy,
+    p_segments: segments,
+    p_topics: filters.topics?.length ? filters.topics : null,
+    p_disease_states: filters.disease_states?.length ? filters.disease_states : null,
+    p_disease_stages: filters.disease_stages?.length ? filters.disease_stages : null,
+    p_disease_types: filters.disease_types?.length ? filters.disease_types : null,
+    p_treatment_lines: filters.treatment_lines?.length ? filters.treatment_lines : null,
+    p_treatments: filters.treatments?.length ? filters.treatments : null,
+    p_biomarkers: filters.biomarkers?.length ? filters.biomarkers : null,
+    p_trials: filters.trials?.length ? filters.trials : null,
+    p_activities: filters.activities?.length ? filters.activities : null,
+    p_quarters: filters.quarters?.length ? filters.quarters : null
+  })
+
+  if (error) throw new Error(`Aggregate by tag with segments failed: ${error.message}`)
+  return { data: data || [] } as AggregatedReportResponse
 }
 
 export async function aggregateByDemographic(
