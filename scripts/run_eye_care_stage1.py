@@ -144,9 +144,28 @@ def parse_eye_care_response(content: str) -> dict:
     try:
         parsed = json.loads(content)
         return _normalize_parsed(parsed)
-    except json.JSONDecodeError as e:
-        logger.warning(f"Failed to parse JSON: {e} | Content: {content[:200]}")
-        return default
+    except json.JSONDecodeError:
+        pass
+
+    # Strategy 4: Handle truncated JSON — extract fields with regex
+    result = dict(default)
+    eye_care_match = re.search(r'"is_eye_care"\s*:\s*(true|false)', content, re.IGNORECASE)
+    if eye_care_match:
+        result["is_eye_care"] = eye_care_match.group(1).lower() == "true"
+
+    condition_match = re.search(r'"condition"\s*:\s*"([^"]+)"', content)
+    if condition_match:
+        result["condition"] = condition_match.group(1).strip()
+
+    secondary_match = re.search(r'"condition_secondary"\s*:\s*"([^"]+)"', content)
+    if secondary_match:
+        result["condition_secondary"] = secondary_match.group(1).strip()
+
+    if result["is_eye_care"] is not None or result["condition"] is not None:
+        return result
+
+    logger.warning(f"Failed to parse JSON: Content: {content[:200]}")
+    return default
 
 
 def _normalize_parsed(parsed: dict) -> dict:
@@ -299,7 +318,7 @@ async def classify_question(
         messages=messages,
         models=VOTING_MODELS,
         temperature=0.0,
-        max_tokens=500,
+        max_tokens=1000,
     )
 
     # Parse each model's response
