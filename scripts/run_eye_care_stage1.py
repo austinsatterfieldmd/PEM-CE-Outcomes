@@ -33,7 +33,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 load_dotenv(PROJECT_ROOT / ".env")
 
-from src.core.taggers.openrouter_client import OpenRouterClient
+from src.core.taggers.openrouter_client import OpenRouterClient, RetryConfig
 
 logging.basicConfig(
     level=logging.INFO,
@@ -351,7 +351,9 @@ async def classify_batch(
     tasks = []
     for q in questions:
         activities = fetch_question_activities(supabase_client, q["id"])
-        tasks.append(classify_question(llm_client, system_prompt, q, activities))
+        # Wrap each classification in a 90-second timeout to prevent hung requests
+        coro = classify_question(llm_client, system_prompt, q, activities)
+        tasks.append(asyncio.wait_for(coro, timeout=90.0))
 
     results = await asyncio.gather(*tasks, return_exceptions=True)
 
@@ -418,7 +420,7 @@ async def run(args):
 
     # Init clients
     supabase_client = get_supabase_client()
-    llm_client = OpenRouterClient()
+    llm_client = OpenRouterClient(retry_config=RetryConfig(max_retries=1))
     logger.info("Initialized Supabase + OpenRouter clients")
 
     # Fetch unclassified questions
