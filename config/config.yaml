@@ -1,9 +1,9 @@
 # Automated CE Outcomes Dashboard - Main Configuration
 
 app:
-  name: "Automated CE Outcomes Dashboard"
+  name: "PEM Eye Care CE Outcomes Dashboard"
   version: "3.0.0"
-  description: "CME question tagging with 3-model LLM voting"
+  description: "Eye care CE question tagging with 3-model LLM voting"
 
 # Database settings
 database:

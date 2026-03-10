@@ -184,3 +184,6 @@ desktop.ini
 Retagging*.md
 .vercel
 .env*.local
+
+# Oncology reference prompts (local only, not committed)
+prompts/_oncology_reference/
