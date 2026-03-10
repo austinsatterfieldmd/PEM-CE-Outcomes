@@ -269,6 +269,16 @@ def main():
     df_eye = df[eye_care_mask].copy()
     print(f"  Eye care matches: {len(df_eye)}")
 
+    # Drop rows with missing QGD or question stem
+    missing_qgd = df_eye["QUESTIONGROUPDESIGNATION"].isna().sum()
+    if missing_qgd > 0:
+        print(f"  Skipping {missing_qgd} rows with missing QUESTIONGROUPDESIGNATION")
+        df_eye = df_eye.dropna(subset=["QUESTIONGROUPDESIGNATION"])
+    missing_stem = df_eye["OPTIMIZEDQUESTION"].isna().sum()
+    if missing_stem > 0:
+        print(f"  Skipping {missing_stem} rows with missing question stem")
+        df_eye = df_eye.dropna(subset=["OPTIMIZEDQUESTION"])
+
     # Deduplicate by QUESTIONGROUPDESIGNATION (keep first occurrence)
     before_dedup = len(df_eye)
     df_eye = df_eye.drop_duplicates(subset=["QUESTIONGROUPDESIGNATION"], keep="first")
