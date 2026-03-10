@@ -110,8 +110,10 @@ def fetch_question_activities(client, question_id):
 
 def parse_eye_care_response(content: str) -> dict:
     """Parse JSON response from LLM for eye care classification."""
-    content = content.strip()
     default = {"is_eye_care": None, "condition": None, "condition_secondary": None}
+    if not content:
+        return default
+    content = content.strip()
 
     # Strategy 1: Extract from ```json ... ``` code block
     json_block = re.search(r'```(?:json)?\s*(\{[\s\S]*?\})\s*```', content)
