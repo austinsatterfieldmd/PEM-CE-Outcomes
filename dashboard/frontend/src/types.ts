@@ -13,6 +13,8 @@ export interface Question {
   treatment: string | null
   pre_score: number | null
   post_score: number | null
+  pre_n: number | null
+  post_n: number | null
   knowledge_gain: number | null
   sample_size: number | null
   activity_count: number

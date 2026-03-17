@@ -219,7 +219,7 @@ export function QuestionTable({ questions, loading, onSelect, selectedId, showWo
               {/* Topic */}
               <div className="col-span-2 mt-2 md:mt-0">
                 {question.topic ? (
-                  <span className="px-2 py-0.5 bg-primary-50 text-primary-700 rounded text-xs font-medium">
+                  <span className="inline-block px-2 py-0.5 bg-primary-50 text-primary-700 rounded text-xs font-medium leading-snug line-clamp-2">
                     {question.topic}
                   </span>
                 ) : (
@@ -241,15 +241,21 @@ export function QuestionTable({ questions, loading, onSelect, selectedId, showWo
               <div className="col-span-2 mt-3 md:mt-0">
                 {question.pre_score != null || question.post_score != null ? (
                   <div className="space-y-0.5">
-                    <div className="flex items-center gap-2 text-xs">
+                    <div className="flex items-center gap-2 text-xs flex-wrap">
                       {question.pre_score != null && (
                         <span className="text-slate-500">
                           Pre: <span className="font-medium text-slate-700">{question.pre_score?.toFixed(1)}%</span>
+                          {question.pre_n != null && question.pre_n > 0 && (
+                            <span className="text-slate-400 ml-0.5">(n={question.pre_n.toLocaleString()})</span>
+                          )}
                         </span>
                       )}
                       {question.post_score != null && (
                         <span className="text-slate-500">
                           Post: <span className="font-medium text-slate-700">{question.post_score?.toFixed(1)}%</span>
+                          {question.post_n != null && question.post_n > 0 && (
+                            <span className="text-slate-400 ml-0.5">(n={question.post_n.toLocaleString()})</span>
+                          )}
                         </span>
                       )}
                     </div>
