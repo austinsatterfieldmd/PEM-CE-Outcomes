@@ -271,6 +271,7 @@ class DatabaseService:
                 ("source_question_id", "INTEGER"),  # Original question ID from checkpoint
                 ("source_id", "INTEGER"),           # Source ID (QGD) for linking to Snowflake
                 ("canonical_source_id", "TEXT"),    # For duplicates: points to canonical's source_id (defaults to own source_id)
+                ("is_oncology", "INTEGER DEFAULT 1"),  # Relevance flag (1=eye care question, 0=excluded)
             ]
             for col_name, col_type in questions_migration_columns:
                 try:

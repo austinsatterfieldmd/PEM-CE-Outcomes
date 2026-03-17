@@ -526,85 +526,85 @@ function App() {
         <div className="max-w-[1600px] mx-auto px-6 py-3">
           <div className="flex items-center justify-between">
             {/* Logo and Title */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 flex-shrink-0">
               <img
                 src={perLogoWhite}
                 alt="PER Logo"
                 className="h-10 w-auto"
               />
-              <div className="border-l border-white/30 pl-4">
-                <h1 className="text-lg font-bold text-white">
+              <div className="border-l border-white/30 pl-3">
+                <h1 className="text-lg font-bold text-white whitespace-nowrap">
                   Outcomes Questions Database
                 </h1>
-                <p className="text-sm text-white/70">
+                <p className="text-sm text-white/70 whitespace-nowrap">
                   Search and analyze outcomes questions
                 </p>
               </div>
             </div>
 
-            {/* Tab Navigation - shifted right with more spacing */}
-            <div className="flex items-center gap-2 ml-8">
+            {/* Tab Navigation */}
+            <div className="flex items-center gap-1.5 ml-6">
               <button
                 onClick={() => setActiveTab('explorer')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all whitespace-nowrap ${
                   activeTab === 'explorer'
                     ? 'bg-white text-primary-500 shadow-lg'
                     : 'text-white/80 hover:text-white hover:bg-white/10'
                 }`}
               >
-                <Database className="w-4 h-4" />
+                <Database className="w-4 h-4 flex-shrink-0" />
                 Question Explorer
               </button>
               <button
                 onClick={() => setActiveTab('reports')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all whitespace-nowrap ${
                   activeTab === 'reports'
                     ? 'bg-white text-primary-500 shadow-lg'
                     : 'text-white/80 hover:text-white hover:bg-white/10'
                 }`}
               >
-                <BarChart3 className="w-4 h-4" />
+                <BarChart3 className="w-4 h-4 flex-shrink-0" />
                 Reports
               </button>
               <button
                 onClick={() => setActiveTab('review')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all whitespace-nowrap ${
                   activeTab === 'review'
                     ? 'bg-white text-primary-500 shadow-lg'
                     : 'text-white/80 hover:text-white hover:bg-white/10'
                 }`}
               >
-                <ClipboardCheck className="w-4 h-4" />
+                <ClipboardCheck className="w-4 h-4 flex-shrink-0" />
                 Review
               </button>
               <button
                 onClick={() => setActiveTab('qsuite')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all whitespace-nowrap ${
                   activeTab === 'qsuite'
                     ? 'bg-white text-primary-500 shadow-lg'
                     : 'text-white/80 hover:text-white hover:bg-white/10'
                 }`}
               >
-                <Zap className="w-4 h-4" />
+                <Zap className="w-4 h-4 flex-shrink-0" />
                 Q-Suite
               </button>
               {isAdmin && (
                 <button
                   onClick={() => setActiveTab('settings')}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all whitespace-nowrap ${
                     activeTab === 'settings'
                       ? 'bg-white text-primary-500 shadow-lg'
                       : 'text-white/80 hover:text-white hover:bg-white/10'
                   }`}
                 >
-                  <Settings className="w-4 h-4" />
+                  <Settings className="w-4 h-4 flex-shrink-0" />
                   Settings
                 </button>
               )}
             </div>
 
             {/* Export Edits (Vercel Mode) + User Menu */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 flex-shrink-0">
               <ExportEditsButton />
               <UserMenu />
             </div>
