@@ -11,6 +11,7 @@ import {
   LabelList,
 } from 'recharts'
 import type { AggregatedMetric } from '../types'
+import { SEGMENT_COLORS, SEGMENT_LABELS } from '../config/segmentConfig'
 
 type ChartFormat = 'single' | 'stacked' | 'grouped'
 
@@ -26,28 +27,6 @@ interface PerformanceBarChartProps {
   chartFormat?: ChartFormat
   showN?: boolean
   whiteBackground?: boolean
-}
-
-// Segment colors for comparison view - lighter pre, darker post
-const SEGMENT_COLORS: Record<string, { pre: string; post: string }> = {
-  overall: { pre: '#93c5fd', post: '#1d4ed8' },           // Blue (light -> dark)
-  medical_oncologist: { pre: '#c4b5fd', post: '#6d28d9' }, // Purple (light -> dark)
-  surgical_oncologist: { pre: '#f9a8d4', post: '#be185d' }, // Pink (light -> dark)
-  radiation_oncologist: { pre: '#fdba74', post: '#c2410c' }, // Orange (light -> dark)
-  app: { pre: '#6ee7b7', post: '#047857' },               // Green (light -> dark)
-  community: { pre: '#67e8f9', post: '#0e7490' },         // Cyan (light -> dark)
-  academic: { pre: '#fca5a5', post: '#b91c1c' },          // Red (light -> dark)
-}
-
-// Segment display names
-const SEGMENT_LABELS: Record<string, string> = {
-  overall: 'All Learners',
-  medical_oncologist: 'Med/Heme Oncs',
-  surgical_oncologist: 'Surg Oncs',
-  radiation_oncologist: 'Rad Oncs',
-  app: 'APPs',
-  community: 'Community',
-  academic: 'Academic',
 }
 
 // Custom tooltip for charts

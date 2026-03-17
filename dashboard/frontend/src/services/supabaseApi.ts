@@ -678,8 +678,7 @@ export async function aggregateBySegment(
 
 export async function getSegmentOptions(): Promise<SegmentOptions> {
   const segmentNames = [
-    'overall', 'medical_oncologist', 'app', 'academic',
-    'community', 'surgical_oncologist', 'radiation_oncologist'
+    'overall', 'ophthalmologist', 'optometrist', 'app', 'pharmacist'
   ]
   return {
     segments: segmentNames.map(s => ({ segment: s, count: 0 }))

@@ -1304,15 +1304,11 @@ export function QuestionReviewDetail({ questionId, onClose, onReviewComplete }: 
                 // Define segments with display names - Row 1: specialty, Row 2: practice setting
                 const segmentRows = [
                   [
-                    { key: 'overall', label: 'Overall' },
-                    { key: 'medical_oncologist', label: 'Med/Heme Oncs' },
-                    { key: 'surgical_oncologist', label: 'Surg Oncs' },
-                    { key: 'radiation_oncologist', label: 'Rad Oncs' },
-                    { key: 'app', label: 'APPs' },
-                  ],
-                  [
-                    { key: 'community', label: 'Community Oncs' },
-                    { key: 'academic', label: 'Academic Oncs' },
+                    { key: 'overall', label: 'All Learners' },
+                    { key: 'ophthalmologist', label: 'Ophthalmologists' },
+                    { key: 'optometrist', label: 'Optometrists' },
+                    { key: 'app', label: 'APPs/Technicians' },
+                    { key: 'pharmacist', label: 'Pharmacists' },
                   ]
                 ]
 

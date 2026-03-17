@@ -7,6 +7,7 @@ import type { QuestionDetailData, PerformanceMetric } from '../types'
 import { FIELD_GROUPS } from '../types'
 import { useAuth } from './AuthProvider'
 import { useRole } from '../contexts/RoleContext'
+import { SEGMENT_DEFS } from '../config/segmentConfig'
 
 interface QuestionDetailProps {
   questionId: number
@@ -929,19 +930,8 @@ export function QuestionDetail({ questionId, onClose, onTagsUpdated }: QuestionD
                   {/* Segment Selector */}
                   {(() => {
                     // Define segments with display names - Row 1: specialty, Row 2: practice setting
-                    const segmentRows = [
-                      [
-                        { key: 'overall', label: 'Overall' },
-                        { key: 'medical_oncologist', label: 'Med/Heme Oncs' },
-                        { key: 'surgical_oncologist', label: 'Surg Oncs' },
-                        { key: 'radiation_oncologist', label: 'Rad Oncs' },
-                        { key: 'app', label: 'APPs' },
-                      ],
-                      [
-                        { key: 'community', label: 'Community Oncs' },
-                        { key: 'academic', label: 'Academic Oncs' },
-                      ]
-                    ]
+                    const allSegments = SEGMENT_DEFS.map(s => ({ key: s.key, label: s.label }))
+                    const segmentRows = [allSegments]
 
                     // Get available segments from data
                     const availableSegments = new Set(data.performance.map(p => p.segment))

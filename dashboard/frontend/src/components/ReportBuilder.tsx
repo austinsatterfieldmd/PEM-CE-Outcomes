@@ -40,15 +40,13 @@ import type {
 type WizardStep = 'filters' | 'chart-type' | 'configure' | 'result'
 type ChartFormat = 'single' | 'stacked' | 'grouped'
 
-// Audience segment configuration
+// Audience segment configuration — built from centralized config
 const AUDIENCE_SEGMENTS: { value: AudienceSegment; label: string; color: string }[] = [
-  { value: 'overall', label: 'All Learners', color: '#6366f1' },
-  { value: 'medical_oncologist', label: 'Med/Heme Oncs', color: '#8b5cf6' },
-  { value: 'surgical_oncologist', label: 'Surg Oncs', color: '#ec4899' },
-  { value: 'radiation_oncologist', label: 'Rad Oncs', color: '#f59e0b' },
-  { value: 'app', label: 'APPs', color: '#10b981' },
-  { value: 'community', label: 'Community', color: '#3b82f6' },
-  { value: 'academic', label: 'Academic', color: '#ef4444' },
+  { value: 'overall', label: 'All Learners', color: '#1d4ed8' },
+  { value: 'ophthalmologist', label: 'Ophthalmologists', color: '#6d28d9' },
+  { value: 'optometrist', label: 'Optometrists', color: '#047857' },
+  { value: 'app', label: 'APPs/Technicians', color: '#c2410c' },
+  { value: 'pharmacist', label: 'Pharmacists', color: '#be185d' },
 ]
 
 // Group by options organized by category

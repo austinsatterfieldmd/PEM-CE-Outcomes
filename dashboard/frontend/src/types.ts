@@ -293,7 +293,7 @@ export type TagGroupBy =
   // Question Format
   | 'cme_outcome_level'
 export type DemographicSegment = 'specialty' | 'practice_setting' | 'region' | 'practice_state'
-export type AudienceSegment = 'overall' | 'medical_oncologist' | 'app' | 'academic' | 'community' | 'surgical_oncologist' | 'radiation_oncologist'
+export type AudienceSegment = 'overall' | 'ophthalmologist' | 'optometrist' | 'app' | 'pharmacist'
 
 export interface ReportFilters {
   topics?: string[]
