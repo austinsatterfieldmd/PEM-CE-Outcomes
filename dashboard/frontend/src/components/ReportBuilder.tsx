@@ -51,31 +51,20 @@ const AUDIENCE_SEGMENTS: { value: AudienceSegment; label: string; color: string 
 
 // Group by options organized by category
 const GROUP_BY_OPTIONS: { value: TagGroupBy; label: string; group: string }[] = [
-  // Core
-  { value: 'topic', label: 'Topic', group: 'Core' },
-  { value: 'disease_state', label: 'Disease State', group: 'Core' },
-  { value: 'disease_stage', label: 'Disease Stage', group: 'Core' },
-  { value: 'disease_type', label: 'Disease Type', group: 'Core' },
-  { value: 'treatment_line', label: 'Treatment Line', group: 'Core' },
-  { value: 'treatment', label: 'Treatment', group: 'Core' },
-  { value: 'biomarker', label: 'Biomarker', group: 'Core' },
-  { value: 'trial', label: 'Trial', group: 'Core' },
-  // Treatment Metadata
-  { value: 'drug_class', label: 'Drug Class', group: 'Treatment' },
-  { value: 'drug_target', label: 'Drug Target', group: 'Treatment' },
+  // Core Eye Care
+  { value: 'disease_state', label: 'Condition', group: 'Core' },
+  { value: 'disease_stage', label: 'Severity / Subtype', group: 'Core' },
+  { value: 'disease_type', label: 'Condition Category', group: 'Core' },
+  { value: 'topic', label: 'Knowledge Domain', group: 'Core' },
+  // Treatment
+  { value: 'drug_class', label: 'Treatment Modality', group: 'Treatment' },
+  { value: 'treatment', label: 'Specific Treatment', group: 'Treatment' },
   // Clinical Context
-  { value: 'metastatic_site', label: 'Metastatic Site', group: 'Clinical' },
-  { value: 'performance_status', label: 'Performance Status', group: 'Clinical' },
-  // Safety
-  { value: 'toxicity_type', label: 'Toxicity Type', group: 'Safety' },
-  { value: 'toxicity_organ', label: 'Toxicity Organ', group: 'Safety' },
-  // Efficacy
-  { value: 'efficacy_endpoint', label: 'Efficacy Endpoint', group: 'Efficacy' },
-  { value: 'clinical_benefit', label: 'Clinical Benefit', group: 'Efficacy' },
-  // Evidence
+  { value: 'biomarker', label: 'Diagnostic Marker', group: 'Clinical' },
+  { value: 'performance_status', label: 'Clinical Setting', group: 'Clinical' },
+  // Evidence & Quality
   { value: 'guideline_source', label: 'Guideline Source', group: 'Evidence' },
   { value: 'evidence_type', label: 'Evidence Type', group: 'Evidence' },
-  // Question Quality
   { value: 'cme_outcome_level', label: 'CME Outcome Level', group: 'Quality' },
 ]
 
@@ -129,7 +118,7 @@ export default function ReportBuilder() {
   const [segmentOptions, setSegmentOptions] = useState<SegmentOptions | null>(null)
 
   // Chart configuration state
-  const [groupBy, setGroupBy] = useState<TagGroupBy>('topic')
+  const [groupBy, setGroupBy] = useState<TagGroupBy>('disease_state')
   const [selectedAudiences, setSelectedAudiences] = useState<AudienceSegment[]>(['overall'])
   const [chartFormat, setChartFormat] = useState<ChartFormat>('single')
   const [chartLabels, setChartLabels] = useState({
@@ -305,13 +294,11 @@ export default function ReportBuilder() {
         'ID': q.id,
         'Question': q.question_stem,
         'Topic': q.topic || '',
-        'Disease State': q.disease_state || '',
-        'Disease Type': q.disease_type || '',
-        'Disease Stage': q.disease_stage || '',
+        'Condition': q.disease_state || '',
+        'Condition Category': q.disease_type || '',
+        'Severity / Subtype': q.disease_stage || '',
         'Treatment': q.treatment || '',
-        'Treatment Line': q.treatment_line || '',
-        'Biomarker': q.biomarker || '',
-        'Trial': q.trial || '',
+        'Diagnostic Marker': q.biomarker || '',
         'Pre Score': q.pre_score,
         'Post Score': q.post_score,
         'Knowledge Gain': q.knowledge_gain,
@@ -425,25 +412,25 @@ export default function ReportBuilder() {
             {dynamicFilterOptions && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <FilterSection
-                  title="Disease State"
+                  title="Condition"
                   options={dynamicFilterOptions.disease_states || []}
                   selected={filters.disease_states || []}
                   onToggle={(v) => toggleFilter('disease_states', v)}
                 />
                 <FilterSection
-                  title="Disease Type"
+                  title="Condition Category"
                   options={dynamicFilterOptions.disease_types || []}
                   selected={filters.disease_types || []}
                   onToggle={(v) => toggleFilter('disease_types', v)}
                 />
                 <FilterSection
-                  title="Disease Stage"
+                  title="Severity / Subtype"
                   options={dynamicFilterOptions.disease_stages || []}
                   selected={filters.disease_stages || []}
                   onToggle={(v) => toggleFilter('disease_stages', v)}
                 />
                 <FilterSection
-                  title="Topic"
+                  title="Knowledge Domain"
                   options={dynamicFilterOptions.topics || []}
                   selected={filters.topics || []}
                   onToggle={(v) => toggleFilter('topics', v)}
@@ -455,22 +442,10 @@ export default function ReportBuilder() {
                   onToggle={(v) => toggleFilter('treatments', v)}
                 />
                 <FilterSection
-                  title="Treatment Line"
-                  options={dynamicFilterOptions.treatment_lines || []}
-                  selected={filters.treatment_lines || []}
-                  onToggle={(v) => toggleFilter('treatment_lines', v)}
-                />
-                <FilterSection
-                  title="Biomarker"
+                  title="Diagnostic Marker"
                   options={dynamicFilterOptions.biomarkers || []}
                   selected={filters.biomarkers || []}
                   onToggle={(v) => toggleFilter('biomarkers', v)}
-                />
-                <FilterSection
-                  title="Trial"
-                  options={dynamicFilterOptions.trials || []}
-                  selected={filters.trials || []}
-                  onToggle={(v) => toggleFilter('trials', v)}
                 />
                 <FilterSection
                   title="Activity"
